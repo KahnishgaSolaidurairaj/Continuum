@@ -1,19 +1,10 @@
-//
-//  SpeechEvaluationApp.swift
-//  SpeechEvaluation
-//
-//  Created by 59 BGCC Loan Library on 6/30/26.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
-struct SpeechEvaluationApp: App {
+struct ContinuumApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+        let schema = Schema([PracticeSessionRecord.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {

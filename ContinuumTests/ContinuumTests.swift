@@ -1,14 +1,12 @@
 //
-//  SpeechEvaluationTests.swift
-//  SpeechEvaluationTests
-//
-//  Created by 59 BGCC Loan Library on 6/30/26.
+//  ContinuumTests.swift
+//  ContinuumTests
 //
 
 import Testing
-@testable import SpeechEvaluation
+@testable import Continuum
 
-struct SpeechEvaluationTests {
+struct ContinuumTests {
 
     @Test func example() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.

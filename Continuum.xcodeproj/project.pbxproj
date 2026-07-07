@@ -12,37 +12,37 @@
 			containerPortal = 63F5F65E2FF44F0D009993E2 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 63F5F6652FF44F0D009993E2;
-			remoteInfo = SpeechEvaluation;
+			remoteInfo = Continuum;
 		};
 		63F5F6802FF44F0F009993E2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 63F5F65E2FF44F0D009993E2 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 63F5F6652FF44F0D009993E2;
-			remoteInfo = SpeechEvaluation;
+			remoteInfo = Continuum;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		63F5F6662FF44F0D009993E2 /* SpeechEvaluation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpeechEvaluation.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		63F5F6752FF44F0F009993E2 /* SpeechEvaluationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeechEvaluationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		63F5F67F2FF44F0F009993E2 /* SpeechEvaluationUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeechEvaluationUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		63F5F6662FF44F0D009993E2 /* Continuum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Continuum.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		63F5F6752FF44F0F009993E2 /* ContinuumTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ContinuumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		63F5F67F2FF44F0F009993E2 /* ContinuumUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ContinuumUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		63F5F6682FF44F0D009993E2 /* SpeechEvaluation */ = {
+		63F5F6682FF44F0D009993E2 /* Continuum */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SpeechEvaluation;
+			path = Continuum;
 			sourceTree = "<group>";
 		};
-		63F5F6782FF44F0F009993E2 /* SpeechEvaluationTests */ = {
+		63F5F6782FF44F0F009993E2 /* ContinuumTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SpeechEvaluationTests;
+			path = ContinuumTests;
 			sourceTree = "<group>";
 		};
-		63F5F6822FF44F0F009993E2 /* SpeechEvaluationUITests */ = {
+		63F5F6822FF44F0F009993E2 /* ContinuumUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SpeechEvaluationUITests;
+			path = ContinuumUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +75,9 @@
 		63F5F65D2FF44F0D009993E2 = {
 			isa = PBXGroup;
 			children = (
-				63F5F6682FF44F0D009993E2 /* SpeechEvaluation */,
-				63F5F6782FF44F0F009993E2 /* SpeechEvaluationTests */,
-				63F5F6822FF44F0F009993E2 /* SpeechEvaluationUITests */,
+				63F5F6682FF44F0D009993E2 /* Continuum */,
+				63F5F6782FF44F0F009993E2 /* ContinuumTests */,
+				63F5F6822FF44F0F009993E2 /* ContinuumUITests */,
 				63F5F6672FF44F0D009993E2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +85,9 @@
 		63F5F6672FF44F0D009993E2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				63F5F6662FF44F0D009993E2 /* SpeechEvaluation.app */,
-				63F5F6752FF44F0F009993E2 /* SpeechEvaluationTests.xctest */,
-				63F5F67F2FF44F0F009993E2 /* SpeechEvaluationUITests.xctest */,
+				63F5F6662FF44F0D009993E2 /* Continuum.app */,
+				63F5F6752FF44F0F009993E2 /* ContinuumTests.xctest */,
+				63F5F67F2FF44F0F009993E2 /* ContinuumUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		63F5F6652FF44F0D009993E2 /* SpeechEvaluation */ = {
+		63F5F6652FF44F0D009993E2 /* Continuum */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 63F5F6892FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "SpeechEvaluation" */;
+			buildConfigurationList = 63F5F6892FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "Continuum" */;
 			buildPhases = (
 				63F5F6622FF44F0D009993E2 /* Sources */,
 				63F5F6632FF44F0D009993E2 /* Frameworks */,
@@ -108,18 +108,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				63F5F6682FF44F0D009993E2 /* SpeechEvaluation */,
+				63F5F6682FF44F0D009993E2 /* Continuum */,
 			);
-			name = SpeechEvaluation;
+			name = Continuum;
 			packageProductDependencies = (
 			);
-			productName = SpeechEvaluation;
-			productReference = 63F5F6662FF44F0D009993E2 /* SpeechEvaluation.app */;
+			productName = Continuum;
+			productReference = 63F5F6662FF44F0D009993E2 /* Continuum.app */;
 			productType = "com.apple.product-type.application";
 		};
-		63F5F6742FF44F0F009993E2 /* SpeechEvaluationTests */ = {
+		63F5F6742FF44F0F009993E2 /* ContinuumTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 63F5F68C2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "SpeechEvaluationTests" */;
+			buildConfigurationList = 63F5F68C2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "ContinuumTests" */;
 			buildPhases = (
 				63F5F6712FF44F0F009993E2 /* Sources */,
 				63F5F6722FF44F0F009993E2 /* Frameworks */,
@@ -131,18 +131,18 @@
 				63F5F6772FF44F0F009993E2 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				63F5F6782FF44F0F009993E2 /* SpeechEvaluationTests */,
+				63F5F6782FF44F0F009993E2 /* ContinuumTests */,
 			);
-			name = SpeechEvaluationTests;
+			name = ContinuumTests;
 			packageProductDependencies = (
 			);
-			productName = SpeechEvaluationTests;
-			productReference = 63F5F6752FF44F0F009993E2 /* SpeechEvaluationTests.xctest */;
+			productName = ContinuumTests;
+			productReference = 63F5F6752FF44F0F009993E2 /* ContinuumTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		63F5F67E2FF44F0F009993E2 /* SpeechEvaluationUITests */ = {
+		63F5F67E2FF44F0F009993E2 /* ContinuumUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 63F5F68F2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "SpeechEvaluationUITests" */;
+			buildConfigurationList = 63F5F68F2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "ContinuumUITests" */;
 			buildPhases = (
 				63F5F67B2FF44F0F009993E2 /* Sources */,
 				63F5F67C2FF44F0F009993E2 /* Frameworks */,
@@ -154,13 +154,13 @@
 				63F5F6812FF44F0F009993E2 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				63F5F6822FF44F0F009993E2 /* SpeechEvaluationUITests */,
+				63F5F6822FF44F0F009993E2 /* ContinuumUITests */,
 			);
-			name = SpeechEvaluationUITests;
+			name = ContinuumUITests;
 			packageProductDependencies = (
 			);
-			productName = SpeechEvaluationUITests;
-			productReference = 63F5F67F2FF44F0F009993E2 /* SpeechEvaluationUITests.xctest */;
+			productName = ContinuumUITests;
+			productReference = 63F5F67F2FF44F0F009993E2 /* ContinuumUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 63F5F6612FF44F0D009993E2 /* Build configuration list for PBXProject "SpeechEvaluation" */;
+			buildConfigurationList = 63F5F6612FF44F0D009993E2 /* Build configuration list for PBXProject "Continuum" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				63F5F6652FF44F0D009993E2 /* SpeechEvaluation */,
-				63F5F6742FF44F0F009993E2 /* SpeechEvaluationTests */,
-				63F5F67E2FF44F0F009993E2 /* SpeechEvaluationUITests */,
+				63F5F6652FF44F0D009993E2 /* Continuum */,
+				63F5F6742FF44F0F009993E2 /* ContinuumTests */,
+				63F5F67E2FF44F0F009993E2 /* ContinuumUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		63F5F6772FF44F0F009993E2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 63F5F6652FF44F0D009993E2 /* SpeechEvaluation */;
+			target = 63F5F6652FF44F0D009993E2 /* Continuum */;
 			targetProxy = 63F5F6762FF44F0F009993E2 /* PBXContainerItemProxy */;
 		};
 		63F5F6812FF44F0F009993E2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 63F5F6652FF44F0D009993E2 /* SpeechEvaluation */;
+			target = 63F5F6652FF44F0D009993E2 /* Continuum */;
 			targetProxy = 63F5F6802FF44F0F009993E2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -395,8 +395,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used for ARKit face tracking to coach pronunciation.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access analyzes how you produce each sound.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -407,7 +410,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com..SpeechEvaluation;
+				PRODUCT_BUNDLE_IDENTIFIER = com..Continuum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -426,8 +429,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used for ARKit face tracking to coach pronunciation.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access analyzes how you produce each sound.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -438,7 +444,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com..SpeechEvaluation;
+				PRODUCT_BUNDLE_IDENTIFIER = com..Continuum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -459,7 +465,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com..SpeechEvaluationTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com..ContinuumTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -467,7 +473,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpeechEvaluation.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SpeechEvaluation";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Continuum.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Continuum";
 			};
 			name = Debug;
 		};
@@ -480,7 +486,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com..SpeechEvaluationTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com..ContinuumTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -488,7 +494,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpeechEvaluation.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SpeechEvaluation";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Continuum.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Continuum";
 			};
 			name = Release;
 		};
@@ -499,7 +505,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com..SpeechEvaluationUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com..ContinuumUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -507,7 +513,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = SpeechEvaluation;
+				TEST_TARGET_NAME = Continuum;
 			};
 			name = Debug;
 		};
@@ -518,7 +524,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com..SpeechEvaluationUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com..ContinuumUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -526,14 +532,14 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = SpeechEvaluation;
+				TEST_TARGET_NAME = Continuum;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		63F5F6612FF44F0D009993E2 /* Build configuration list for PBXProject "SpeechEvaluation" */ = {
+		63F5F6612FF44F0D009993E2 /* Build configuration list for PBXProject "Continuum" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				63F5F6872FF44F0F009993E2 /* Debug */,
@@ -542,7 +548,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		63F5F6892FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "SpeechEvaluation" */ = {
+		63F5F6892FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "Continuum" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				63F5F68A2FF44F0F009993E2 /* Debug */,
@@ -551,7 +557,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		63F5F68C2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "SpeechEvaluationTests" */ = {
+		63F5F68C2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "ContinuumTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				63F5F68D2FF44F0F009993E2 /* Debug */,
@@ -560,7 +566,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		63F5F68F2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "SpeechEvaluationUITests" */ = {
+		63F5F68F2FF44F0F009993E2 /* Build configuration list for PBXNativeTarget "ContinuumUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				63F5F6902FF44F0F009993E2 /* Debug */,
