@@ -46,9 +46,29 @@ struct CoachingMessage: Codable, Sendable, Identifiable {
     }
 }
 
+/// How an attempt was scored.
+enum ScoringMethod: String, Codable, Sendable {
+    case rules
+    case machineLearning
+    case hybridFallback
+}
+
 /// Final scoring output for one attempt.
 struct PronunciationScore: Codable, Sendable {
     let correctness: Int
     let confidence: Double
     let messages: [CoachingMessage]
+    var scoringMethod: ScoringMethod = .rules
+
+    /// Short label shown under the score card.
+    var scoringMethodLabel: String {
+        switch scoringMethod {
+        case .rules:
+            return "Scored with rules"
+        case .machineLearning:
+            return "Scored with on-device ML"
+        case .hybridFallback:
+            return "Rejected before ML scoring"
+        }
+    }
 }

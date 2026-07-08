@@ -79,22 +79,29 @@ struct TestActivityView: View {
     }
 
     private func scoreCard(score: PronunciationScore) -> some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text("Accuracy")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text("\(score.correctness)%")
-                    .font(.largeTitle.bold())
+        VStack(spacing: 8) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Accuracy")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("\(score.correctness)%")
+                        .font(.largeTitle.bold())
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text("Confidence")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(String(format: "%.0f%%", score.confidence * 100))
+                        .font(.title2.bold())
+                }
             }
-            Spacer()
-            VStack(alignment: .trailing) {
-                Text("Confidence")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(String(format: "%.0f%%", score.confidence * 100))
-                    .font(.title2.bold())
-            }
+
+            Text(score.scoringMethodLabel)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(12)
         .background(.ultraThinMaterial)

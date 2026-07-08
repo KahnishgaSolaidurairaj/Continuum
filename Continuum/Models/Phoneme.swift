@@ -99,4 +99,42 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
     static var mvpOrder: [Phoneme] {
         [.m, .p, .b, .f, .v, .i, .u]
     }
+
+    /// Folder / model label used by Create ML and SoundAnalysis.
+    var modelLabel: String {
+        switch self {
+        case .theta: return "theta"
+        case .eth: return "eth"
+        default: return rawValue
+        }
+    }
+
+    /// Class label representing silence, coughs, and background noise.
+    static let noiseModelLabel = "noise"
+
+    /// Labels expected in `PhonemeClassifier.mlmodel`, including the noise class.
+    static var modelLabels: [String] {
+        allCases.map(\.modelLabel) + [noiseModelLabel]
+    }
+
+    /// How ML window confidences should be aggregated into one score for this sound.
+    var mlAggregation: MLAggregation {
+        switch self {
+        case .p, .b:
+            return .transient
+        default:
+            return .sustained
+        }
+    }
+}
+
+/// Strategy for turning many per-window confidences into a single accuracy score.
+///
+/// - `sustained`: Held sounds (like /m/ or /f/) are scored on their average
+///   confidence across the windows where the user was actually speaking.
+/// - `transient`: Short burst sounds (like /p/ or /b/) live in only one or two
+///   windows, so they are scored on their strongest few windows instead.
+enum MLAggregation {
+    case sustained
+    case transient
 }

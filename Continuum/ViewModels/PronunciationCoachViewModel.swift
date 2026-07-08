@@ -17,6 +17,7 @@ final class PronunciationCoachViewModel {
     var liveVoicingLevel: Float = 0
 
     private let audioCapture = AudioCaptureService()
+    private let mlScorer = MLPronunciationScorer()
     private var audioChunks: [AudioChunk] = []
     private var userProfile = UserProfileStore.load()
 
@@ -26,6 +27,12 @@ final class PronunciationCoachViewModel {
                 guard let self, self.isRecording else { return }
                 self.audioChunks.append(chunk)
                 self.updateLiveAudioMetrics()
+            }
+        }
+        audioCapture.onBufferCaptured = { [weak self] buffer in
+            Task { @MainActor in
+                guard let self, self.isRecording else { return }
+                self.mlScorer.process(buffer: buffer)
             }
         }
         personalizedTips = userProfile.personalizedTips()
@@ -56,9 +63,13 @@ final class PronunciationCoachViewModel {
         liveAudioLevel = 0
         liveDuration = 0
         liveVoicingLevel = 0
+        mlScorer.reset()
 
         do {
             try audioCapture.start()
+            if let format = audioCapture.inputFormat {
+                try mlScorer.prepare(format: format)
+            }
             isRecording = true
         } catch {
             errorMessage = "Could not start audio capture: \(error.localizedDescription)"
@@ -74,10 +85,12 @@ final class PronunciationCoachViewModel {
         isRecording = false
 
         let audio = FeatureExtractor.extractAudio(from: audioChunks)
-        let score = PronunciationScorer.scoreAudioOnly(
+        let score = PronunciationScorer.scoreAttempt(
             phoneme: selectedPhoneme,
-            audio: audio
+            audio: audio,
+            mlScorer: mlScorer
         )
+        mlScorer.reset()
 
         lastScore = score
         PersonalizationEngine.updateProfile(

@@ -155,7 +155,76 @@ enum PronunciationScorer {
         return PronunciationScore(
             correctness: clampedScore,
             confidence: confidence,
-            messages: messages
+            messages: messages,
+            scoringMethod: .rules
+        )
+    }
+
+    /// Rejects attempts with unusable audio before ML scoring is trusted.
+    /// - Parameter audio: Aggregated audio features.
+    /// - Returns: A critical coaching message when audio should be rejected.
+    static func audioQualityFailure(for audio: AudioFeatures) -> CoachingMessage? {
+        if audio.duration < 0.08 {
+            return CoachingMessage(
+                text: "Too short — hold the sound a little longer.",
+                severity: .critical
+            )
+        }
+        if audio.rmsEnergy < 0.004 {
+            return CoachingMessage(
+                text: "No audio detected — speak louder or move closer to the mic.",
+                severity: .critical
+            )
+        }
+        if audio.peakEnergy > 0.98 {
+            return CoachingMessage(
+                text: "Audio clipped — move slightly back from the microphone.",
+                severity: .critical
+            )
+        }
+        return nil
+    }
+
+    /// Scores an attempt with rules as a gate and ML as the primary scorer.
+    /// - Parameters:
+    ///   - phoneme: Target sound.
+    ///   - audio: Aggregated audio features.
+    ///   - mlScorer: Live sound classifier fed during recording.
+    /// - Returns: Final score from ML when available, otherwise rule-based scoring.
+    @MainActor
+    static func scoreAttempt(
+        phoneme: Phoneme,
+        audio: AudioFeatures,
+        mlScorer: MLPronunciationScorer
+    ) -> PronunciationScore {
+        if let failure = audioQualityFailure(for: audio) {
+            return PronunciationScore(
+                correctness: 0,
+                confidence: 0.1,
+                messages: [failure],
+                scoringMethod: .hybridFallback
+            )
+        }
+
+        if let mlScore = mlScorer.score(phoneme: phoneme) {
+            return mlScore
+        }
+
+        let ruleScore = scoreAudioOnly(phoneme: phoneme, audio: audio)
+        var messages = ruleScore.messages
+        messages.insert(
+            CoachingMessage(
+                text: "Using rule-based scoring — add PhonemeClassifier.mlmodel to enable ML.",
+                severity: .warning
+            ),
+            at: 0
+        )
+
+        return PronunciationScore(
+            correctness: ruleScore.correctness,
+            confidence: ruleScore.confidence,
+            messages: messages,
+            scoringMethod: .rules
         )
     }
 
