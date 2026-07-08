@@ -194,7 +194,7 @@ struct MoodLogSheet: View {
                     dismiss()
                 }
             }
-            .navigationTitle("Log your mood")
+            .kidFriendlyNavigationTitle("Log your mood")
         }
         .presentationDetents([.medium])
     }

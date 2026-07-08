@@ -7,7 +7,7 @@ struct TryActivityView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("See an example")
-                .font(.title2.weight(.bold))
+                .font(ContinuumTheme.kidSectionHeaderFont)
 
             demoFrame
 

@@ -69,7 +69,7 @@ struct TestActivityView: View {
     private var header: some View {
         VStack(spacing: 8) {
             Text("Try it yourself")
-                .font(.title2.weight(.bold))
+                .font(ContinuumTheme.kidSectionHeaderFont)
             Text("Practice /\(target.symbol)/")
                 .font(.headline)
         }

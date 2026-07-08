@@ -9,7 +9,7 @@ struct DashboardView: View {
         ScrollView {
             VStack(spacing: 20) {
                 Text("Dashboard")
-                    .font(.title2.weight(.bold))
+                    .font(ContinuumTheme.kidSectionHeaderFont)
                     .padding(.top, 8)
 
                 PracticeCalendarCard(sessionDates: sessions.map(\.timestamp))

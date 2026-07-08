@@ -69,7 +69,7 @@ struct PhonemeSelectionView: View {
                 .pickerStyle(.segmented)
 
                 Text(mode.rawValue)
-                    .font(.title2.weight(.bold))
+                    .font(ContinuumTheme.kidSectionHeaderFont)
 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: mode == .alphabet ? 7 : 4), spacing: 12) {
                     ForEach(currentTargets) { target in
@@ -113,7 +113,7 @@ struct ActivityCarouselView: View {
             .padding(.horizontal)
 
             Text("Practice “\(target.symbol)”")
-                .font(.title.weight(.bold))
+                .font(ContinuumTheme.kidSectionHeaderFont)
 
             ZStack {
                 RoundedRectangle(cornerRadius: 20)
@@ -181,8 +181,7 @@ struct ActivityDetailView: View {
                 TestActivityView(target: target)
             }
         }
-        .navigationTitle(activity.subtitle)
-        .navigationBarTitleDisplayMode(.inline)
+        .kidFriendlyNavigationTitle(activity.subtitle)
     }
 }
 

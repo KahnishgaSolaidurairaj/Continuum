@@ -9,7 +9,7 @@ struct FlashActivityView: View {
     var body: some View {
         VStack(spacing: 28) {
             Text("Flashcard")
-                .font(.title2.weight(.bold))
+                .font(ContinuumTheme.kidSectionHeaderFont)
 
             VStack(spacing: 16) {
                 Text(target.spelling)

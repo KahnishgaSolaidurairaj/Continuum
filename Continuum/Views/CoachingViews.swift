@@ -182,7 +182,7 @@ struct SessionHistoryView: View {
             }
             .padding(.vertical, 4)
         }
-        .navigationTitle("Practice History")
+        .kidFriendlyNavigationTitle("Practice History")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Export") {
