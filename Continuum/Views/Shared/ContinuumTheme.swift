@@ -14,6 +14,9 @@ enum ContinuumTheme {
     static let sandGrain = Color(red: 0.86, green: 0.74, blue: 0.42)
     static let shellPink = Color(red: 0.96, green: 0.82, blue: 0.78)
     static let shellCream = Color(red: 0.99, green: 0.94, blue: 0.86)
+    static let beachCoralPen = Color(red: 0.82, green: 0.36, blue: 0.42)
+    static let beachCoral = Color(red: 1.0, green: 0.58, blue: 0.42)
+    static let beachSunYellow = Color(red: 1.0, green: 0.93, blue: 0.52)
     static let pencilLead = Color(red: 0.22, green: 0.32, blue: 0.52)
 
     // Lightning flash palette
