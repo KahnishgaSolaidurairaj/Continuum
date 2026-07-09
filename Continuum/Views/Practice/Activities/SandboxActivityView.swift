@@ -17,17 +17,17 @@ struct SandboxActivityView: View {
                 tracingBox(availableHeight: geometry.size.height * 0.68)
 
                 penThicknessPicker
-
-                Text("Trace the letter shape with your finger.")
-                    .font(ContinuumTheme.kidBodyFont)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 8)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(ContinuumTheme.practiceCream)
+            .background(
+                LinearGradient(
+                    colors: [ContinuumTheme.beachCoral, ContinuumTheme.beachSunYellow],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -37,15 +37,11 @@ struct SandboxActivityView: View {
                     Text("Clear")
                         .font(ContinuumTheme.kidButtonFont)
                         .foregroundStyle(ContinuumTheme.tabPurple)
-                        .padding(.horizontal, 18)
+                        .padding(.horizontal, 22)
                         .padding(.vertical, 10)
-                        .background(.white.opacity(0.95))
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(ContinuumTheme.cardBorder.opacity(0.25), lineWidth: 1.5)
-                        )
+                        .background(.white.opacity(0.95), in: Capsule())
                 }
+                .buttonStyle(.plain)
                 .accessibilityLabel("Clear drawing")
             }
         }
@@ -55,58 +51,59 @@ struct SandboxActivityView: View {
     private func tracingBox(availableHeight: CGFloat) -> some View {
         GeometryReader { boxGeometry in
             let borderPadding: CGFloat = 46
-            let innerWidth = boxGeometry.size.width - (borderPadding * 2)
-            let innerHeight = boxGeometry.size.height - (borderPadding * 2)
-            let letterSize = min(innerWidth, innerHeight) * 0.78
+            let sandSize = CGSize(
+                width: boxGeometry.size.width - (borderPadding * 2),
+                height: boxGeometry.size.height - (borderPadding * 2)
+            )
 
             ZStack {
                 SeashellSandboxBorder()
 
-                ZStack {
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(ContinuumTheme.sandYellow)
-                        .overlay {
-                            SandTextureBackground()
-                                .clipShape(RoundedRectangle(cornerRadius: 24))
-                        }
-                        .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-
-                    Text(target.spelling.uppercased())
-                        .font(.system(size: letterSize, weight: .bold, design: .rounded))
-                        .foregroundStyle(.black.opacity(0.14))
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                        .padding(letterSize * 0.12)
-
-                    GrainyTracedPath(points: tracedPoints, lineWidth: selectedPenThickness.lineWidth)
-                }
-                .padding(borderPadding)
+                sandDrawingArea(size: sandSize)
+                    .padding(borderPadding)
             }
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        let point = value.location
-                        let sandRect = CGRect(
-                            x: borderPadding,
-                            y: borderPadding,
-                            width: innerWidth,
-                            height: innerHeight
-                        )
-                        guard sandRect.contains(point) else { return }
-                        tracedPoints.append(point)
-                    }
-            )
         }
         .frame(maxWidth: .infinity)
         .frame(height: max(availableHeight, 380))
+    }
+
+    /// Sand canvas where touch coordinates match drawn stroke coordinates.
+    private func sandDrawingArea(size: CGSize) -> some View {
+        let letterSize = min(size.width, size.height) * 0.78
+
+        return ZStack {
+            RoundedRectangle(cornerRadius: 24)
+                .fill(ContinuumTheme.sandYellow)
+                .overlay {
+                    SandTextureBackground()
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                }
+                .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+
+            Text(target.spelling.uppercased())
+                .font(.system(size: letterSize, weight: .bold, design: .rounded))
+                .foregroundStyle(.black.opacity(0.14))
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .padding(letterSize * 0.12)
+
+            GrainyTracedPath(points: tracedPoints, lineWidth: selectedPenThickness.lineWidth)
+        }
+        .frame(width: size.width, height: size.height)
+        .contentShape(RoundedRectangle(cornerRadius: 24))
+        .gesture(
+            DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                .onChanged { value in
+                    tracedPoints.append(value.location)
+                }
+        )
     }
 
     /// Kid-friendly pen thickness selector with large tap targets.
     private var penThicknessPicker: some View {
         VStack(spacing: 10) {
             Text("Pen size")
-                .font(ContinuumTheme.kidSubheadFont)
+                .font(ContinuumTheme.kidSectionHeaderFont)
 
             HStack(spacing: 16) {
                 ForEach(PenThickness.allCases) { thickness in
@@ -115,7 +112,7 @@ struct SandboxActivityView: View {
                     } label: {
                         VStack(spacing: 8) {
                             Circle()
-                                .fill(ContinuumTheme.pencilLead)
+                                .fill(ContinuumTheme.beachCoralPen)
                                 .frame(width: thickness.displaySize, height: thickness.displaySize)
 
                             Text(thickness.label)
@@ -227,7 +224,18 @@ private struct GrainyTracedPath: View {
 
     var body: some View {
         Canvas { context, _ in
-            guard points.count > 1 else { return }
+            guard !points.isEmpty else { return }
+
+            if points.count == 1, let point = points.first {
+                let dotRect = CGRect(
+                    x: point.x - lineWidth / 2,
+                    y: point.y - lineWidth / 2,
+                    width: lineWidth,
+                    height: lineWidth
+                )
+                context.fill(Path(ellipseIn: dotRect), with: .color(ContinuumTheme.beachCoralPen))
+                return
+            }
 
             var path = Path()
             path.addLines(points)
@@ -245,7 +253,7 @@ private struct GrainyTracedPath: View {
                 strokeContext.translateBy(x: offsetX, y: offsetY)
                 strokeContext.stroke(
                     path,
-                    with: .color(ContinuumTheme.pencilLead.opacity(opacity)),
+                    with: .color(ContinuumTheme.beachCoralPen.opacity(opacity)),
                     style: StrokeStyle(
                         lineWidth: lineWidth * (offsetX == 0 ? 1 : 0.45),
                         lineCap: .round,
@@ -265,7 +273,7 @@ private struct GrainyTracedPath: View {
                 )
                 context.fill(
                     Path(ellipseIn: rect),
-                    with: .color(ContinuumTheme.pencilLead.opacity(0.18 + Double(speckleSeed) / 30.0))
+                    with: .color(ContinuumTheme.beachCoralPen.opacity(0.18 + Double(speckleSeed) / 30.0))
                 )
             }
         }
