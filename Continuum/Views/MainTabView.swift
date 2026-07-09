@@ -53,8 +53,8 @@ struct ContinuumTabBar: View {
             tabButton(tab: .dashboard, title: "Dashboard", systemImage: "chart.bar.fill")
         }
         .padding(.horizontal, 36)
-        .padding(.top, 12)
-        .padding(.bottom, 20)
+        .padding(.top, 14)
+        .padding(.bottom, 24)
         .background(ContinuumTheme.tabPurple)
         .foregroundStyle(.white)
     }
@@ -63,13 +63,13 @@ struct ContinuumTabBar: View {
         Button {
             selectedTab = tab
         } label: {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 Image(systemName: systemImage)
-                    .font(isRaised ? .system(size: 34) : .title2)
+                    .font(isRaised ? .system(size: 40) : .title)
                     .offset(y: isRaised ? -8 : 0)
                 if !isRaised {
                     Text(title)
-                        .font(.caption2)
+                        .font(ContinuumTheme.kidCaptionFont)
                 }
             }
             .opacity(selectedTab == tab ? 1 : 0.65)

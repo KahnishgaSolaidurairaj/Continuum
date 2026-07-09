@@ -16,7 +16,7 @@ struct FlashActivityView: View {
                     .font(.system(size: 72, weight: .bold, design: .rounded))
 
                 Text(target.exampleWord)
-                    .font(.title3)
+                    .font(ContinuumTheme.kidBodyFont)
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
@@ -31,9 +31,9 @@ struct FlashActivityView: View {
                 speechService.speak(target)
             } label: {
                 Label("Hear it", systemImage: "speaker.wave.2.fill")
-                    .font(.headline)
+                    .font(ContinuumTheme.kidButtonFont)
                     .padding()
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
                     .background(ContinuumTheme.tabPurple)
                     .foregroundStyle(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 14))

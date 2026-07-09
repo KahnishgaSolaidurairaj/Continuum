@@ -71,7 +71,7 @@ struct TestActivityView: View {
             Text("Try it yourself")
                 .font(ContinuumTheme.kidSectionHeaderFont)
             Text("Practice /\(target.symbol)/")
-                .font(.headline)
+                .font(ContinuumTheme.kidSubheadFont)
         }
         .padding()
         .background(.ultraThinMaterial)
@@ -122,8 +122,8 @@ struct TestActivityView: View {
                 viewModel.isRecording ? "Stop & Score" : "Start Recording",
                 systemImage: viewModel.isRecording ? "stop.circle.fill" : "mic.circle.fill"
             )
-            .font(.headline)
-            .frame(maxWidth: .infinity)
+            .font(ContinuumTheme.kidButtonFont)
+            .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
             .padding()
             .background(viewModel.isRecording ? Color.red : Color.blue)
             .foregroundStyle(.white)

@@ -30,13 +30,13 @@ struct PracticeCalendarCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(currentMonthTitle)
-                .font(.headline)
+                .font(ContinuumTheme.kidSubheadFont)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
                 ForEach(dayItems, id: \.day) { item in
                     VStack(spacing: 4) {
                         Text("\(item.day)")
-                            .font(.caption)
+                            .font(ContinuumTheme.kidCaptionFont)
                         Circle()
                             .fill(item.intensityColor)
                             .frame(width: 10, height: 10)
@@ -124,12 +124,12 @@ struct ProgressRingView: View {
                     .stroke(ContinuumTheme.tabPurple, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                 Text("\(Int(value * 100))%")
-                    .font(.headline)
+                    .font(ContinuumTheme.kidSubheadFont)
             }
             .frame(width: 88, height: 88)
 
             Text(title)
-                .font(.caption)
+                .font(ContinuumTheme.kidCaptionFont)
                 .multilineTextAlignment(.center)
         }
         .padding()
@@ -146,7 +146,7 @@ struct PracticeGraphCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Practice over time", systemImage: "chart.xyaxis.line")
-                .font(.headline)
+                .font(ContinuumTheme.kidSubheadFont)
 
             RoundedRectangle(cornerRadius: 12)
                 .fill(.white.opacity(0.45))
@@ -154,7 +154,7 @@ struct PracticeGraphCard: View {
                 .overlay {
                     if sessions.isEmpty {
                         Text("Complete a Test activity to see your graph.")
-                            .font(.subheadline)
+                            .font(ContinuumTheme.kidBodyFont)
                             .foregroundStyle(.secondary)
                     } else {
                         SimpleBarChart(values: sessions.prefix(7).map { Double($0.correctness) }.reversed())
@@ -221,9 +221,9 @@ struct DashboardSummaryCard: View {
     private func summaryRow(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.subheadline.weight(.bold))
+                .font(ContinuumTheme.kidSubheadFont)
             Text(detail)
-                .font(.subheadline)
+                .font(ContinuumTheme.kidBodyFont)
         }
     }
 }

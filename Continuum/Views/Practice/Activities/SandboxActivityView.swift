@@ -19,7 +19,7 @@ struct SandboxActivityView: View {
                 penThicknessPicker
 
                 Text("Trace the letter shape with your finger.")
-                    .font(.title3.weight(.medium))
+                    .font(ContinuumTheme.kidBodyFont)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 8)
@@ -35,7 +35,7 @@ struct SandboxActivityView: View {
                     tracedPoints.removeAll()
                 } label: {
                     Text("Clear")
-                        .font(.title3.weight(.bold))
+                        .font(ContinuumTheme.kidButtonFont)
                         .foregroundStyle(ContinuumTheme.tabPurple)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 10)
@@ -106,7 +106,7 @@ struct SandboxActivityView: View {
     private var penThicknessPicker: some View {
         VStack(spacing: 10) {
             Text("Pen size")
-                .font(.title3.weight(.semibold))
+                .font(ContinuumTheme.kidSubheadFont)
 
             HStack(spacing: 16) {
                 ForEach(PenThickness.allCases) { thickness in
@@ -119,9 +119,9 @@ struct SandboxActivityView: View {
                                 .frame(width: thickness.displaySize, height: thickness.displaySize)
 
                             Text(thickness.label)
-                                .font(.subheadline.weight(.semibold))
+                                .font(ContinuumTheme.kidCaptionFont.weight(.semibold))
                         }
-                        .frame(maxWidth: .infinity, minHeight: 88)
+                        .frame(maxWidth: .infinity, minHeight: 96)
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 16)

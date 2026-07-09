@@ -12,14 +12,14 @@ struct TryActivityView: View {
             demoFrame
 
             Text("Watch how to say /\(target.symbol)/")
-                .font(.headline)
+                .font(ContinuumTheme.kidSubheadFont)
 
             Text("“\(target.exampleWord)”")
-                .font(.title2.weight(.bold))
+                .font(ContinuumTheme.kidSectionHeaderFont)
                 .foregroundStyle(ContinuumTheme.tabPurple)
 
             Text(target.linkedPhoneme?.instruction ?? "")
-                .font(.subheadline)
+                .font(ContinuumTheme.kidBodyFont)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)

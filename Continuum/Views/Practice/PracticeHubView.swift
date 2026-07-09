@@ -77,8 +77,8 @@ struct PhonemeSelectionView: View {
                             onSelect(target)
                         } label: {
                             Text(target.symbol)
-                                .font(.title2.weight(.bold))
-                                .frame(maxWidth: .infinity, minHeight: 52)
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .frame(maxWidth: .infinity, minHeight: 64)
                                 .background(.white.opacity(0.8))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
@@ -107,7 +107,14 @@ struct ActivityCarouselView: View {
     var body: some View {
         VStack(spacing: 24) {
             HStack {
-                Button("Back", action: onBack)
+                Button(action: onBack) {
+                    Label("Back", systemImage: "chevron.left")
+                        .font(ContinuumTheme.kidButtonFont)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(.white.opacity(0.85))
+                        .clipShape(Capsule())
+                }
                 Spacer()
             }
             .padding(.horizontal)
@@ -127,7 +134,7 @@ struct ActivityCarouselView: View {
             .padding(.horizontal)
 
             Text("Choose an activity")
-                .font(.headline)
+                .font(ContinuumTheme.kidSubheadFont)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
@@ -135,16 +142,16 @@ struct ActivityCarouselView: View {
                         Button {
                             onSelectActivity(activity)
                         } label: {
-                            VStack(spacing: 10) {
+                            VStack(spacing: 12) {
                                 Image(systemName: activity.systemImage)
-                                    .font(.largeTitle)
+                                    .font(.system(size: 44))
                                 Text(activity.subtitle)
-                                    .font(.headline)
+                                    .font(ContinuumTheme.kidSubheadFont)
                                 Text(activity.title)
-                                    .font(.caption)
+                                    .font(ContinuumTheme.kidCaptionFont)
                                     .multilineTextAlignment(.center)
                             }
-                            .frame(width: 160, height: 160)
+                            .frame(width: 180, height: 180)
                             .background(.white.opacity(0.85))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)

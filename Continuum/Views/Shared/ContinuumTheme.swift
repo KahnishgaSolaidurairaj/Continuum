@@ -19,6 +19,11 @@ enum ContinuumTheme {
     /// Large rounded title for kid-readable navigation and section headers.
     static let kidNavigationTitleFont: Font = .system(size: 34, weight: .bold, design: .rounded)
     static let kidSectionHeaderFont: Font = .system(size: 30, weight: .bold, design: .rounded)
+    static let kidBodyFont: Font = .system(size: 22, weight: .medium, design: .rounded)
+    static let kidSubheadFont: Font = .system(size: 20, weight: .semibold, design: .rounded)
+    static let kidButtonFont: Font = .system(size: 22, weight: .bold, design: .rounded)
+    static let kidCaptionFont: Font = .system(size: 18, weight: .medium, design: .rounded)
+    static let kidMinTapHeight: CGFloat = 56
 }
 
 extension View {
@@ -32,5 +37,47 @@ extension View {
                         .font(ContinuumTheme.kidNavigationTitleFont)
                 }
             }
+    }
+
+    /// Applies kid-friendly primary button styling with a large tap target.
+    func kidPrimaryButtonStyle(
+        background: Color = ContinuumTheme.tabPurple,
+        foreground: Color = .white
+    ) -> some View {
+        font(ContinuumTheme.kidButtonFont)
+            .foregroundStyle(foreground)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
+            .frame(minHeight: ContinuumTheme.kidMinTapHeight)
+            .background(background)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    /// Applies kid-friendly secondary button styling with a large tap target.
+    func kidSecondaryButtonStyle() -> some View {
+        font(ContinuumTheme.kidButtonFont)
+            .foregroundStyle(ContinuumTheme.tabPurple)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
+            .frame(minHeight: ContinuumTheme.kidMinTapHeight)
+            .background(.white.opacity(0.95))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(ContinuumTheme.cardBorder.opacity(0.25), lineWidth: 2)
+            )
+    }
+
+    /// Applies styling for selectable list rows in sheets.
+    func kidChoiceButtonStyle(isSelected: Bool) -> some View {
+        background(.white.opacity(isSelected ? 1 : 0.95))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        isSelected ? ContinuumTheme.tabPurple : ContinuumTheme.cardBorder.opacity(0.15),
+                        lineWidth: isSelected ? 3 : 1.5
+                    )
+            )
     }
 }
