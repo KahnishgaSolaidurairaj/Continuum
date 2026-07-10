@@ -13,10 +13,10 @@ struct HomeView: View {
 
     private var suggestedTarget: PracticeTarget {
         if let lastID = PracticeProgressStore.lastPracticeTargetID,
-           let match = PracticeTarget.sounds.first(where: { $0.id == lastID }) {
+           let match = PracticeTarget.allPhonemes.first(where: { $0.id == lastID }) {
             return match
         }
-        return PracticeTarget.sounds[0]
+        return PracticeTarget.allPhonemes[0]
     }
 
     var body: some View {

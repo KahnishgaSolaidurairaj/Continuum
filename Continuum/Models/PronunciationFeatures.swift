@@ -51,6 +51,7 @@ enum ScoringMethod: String, Codable, Sendable {
     case rules
     case machineLearning
     case hybridFallback
+    case embeddingSimilarity
 }
 
 /// Final scoring output for one attempt.
@@ -69,6 +70,8 @@ struct PronunciationScore: Codable, Sendable {
             return "Scored with on-device ML"
         case .hybridFallback:
             return "Rejected before ML scoring"
+        case .embeddingSimilarity:
+            return "Scored with embedding similarity"
         }
     }
 }

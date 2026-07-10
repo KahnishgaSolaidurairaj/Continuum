@@ -18,7 +18,7 @@ struct TryActivityView: View {
                 .font(ContinuumTheme.kidSectionHeaderFont)
                 .foregroundStyle(ContinuumTheme.tabPurple)
 
-            Text(target.linkedPhoneme?.instruction ?? "")
+            Text(target.linkedPhoneme.instruction)
                 .font(ContinuumTheme.kidBodyFont)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
