@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Sandbox activity: trace the spelling with a guided finger path on a beach-themed canvas.
+/// Sandbox activity: trace the phoneme symbol with a guided finger path on a beach-themed canvas.
 struct SandboxActivityView: View {
     let target: PracticeTarget
 
@@ -80,7 +80,7 @@ struct SandboxActivityView: View {
                 }
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
 
-            Text(target.spelling.uppercased())
+            Text(target.symbol)
                 .font(.system(size: letterSize, weight: .bold, design: .rounded))
                 .foregroundStyle(.black.opacity(0.14))
                 .minimumScaleFactor(0.5)

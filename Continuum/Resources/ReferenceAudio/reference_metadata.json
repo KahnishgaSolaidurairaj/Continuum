@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "voice": "en-US",
+  "sampleRate": 44100,
+  "preRollSilenceSeconds": 0.12,
+  "phonemes": {
+    "m": {
+      "prompt": "mmmm",
+      "aggregation": "sustained",
+      "referenceAudioFile": "m.wav",
+      "referenceDurationSeconds": 0.5960090702947846,
+      "sampleRate": 44100,
+      "sampleCount": 26284
+    },
+    "p": {
+      "prompt": "puh",
+      "aggregation": "transient",
+      "referenceAudioFile": "p.wav",
+      "referenceDurationSeconds": 0.5379591836734694,
+      "sampleRate": 44100,
+      "sampleCount": 23724
+    },
+    "b": {
+      "prompt": "buh",
+      "aggregation": "transient",
+      "referenceAudioFile": "b.wav",
+      "referenceDurationSeconds": 0.5263492063492063,
+      "sampleRate": 44100,
+      "sampleCount": 23212
+    },
+    "f": {
+      "prompt": "ffff",
+      "aggregation": "sustained",
+      "referenceAudioFile": "f.wav",
+      "referenceDurationSeconds": 0.5727891156462585,
+      "sampleRate": 44100,
+      "sampleCount": 25260
+    },
+    "v": {
+      "prompt": "vvvv",
+      "aggregation": "sustained",
+      "referenceAudioFile": "v.wav",
+      "referenceDurationSeconds": 0.6018140589569161,
+      "sampleRate": 44100,
+      "sampleCount": 26540
+    },
+    "i": {
+      "prompt": "eee",
+      "aggregation": "sustained",
+      "referenceAudioFile": "i.wav",
+      "referenceDurationSeconds": 0.712108843537415,
+      "sampleRate": 44100,
+      "sampleCount": 31404
+    },
+    "u": {
+      "prompt": "ooo",
+      "aggregation": "sustained",
+      "referenceAudioFile": "u.wav",
+      "referenceDurationSeconds": 0.43927437641723355,
+      "sampleRate": 44100,
+      "sampleCount": 19372
+    },
+    "theta": {
+      "prompt": "thth",
+      "aggregation": "sustained",
+      "referenceAudioFile": "theta.wav",
+      "referenceDurationSeconds": 1.315827664399093,
+      "sampleRate": 44100,
+      "sampleCount": 58028
+    },
+    "eth": {
+      "prompt": "thth",
+      "aggregation": "sustained",
+      "referenceAudioFile": "eth.wav",
+      "referenceDurationSeconds": 1.315827664399093,
+      "sampleRate": 44100,
+      "sampleCount": 58028
+    }
+  }
+}
