@@ -1,0 +1,53 @@
+{
+  "voice": "en-US",
+  "sampleRate": 44100,
+  "targetPeak": 0.9,
+  "preRollSilenceSeconds": 0.12,
+  "phonemes": {
+    "m": {
+      "prompt": "mmmm",
+      "aggregation": "sustained",
+      "notes": "Sustained hum"
+    },
+    "p": {
+      "prompt": "puh",
+      "aggregation": "transient",
+      "notes": "Unvoiced burst with schwa"
+    },
+    "b": {
+      "prompt": "buh",
+      "aggregation": "transient",
+      "notes": "Voiced burst with schwa"
+    },
+    "f": {
+      "prompt": "ffff",
+      "aggregation": "sustained",
+      "notes": "Sustained fricative"
+    },
+    "v": {
+      "prompt": "vvvv",
+      "aggregation": "sustained",
+      "notes": "Voiced fricative"
+    },
+    "i": {
+      "prompt": "eee",
+      "aggregation": "sustained",
+      "notes": "Front vowel"
+    },
+    "u": {
+      "prompt": "ooo",
+      "aggregation": "sustained",
+      "notes": "Back vowel"
+    },
+    "theta": {
+      "prompt": "thth",
+      "aggregation": "sustained",
+      "notes": "Unvoiced fricative"
+    },
+    "eth": {
+      "prompt": "thth",
+      "aggregation": "sustained",
+      "notes": "Voiced fricative"
+    }
+  }
+}

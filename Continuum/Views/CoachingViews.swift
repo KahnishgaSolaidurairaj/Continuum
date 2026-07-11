@@ -5,18 +5,25 @@ import SwiftData
 struct LiveAudioMetersView: View {
     let audioLevel: Float
     let duration: TimeInterval
+    let targetDuration: TimeInterval
+    let recordingProgress: Double
     let voicingLevel: Float
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             meterRow(title: "Audio level", value: audioLevel)
             meterRow(title: "Voicing", value: voicingLevel)
-            HStack {
-                Text("Duration")
-                    .font(.caption)
-                Spacer()
-                Text(String(format: "%.1fs", duration))
-                    .font(.caption.monospacedDigit())
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("Recording")
+                        .font(.caption)
+                    Spacer()
+                    Text(String(format: "%.1f / %.1fs", duration, targetDuration))
+                        .font(.caption.monospacedDigit())
+                }
+                ProgressView(value: recordingProgress)
+                    .tint(.orange)
             }
         }
         .padding(12)

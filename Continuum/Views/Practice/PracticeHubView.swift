@@ -47,54 +47,59 @@ struct PracticeHubView: View {
     }
 }
 
-/// Wireframe step 1: choose alphabet letter or sound.
+/// Wireframe step 1: choose one of the 44 English phonemes.
 struct PhonemeSelectionView: View {
-    enum PickerMode: String, CaseIterable {
-        case alphabet = "Which Alphabet?"
-        case sounds = "Which Sound?"
-    }
-
     let onSelect: (PracticeTarget) -> Void
 
-    @State private var mode: PickerMode = .sounds
+    private let gridColumns = Array(repeating: GridItem(.flexible()), count: 5)
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Picker("Mode", selection: $mode) {
-                    ForEach(PickerMode.allCases, id: \.self) { option in
-                        Text(option.rawValue).tag(option)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                Text(mode.rawValue)
+            VStack(alignment: .leading, spacing: 24) {
+                Text("Which sound?")
                     .font(ContinuumTheme.kidSectionHeaderFont)
 
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: mode == .alphabet ? 7 : 4), spacing: 12) {
-                    ForEach(currentTargets) { target in
-                        Button {
-                            onSelect(target)
-                        } label: {
-                            Text(target.symbol)
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .frame(maxWidth: .infinity, minHeight: 64)
-                                .background(.white.opacity(0.8))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(ContinuumTheme.cardBorder, lineWidth: 2)
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+                phonemeSection(title: "Consonants", phonemes: Phoneme.consonants)
+                phonemeSection(title: "Vowels", phonemes: Phoneme.vowels)
             }
             .padding()
         }
     }
 
-    private var currentTargets: [PracticeTarget] {
-        mode == .alphabet ? PracticeTarget.alphabet : PracticeTarget.sounds
+    private func phonemeSection(title: String, phonemes: [Phoneme]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(ContinuumTheme.kidSubheadFont)
+                .foregroundStyle(ContinuumTheme.tabPurple)
+
+            LazyVGrid(columns: gridColumns, spacing: 12) {
+                ForEach(phonemes) { phoneme in
+                    if let target = PracticeTarget.allPhonemes.first(where: { $0.linkedPhoneme == phoneme }) {
+                        Button {
+                            onSelect(target)
+                        } label: {
+                            VStack(spacing: 4) {
+                                Text(target.symbol)
+                                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                                Text(phoneme.exampleWord)
+                                    .font(.caption2)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            .foregroundStyle(.primary)
+                            .frame(maxWidth: .infinity, minHeight: 72)
+                            .background(.white.opacity(0.8))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(ContinuumTheme.cardBorder, lineWidth: 2)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(phoneme.displayName), as in \(phoneme.exampleWord)")
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -131,13 +136,13 @@ struct ActivityCarouselView: View {
                         Spacer()
                     }
 
-                    Text("Practice “\(target.symbol)”")
+                    Text("Practice \(target.displayLabel)")
                         .font(.system(size: 40, weight: .bold, design: .rounded))
                         .multilineTextAlignment(.center)
 
-                    letterPreviewCard(
+                    phonemePreviewCard(
                         cardHeight: max(geometry.size.height * 0.22, usesColumnLayout ? 160 : 200),
-                        letterSize: min(geometry.size.width * 0.38, geometry.size.height * 0.16)
+                        symbolSize: min(geometry.size.width * 0.38, geometry.size.height * 0.16)
                     )
 
                     Text("Choose an activity")
@@ -185,8 +190,8 @@ struct ActivityCarouselView: View {
         }
     }
 
-    /// Large preview card showing the practice letter clearly.
-    private func letterPreviewCard(cardHeight: CGFloat, letterSize: CGFloat) -> some View {
+    /// Large preview card showing the practice phoneme clearly.
+    private func phonemePreviewCard(cardHeight: CGFloat, symbolSize: CGFloat) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24)
                 .fill(.white.opacity(0.75))
@@ -195,11 +200,17 @@ struct ActivityCarouselView: View {
                         .stroke(ContinuumTheme.cardBorder.opacity(0.2), lineWidth: 2)
                 )
 
-            Text(target.symbol.uppercased())
-                .font(.system(size: letterSize, weight: .bold, design: .rounded))
-                .foregroundStyle(.black.opacity(0.62))
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
+            VStack(spacing: 8) {
+                Text(target.symbol)
+                    .font(.system(size: symbolSize, weight: .bold, design: .rounded))
+                    .foregroundStyle(.black.opacity(0.72))
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+
+                Text("“\(target.exampleWord)”")
+                    .font(ContinuumTheme.kidSubheadFont)
+                    .foregroundStyle(.secondary)
+            }
         }
         .frame(maxWidth: .infinity)
         .frame(height: cardHeight)

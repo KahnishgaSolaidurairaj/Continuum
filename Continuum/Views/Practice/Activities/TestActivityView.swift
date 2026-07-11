@@ -26,21 +26,20 @@ struct TestActivityView: View {
                         LiveAudioMetersView(
                             audioLevel: viewModel.liveAudioLevel,
                             duration: viewModel.liveDuration,
+                            targetDuration: viewModel.targetRecordingDuration,
+                            recordingProgress: viewModel.recordingProgress,
                             voicingLevel: viewModel.liveVoicingLevel
                         )
+                        Text("Hold /\(target.symbol)/ for the full bar, then we’ll score automatically.")
+                            .font(.caption)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.secondary)
                         CoachingMessagesView(messages: viewModel.liveHints)
                     } else if let score = viewModel.lastScore {
                         scoreCard(score: score)
                         CoachingMessagesView(messages: score.messages)
-                    } else if let phoneme = target.linkedPhoneme {
-                        Text(phoneme.audioInstruction)
-                            .font(.subheadline)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     } else {
-                        Text("Audio scoring is available for linked sounds like /m/, /p/, and /f/.")
+                        Text(target.linkedPhoneme.audioInstruction)
                             .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .padding()
@@ -54,9 +53,7 @@ struct TestActivityView: View {
             }
         }
         .task {
-            if let phoneme = target.linkedPhoneme {
-                viewModel.selectedPhoneme = phoneme
-            }
+            viewModel.selectedPhoneme = target.linkedPhoneme
             await viewModel.preparePermissions()
         }
         .alert("Notice", isPresented: errorAlertBinding) {
@@ -109,27 +106,41 @@ struct TestActivityView: View {
     }
 
     private var recordButton: some View {
-        Button {
-            if viewModel.isRecording {
-                viewModel.stopRecording(modelContext: modelContext)
-                PracticeProgressStore.recordPractice()
-                PracticeProgressStore.lastPracticeTargetID = target.id
-            } else {
-                viewModel.startRecording()
+        VStack(spacing: 10) {
+            Button {
+                if viewModel.isRecording {
+                    viewModel.cancelRecording()
+                } else {
+                    viewModel.startRecording(
+                        modelContext: modelContext,
+                        practiceTargetID: target.id
+                    )
+                }
+            } label: {
+                Label(
+                    viewModel.isRecording ? "Cancel" : "Start Recording",
+                    systemImage: viewModel.isRecording ? "xmark.circle.fill" : "mic.circle.fill"
+                )
+                .font(ContinuumTheme.kidButtonFont)
+                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                .padding()
+                .background(viewModel.isRecording ? Color.orange : Color.blue)
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
             }
-        } label: {
-            Label(
-                viewModel.isRecording ? "Stop & Score" : "Start Recording",
-                systemImage: viewModel.isRecording ? "stop.circle.fill" : "mic.circle.fill"
-            )
-            .font(ContinuumTheme.kidButtonFont)
-            .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-            .padding()
-            .background(viewModel.isRecording ? Color.red : Color.blue)
-            .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .disabled(!viewModel.microphoneAuthorized)
+
+            if !viewModel.isRecording {
+                Text(String(
+                    format: "Recording length matches the reference sound (%.1fs for /%@/).",
+                    viewModel.targetRecordingDuration,
+                    target.symbol
+                ))
+                .font(.caption2)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+            }
         }
-        .disabled(!viewModel.microphoneAuthorized)
     }
 
     private var errorAlertBinding: Binding<Bool> {

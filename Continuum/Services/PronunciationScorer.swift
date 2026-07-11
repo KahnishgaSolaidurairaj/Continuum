@@ -70,6 +70,10 @@ enum PronunciationScorer {
 
         case .theta, .eth:
             break
+
+        default:
+            earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: phoneme.articulationKind != .stopUnvoiced && phoneme.articulationKind != .fricativeUnvoiced)
+            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.2, max: 3.0)
         }
 
         let clampedScore = min(totalPoints, max(0, earnedPoints))
@@ -103,43 +107,50 @@ enum PronunciationScorer {
         var messages: [CoachingMessage] = []
         var earnedPoints = 0
 
-        switch phoneme {
-        case .m:
-            earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 40)
-            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.4, max: 3.0, weight: 35)
-            earnedPoints += scoreSustainedEnergy(audio: audio, messages: &messages, weight: 25)
-
-        case .p:
+        switch phoneme.articulationKind {
+        case .stopUnvoiced:
             earnedPoints += scoreBurstRelease(audio: audio, messages: &messages, weight: 45)
             earnedPoints += scoreNoVoicing(audio: audio, messages: &messages, weight: 35)
             earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.05, max: 1.5, weight: 20)
 
-        case .b:
+        case .stopVoiced:
             earnedPoints += scoreBurstRelease(audio: audio, messages: &messages, weight: 40)
             earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 35)
             earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.05, max: 1.5, weight: 25)
 
-        case .f:
+        case .nasal:
+            earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 40)
+            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.35, max: 3.0, weight: 35)
+            earnedPoints += scoreSustainedEnergy(audio: audio, messages: &messages, weight: 25)
+
+        case .fricativeUnvoiced:
             earnedPoints += scoreAirflow(audio: audio, messages: &messages, weight: 40)
             earnedPoints += scoreNoVoicing(audio: audio, messages: &messages, weight: 35)
             earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.25, max: 3.0, weight: 25)
 
-        case .v:
+        case .fricativeVoiced:
             earnedPoints += scoreAirflow(audio: audio, messages: &messages, weight: 35)
             earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 35)
             earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.25, max: 3.0, weight: 30)
 
-        case .theta:
-            earnedPoints += scoreFrication(audio: audio, messages: &messages, weight: 40)
-            earnedPoints += scoreNoVoicing(audio: audio, messages: &messages, weight: 35)
-            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.2, max: 3.0, weight: 25)
+        case .affricateUnvoiced:
+            earnedPoints += scoreBurstRelease(audio: audio, messages: &messages, weight: 35)
+            earnedPoints += scoreFrication(audio: audio, messages: &messages, weight: 30)
+            earnedPoints += scoreNoVoicing(audio: audio, messages: &messages, weight: 20)
+            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.08, max: 2.0, weight: 15)
 
-        case .eth:
-            earnedPoints += scoreFrication(audio: audio, messages: &messages, weight: 35)
-            earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 35)
-            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.2, max: 3.0, weight: 30)
+        case .affricateVoiced:
+            earnedPoints += scoreBurstRelease(audio: audio, messages: &messages, weight: 30)
+            earnedPoints += scoreFrication(audio: audio, messages: &messages, weight: 30)
+            earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 25)
+            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.08, max: 2.0, weight: 15)
 
-        case .u, .i:
+        case .glide, .liquid:
+            earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 40)
+            earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.3, max: 3.0, weight: 35)
+            earnedPoints += scoreSustainedEnergy(audio: audio, messages: &messages, weight: 25)
+
+        case .vowel:
             earnedPoints += scoreVoicing(audio: audio, messages: &messages, required: true, weight: 45)
             earnedPoints += scoreDuration(audio: audio, messages: &messages, min: 0.35, max: 3.0, weight: 35)
             earnedPoints += scoreSustainedEnergy(audio: audio, messages: &messages, weight: 20)
@@ -185,17 +196,19 @@ enum PronunciationScorer {
         return nil
     }
 
-    /// Scores an attempt with rules as a gate and ML as the primary scorer.
+    /// Scores an attempt with rules as a gate and embedding similarity as the primary scorer.
     /// - Parameters:
     ///   - phoneme: Target sound.
     ///   - audio: Aggregated audio features.
-    ///   - mlScorer: Live sound classifier fed during recording.
-    /// - Returns: Final score from ML when available, otherwise rule-based scoring.
+    ///   - chunks: Raw captured microphone chunks for embedding extraction.
+    ///   - embeddingScorer: Bundled reference embedding scorer.
+    /// - Returns: Final score from embeddings when available, otherwise rule-based scoring.
     @MainActor
     static func scoreAttempt(
         phoneme: Phoneme,
         audio: AudioFeatures,
-        mlScorer: MLPronunciationScorer
+        chunks: [AudioChunk],
+        embeddingScorer: EmbeddingPronunciationScorer
     ) -> PronunciationScore {
         if let failure = audioQualityFailure(for: audio) {
             return PronunciationScore(
@@ -206,15 +219,15 @@ enum PronunciationScorer {
             )
         }
 
-        if let mlScore = mlScorer.score(phoneme: phoneme) {
-            return mlScore
+        if let embeddingScore = embeddingScorer.score(phoneme: phoneme, chunks: chunks) {
+            return embeddingScore
         }
 
         let ruleScore = scoreAudioOnly(phoneme: phoneme, audio: audio)
         var messages = ruleScore.messages
         messages.insert(
             CoachingMessage(
-                text: "Using rule-based scoring — add PhonemeClassifier.mlmodel to enable ML.",
+                text: "Using rule-based scoring — add PhonemeAudioEncoder.mlmodel and reference embeddings to enable ML.",
                 severity: .warning
             ),
             at: 0
@@ -241,18 +254,19 @@ enum PronunciationScorer {
             return hints
         }
 
-        switch phoneme {
-        case .m, .b, .v, .eth, .u, .i:
-            if audio.voicedEnergyRatio > 0.2 {
-                hints.append(CoachingMessage(text: "Voice detected", severity: .good))
-            } else {
-                hints.append(CoachingMessage(text: "Add voice — hum steadily", severity: .warning))
-            }
-        case .p, .f, .theta:
+        switch phoneme.articulationKind {
+        case .stopUnvoiced, .fricativeUnvoiced, .affricateUnvoiced:
             if audio.voicedEnergyRatio < 0.2 {
                 hints.append(CoachingMessage(text: "Good unvoiced airflow", severity: .good))
             } else {
                 hints.append(CoachingMessage(text: "Reduce voice — airflow only", severity: .warning))
+            }
+
+        case .stopVoiced, .nasal, .fricativeVoiced, .affricateVoiced, .glide, .liquid, .vowel:
+            if audio.voicedEnergyRatio > 0.2 {
+                hints.append(CoachingMessage(text: "Voice detected", severity: .good))
+            } else {
+                hints.append(CoachingMessage(text: "Add voice — hum steadily", severity: .warning))
             }
         }
 
@@ -262,7 +276,8 @@ enum PronunciationScorer {
             hints.append(CoachingMessage(text: "Speak louder or move closer to the mic", severity: .warning))
         }
 
-        if [.p, .b].contains(phoneme), audio.burstPeak > 0.03 {
+        if phoneme.articulationKind == .stopUnvoiced || phoneme.articulationKind == .stopVoiced,
+           audio.burstPeak > 0.03 {
             hints.append(CoachingMessage(text: "Sharp burst detected", severity: .good))
         }
 
@@ -300,6 +315,9 @@ enum PronunciationScorer {
                 hints.append(CoachingMessage(text: "Spread lips slightly", severity: .warning))
             }
         case .theta, .eth:
+            hints.append(CoachingMessage(text: "Audio-only coaching for this sound", severity: .warning))
+
+        default:
             hints.append(CoachingMessage(text: "Audio-only coaching for this sound", severity: .warning))
         }
 

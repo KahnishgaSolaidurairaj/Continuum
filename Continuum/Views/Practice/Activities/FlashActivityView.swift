@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// Flash activity: letter and word practice with three lightning-themed levels.
+/// Flash activity: phoneme and word practice with three lightning-themed levels.
 struct FlashActivityView: View {
     let target: PracticeTarget
 
-    @State private var selectedLevel: FlashLevel = .letter
+    @State private var selectedLevel: FlashLevel = .sound
     @State private var wordIndex = 0
 
     private let speechService = SpeechSynthesisService()
@@ -29,7 +29,7 @@ struct FlashActivityView: View {
 
                 flashcard(cardHeight: geometry.size.height * 0.52)
 
-                if selectedLevel != .letter && levelWords.count > 1 {
+                if selectedLevel != .sound && levelWords.count > 1 {
                     nextWordButton
                 }
 
@@ -51,7 +51,7 @@ struct FlashActivityView: View {
         }
     }
 
-    /// Three large level buttons for letter, short words, and long words.
+    /// Three large level buttons for sound, short words, and long words.
     private var levelPicker: some View {
         HStack(spacing: 12) {
             ForEach(FlashLevel.allCases) { level in
@@ -92,7 +92,7 @@ struct FlashActivityView: View {
         }
     }
 
-    /// Large lightning-themed card showing the letter or word for the active level.
+    /// Large lightning-themed card showing the phoneme or word for the active level.
     private func flashcard(cardHeight: CGFloat) -> some View {
         let resolvedHeight = max(cardHeight, 320)
 
@@ -116,8 +116,8 @@ struct FlashActivityView: View {
             VStack(spacing: 18) {
                 practiceBadge
 
-                if selectedLevel == .letter {
-                    Text(target.spelling)
+                if selectedLevel == .sound {
+                    Text(target.symbol)
                         .font(.system(size: resolvedHeight * 0.28, weight: .bold, design: .rounded))
                         .foregroundStyle(ContinuumTheme.stormBlueDeep)
                         .minimumScaleFactor(0.5)
@@ -145,7 +145,7 @@ struct FlashActivityView: View {
 
     /// Shows which sound the child is practicing on word levels.
     private var practiceBadge: some View {
-        Text("Practice: /\(target.symbol)/")
+        Text("Practice: \(target.displayLabel)")
             .font(ContinuumTheme.kidSubheadFont.weight(.bold))
             .foregroundStyle(ContinuumTheme.stormBlueDeep)
             .padding(.horizontal, 20)
@@ -178,10 +178,10 @@ struct FlashActivityView: View {
         .buttonStyle(.plain)
     }
 
-    /// Plays audio for the letter example or the active word.
+    /// Plays audio for the phoneme example or the active word.
     private var hearItButton: some View {
         Button {
-            if selectedLevel == .letter {
+            if selectedLevel == .sound {
                 speechService.speak(target)
             } else {
                 speechService.speakWord(currentWord)
