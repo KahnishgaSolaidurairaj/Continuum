@@ -30,7 +30,7 @@ struct TestActivityView: View {
                             recordingProgress: viewModel.recordingProgress,
                             voicingLevel: viewModel.liveVoicingLevel
                         )
-                        Text("Hold /\(target.symbol)/ for the full bar, then we’ll score automatically.")
+                        Text("Hold \(target.displayLabel) for the full bar, then we’ll score automatically.")
                             .font(.caption)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
@@ -67,7 +67,7 @@ struct TestActivityView: View {
         VStack(spacing: 8) {
             Text("Try it yourself")
                 .font(ContinuumTheme.kidSectionHeaderFont)
-            Text("Practice /\(target.symbol)/")
+            Text("Practice \(target.displayLabel)")
                 .font(ContinuumTheme.kidSubheadFont)
         }
         .padding()
@@ -132,9 +132,9 @@ struct TestActivityView: View {
 
             if !viewModel.isRecording {
                 Text(String(
-                    format: "Recording length matches the reference sound (%.1fs for /%@/).",
+                    format: "Recording length matches the reference sound (%.1fs for %@).",
                     viewModel.targetRecordingDuration,
-                    target.symbol
+                    target.displayLabel
                 ))
                 .font(.caption2)
                 .multilineTextAlignment(.center)

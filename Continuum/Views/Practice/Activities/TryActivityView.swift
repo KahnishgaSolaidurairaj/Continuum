@@ -11,12 +11,16 @@ struct TryActivityView: View {
 
             demoFrame
 
-            Text("Watch how to say /\(target.symbol)/")
+            Text("Watch how to say \(target.displayLabel)")
                 .font(ContinuumTheme.kidSubheadFont)
 
-            Text("“\(target.exampleWord)”")
-                .font(ContinuumTheme.kidSectionHeaderFont)
-                .foregroundStyle(ContinuumTheme.tabPurple)
+            HighlightedWordText(
+                word: target.exampleWord,
+                highlights: target.englishSound.highlights(for: target.exampleWord),
+                font: ContinuumTheme.kidSectionHeaderFont,
+                baseColor: .primary,
+                highlightColor: ContinuumTheme.tabPurple
+            )
 
             Text(target.linkedPhoneme.instruction)
                 .font(ContinuumTheme.kidBodyFont)
