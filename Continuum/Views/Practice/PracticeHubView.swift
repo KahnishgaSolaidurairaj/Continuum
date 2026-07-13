@@ -47,56 +47,71 @@ struct PracticeHubView: View {
     }
 }
 
-/// Wireframe step 1: choose one of the 44 English phonemes.
+/// Wireframe step 1: choose one of the 44 English sounds.
 struct PhonemeSelectionView: View {
     let onSelect: (PracticeTarget) -> Void
 
-    private let gridColumns = Array(repeating: GridItem(.flexible()), count: 5)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    private var columnCount: Int {
+        horizontalSizeClass == .compact ? 2 : 4
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 Text("Which sound?")
                     .font(ContinuumTheme.kidSectionHeaderFont)
+                    .frame(maxWidth: .infinity)
 
-                phonemeSection(title: "Consonants", phonemes: Phoneme.consonants)
-                phonemeSection(title: "Vowels", phonemes: Phoneme.vowels)
+                soundSection(title: "Vowels", sounds: EnglishSound.vowels)
+                soundSection(title: "Consonants", sounds: EnglishSound.consonants)
+                soundSection(title: "Vowel Teams", sounds: EnglishSound.vowelTeams)
             }
             .padding()
         }
     }
 
-    private func phonemeSection(title: String, phonemes: [Phoneme]) -> some View {
+    private func soundSection(title: String, sounds: [EnglishSound]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(ContinuumTheme.kidSubheadFont)
                 .foregroundStyle(ContinuumTheme.tabPurple)
 
-            LazyVGrid(columns: gridColumns, spacing: 12) {
-                ForEach(phonemes) { phoneme in
-                    if let target = PracticeTarget.allPhonemes.first(where: { $0.linkedPhoneme == phoneme }) {
-                        Button {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: columnCount), spacing: 12) {
+                ForEach(sounds) { sound in
+                    Button {
+                        if let target = PracticeTarget.allPhonemes.first(where: { $0.id == sound.id }) {
                             onSelect(target)
-                        } label: {
-                            VStack(spacing: 4) {
-                                Text(target.symbol)
-                                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                                Text(phoneme.exampleWord)
-                                    .font(.caption2)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                            }
-                            .foregroundStyle(.primary)
-                            .frame(maxWidth: .infinity, minHeight: 72)
-                            .background(.white.opacity(0.8))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(ContinuumTheme.cardBorder, lineWidth: 2)
+                        }
+                    } label: {
+                        VStack(spacing: 8) {
+                            Text(sound.displayName)
+                                .font(ContinuumTheme.kidCaptionFont.weight(.bold))
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.8)
+
+                            HighlightedWordText(
+                                word: sound.level1Example.word,
+                                highlights: sound.level1Example.highlights,
+                                font: ContinuumTheme.kidSubheadFont,
+                                baseColor: .primary,
+                                highlightColor: ContinuumTheme.tabPurple
                             )
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("\(phoneme.displayName), as in \(phoneme.exampleWord)")
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity, minHeight: 92)
+                        .background(.white.opacity(0.85))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(ContinuumTheme.cardBorder.opacity(0.35), lineWidth: 2)
+                        )
+                        .contentShape(RoundedRectangle(cornerRadius: 12))
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("\(sound.displayName), as in \(sound.primaryExample)")
                 }
             }
         }
@@ -190,30 +205,30 @@ struct ActivityCarouselView: View {
         }
     }
 
-    /// Large preview card showing the practice phoneme clearly.
+    /// Large preview card showing the practice phoneme; tap to return to sound selection.
     private func phonemePreviewCard(cardHeight: CGFloat, symbolSize: CGFloat) -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 24)
-                .fill(.white.opacity(0.75))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(ContinuumTheme.cardBorder.opacity(0.2), lineWidth: 2)
-                )
+        Button(action: onBack) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(.white.opacity(0.75))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(ContinuumTheme.cardBorder.opacity(0.2), lineWidth: 2)
+                    )
 
-            VStack(spacing: 8) {
-                Text(target.symbol)
+                Text(target.traceCharacter.uppercased())
                     .font(.system(size: symbolSize, weight: .bold, design: .rounded))
                     .foregroundStyle(.black.opacity(0.72))
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
-
-                Text("“\(target.exampleWord)”")
-                    .font(ContinuumTheme.kidSubheadFont)
-                    .foregroundStyle(.secondary)
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: cardHeight)
+            .contentShape(RoundedRectangle(cornerRadius: 24))
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: cardHeight)
+        .buttonStyle(.plain)
+        .accessibilityLabel("Back to all sounds")
+        .accessibilityHint("Returns to the sound selection screen")
     }
 
     /// Side length for square activity tiles on iPad, or row height reference on iPhone.
@@ -324,9 +339,9 @@ private struct ActivityTileTheme {
             )
         case .tryDemo:
             return ActivityTileTheme(
-                gradient: [ContinuumTheme.stormBlue, ContinuumTheme.homeLavender],
-                foreground: ContinuumTheme.tabPurple,
-                border: ContinuumTheme.tabPurple
+                gradient: [ContinuumTheme.homeLavender, ContinuumTheme.stormBlue],
+                foreground: ContinuumTheme.stormBlueDeep,
+                border: ContinuumTheme.stormBlueDeep
             )
         case .test:
             return ActivityTileTheme(

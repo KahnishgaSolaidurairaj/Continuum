@@ -14,8 +14,11 @@ struct FlashActivityView: View {
     }
 
     private var currentWord: String {
-        guard !levelWords.isEmpty else { return target.exampleWord }
-        return levelWords[wordIndex % levelWords.count]
+        levelWords[wordIndex % max(levelWords.count, 1)]
+    }
+
+    private var hasWordsForSelectedLevel: Bool {
+        !levelWords.isEmpty
     }
 
     var body: some View {
@@ -33,7 +36,15 @@ struct FlashActivityView: View {
                     nextWordButton
                 }
 
+                if !hasWordsForSelectedLevel {
+                    Text("More words coming soon for this level.")
+                        .font(ContinuumTheme.kidCaptionFont)
+                        .foregroundStyle(ContinuumTheme.stormBlue)
+                        .multilineTextAlignment(.center)
+                }
+
                 hearItButton
+                    .disabled(!hasWordsForSelectedLevel && selectedLevel != .sound)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
@@ -117,23 +128,29 @@ struct FlashActivityView: View {
                 practiceBadge
 
                 if selectedLevel == .sound {
-                    Text(target.symbol)
-                        .font(.system(size: resolvedHeight * 0.28, weight: .bold, design: .rounded))
+                    Text(target.displayLabel)
+                        .font(.system(size: resolvedHeight * 0.16, weight: .bold, design: .rounded))
                         .foregroundStyle(ContinuumTheme.stormBlueDeep)
                         .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-
-                    Text(currentWord)
-                        .font(.system(size: resolvedHeight * 0.11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(ContinuumTheme.stormBlue)
-                } else {
-                    Text(currentWord)
-                        .font(.system(size: wordFontSize(for: currentWord, cardHeight: resolvedHeight), weight: .bold, design: .rounded))
-                        .foregroundStyle(ContinuumTheme.stormBlueDeep)
-                        .minimumScaleFactor(0.45)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 16)
+
+                    highlightedWordView(
+                        word: target.exampleWord,
+                        font: .system(size: resolvedHeight * 0.14, weight: .semibold, design: .rounded)
+                    )
+                } else if hasWordsForSelectedLevel {
+                    highlightedWordView(
+                        word: currentWord,
+                        font: .system(size: wordFontSize(for: currentWord, cardHeight: resolvedHeight), weight: .bold, design: .rounded)
+                    )
+                    .minimumScaleFactor(0.45)
+                    .lineLimit(2)
+                    .padding(.horizontal, 16)
+                } else {
+                    Text("No words yet")
+                        .font(ContinuumTheme.kidSectionHeaderFont)
+                        .foregroundStyle(ContinuumTheme.stormBlue)
                 }
             }
             .padding(.vertical, 32)
@@ -211,6 +228,17 @@ struct FlashActivityView: View {
         case 7...8: return baseSize * 0.68
         default: return baseSize * 0.56
         }
+    }
+
+    /// Renders a flash word with the target sound letters emphasized.
+    private func highlightedWordView(word: String, font: Font) -> some View {
+        HighlightedWordText(
+            word: word,
+            highlights: FlashWordBank.highlights(for: target, word: word),
+            font: font,
+            baseColor: ContinuumTheme.stormBlueDeep,
+            highlightColor: ContinuumTheme.stormBlue
+        )
     }
 }
 

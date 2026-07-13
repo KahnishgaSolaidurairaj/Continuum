@@ -80,7 +80,8 @@ extension View {
 
     /// Applies styling for selectable list rows in sheets.
     func kidChoiceButtonStyle(isSelected: Bool) -> some View {
-        background(.white.opacity(isSelected ? 1 : 0.95))
+        self
+            .background(.white.opacity(isSelected ? 1 : 0.95))
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
@@ -89,5 +90,6 @@ extension View {
                         lineWidth: isSelected ? 3 : 1.5
                     )
             )
+            .contentShape(RoundedRectangle(cornerRadius: 16))
     }
 }
