@@ -378,10 +378,12 @@ struct MoodLogSheet: View {
                                 }
                             }
                             .padding(.horizontal, 20)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .padding(.vertical, 16)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                            .kidChoiceButtonStyle(isSelected: selectedMood == mood.label)
                         }
                         .buttonStyle(.plain)
-                        .kidChoiceButtonStyle(isSelected: selectedMood == mood.label)
+                        .contentShape(Rectangle())
                     }
                 }
                 .padding(24)
@@ -433,10 +435,12 @@ struct DailyGoalSheet: View {
                                 }
                             }
                             .padding(.horizontal, 20)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .padding(.vertical, 16)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                            .kidChoiceButtonStyle(isSelected: goalMinutes == minutes)
                         }
                         .buttonStyle(.plain)
-                        .kidChoiceButtonStyle(isSelected: goalMinutes == minutes)
+                        .contentShape(Rectangle())
                     }
                 }
                 .padding(24)

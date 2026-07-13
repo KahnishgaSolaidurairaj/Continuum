@@ -80,7 +80,7 @@ struct SandboxActivityView: View {
                 }
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
 
-            Text(target.symbol)
+            Text(target.traceCharacter.uppercased())
                 .font(.system(size: letterSize, weight: .bold, design: .rounded))
                 .foregroundStyle(.black.opacity(0.14))
                 .minimumScaleFactor(0.5)
