@@ -1,155 +1,187 @@
 import SwiftUI
 
-/// Try activity: example of someone saying the target sound/word.
+/// Try activity: embedded YouTube clip demonstrating the target sound.
 struct TryActivityView: View {
     let target: PracticeTarget
+
+    @State private var playbackToken = 0
+    @State private var playerReady = false
+    @State private var segmentFinished = false
+    @State private var showFullVideoPrompt = false
+
+    private var clip: PronunciationVideoClip? {
+        PronunciationVideoCatalog.clip(for: target.id)
+    }
 
     var body: some View {
         VStack(spacing: 20) {
             Text("See an example")
                 .font(ContinuumTheme.kidSectionHeaderFont)
-
-            demoFrame
+                .foregroundStyle(ContinuumTheme.stormBlueDeep)
 
             Text("Watch how to say \(target.displayLabel)")
                 .font(ContinuumTheme.kidSubheadFont)
-
-            HighlightedWordText(
-                word: target.exampleWord,
-                highlights: target.englishSound.highlights(for: target.exampleWord),
-                font: ContinuumTheme.kidSectionHeaderFont,
-                baseColor: .primary,
-                highlightColor: ContinuumTheme.tabPurple
-            )
-
-            Text(target.linkedPhoneme.instruction)
-                .font(ContinuumTheme.kidBodyFont)
+                .foregroundStyle(ContinuumTheme.stormBlueDeep)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal)
+
+            videoSection
+
+            actionButtons
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(ContinuumTheme.practiceCream)
-    }
-
-    private var demoFrame: some View {
-        ZStack {
-            AsyncImage(url: PronunciationDemoPlaceholder.portraitURL(for: target)) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                case .failure:
-                    SpeakingDemoFallbackView(target: target)
-                default:
-                    SpeakingDemoFallbackView(target: target)
-                        .overlay { ProgressView().tint(.white) }
-                }
-            }
-
+        .background(
             LinearGradient(
-                colors: [.clear, .black.opacity(0.55)],
-                startPoint: .center,
-                endPoint: .bottom
-            )
-
-            VStack {
-                Spacer()
-                speechBubble
-                    .padding(.bottom, 20)
-            }
-
-            VStack {
-                HStack {
-                    demoBadge
-                    Spacer()
-                }
-                Spacer()
-            }
-            .padding(12)
-
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Image(systemName: "play.circle.fill")
-                        .font(.system(size: 44))
-                        .foregroundStyle(.white)
-                        .shadow(radius: 4)
-                        .padding(16)
-                }
-            }
-        }
-        .frame(height: 300)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(ContinuumTheme.cardBorder, lineWidth: 2)
-        )
-    }
-
-    private var speechBubble: some View {
-        Text(target.exampleWord)
-            .font(.title.weight(.bold))
-            .foregroundStyle(.primary)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
-            .background(.white.opacity(0.95))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(.white.opacity(0.5), lineWidth: 1)
-            )
-            .shadow(radius: 4)
-    }
-
-    private var demoBadge: some View {
-        Text("Demo")
-            .font(.caption.weight(.bold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(.black.opacity(0.45))
-            .foregroundStyle(.white)
-            .clipShape(Capsule())
-    }
-}
-
-/// Offline fallback that reads like a person saying one word.
-struct SpeakingDemoFallbackView: View {
-    let target: PracticeTarget
-
-    var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.45, green: 0.55, blue: 0.85), Color(red: 0.35, green: 0.42, blue: 0.72)],
+                colors: [ContinuumTheme.homeLavender, ContinuumTheme.stormBlue],
                 startPoint: .top,
                 endPoint: .bottom
             )
-
-            VStack(spacing: 16) {
-                ZStack {
-                    Circle()
-                        .fill(Color(red: 0.96, green: 0.87, blue: 0.78))
-                        .frame(width: 120, height: 120)
-
-                    Ellipse()
-                        .fill(.white)
-                        .frame(width: 36, height: 22)
-                        .offset(y: 18)
-
-                    HStack(spacing: 18) {
-                        Circle().fill(.black.opacity(0.75)).frame(width: 8, height: 8)
-                        Circle().fill(.black.opacity(0.75)).frame(width: 8, height: 8)
-                    }
-                    .offset(y: -8)
-                }
-
-                Text("“\(target.exampleWord)”")
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(.white)
+        )
+        .alert("Watch the full video?", isPresented: $showFullVideoPrompt) {
+            Button("Open YouTube") {
+                openFullVideo()
             }
+            Button("Not now", role: .cancel) {}
+        } message: {
+            Text("This opens the complete pronunciation guide with all 44 English sounds on YouTube.")
         }
+    }
+
+    @ViewBuilder
+    private var videoSection: some View {
+        if let clip {
+            ZStack {
+                YouTubeSegmentPlayerView(
+                    clip: clip,
+                    playbackToken: playbackToken,
+                    onReady: { playerReady = true },
+                    onSegmentFinished: { segmentFinished = true }
+                )
+
+                if !playerReady {
+                    ProgressView("Loading video…")
+                        .tint(ContinuumTheme.stormBlueDeep)
+                        .foregroundStyle(ContinuumTheme.stormBlueDeep)
+                } else if playbackToken == 0 {
+                    playOverlay
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 300)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 2)
+            )
+        } else {
+            missingClipCard
+        }
+    }
+
+    private var playOverlay: some View {
+        Button {
+            segmentFinished = false
+            playbackToken += 1
+        } label: {
+            Image(systemName: "play.circle.fill")
+                .font(.system(size: 72))
+                .foregroundStyle(.white)
+                .shadow(color: ContinuumTheme.stormBlueDeep.opacity(0.45), radius: 8)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Play example clip")
+    }
+
+    private var missingClipCard: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "play.rectangle")
+                .font(.system(size: 44))
+                .foregroundStyle(ContinuumTheme.stormBlueDeep)
+
+            Text("Video clip coming soon")
+                .font(ContinuumTheme.kidSubheadFont)
+                .foregroundStyle(ContinuumTheme.stormBlueDeep)
+
+            Text("We still need the timestamp for \(target.displayLabel) from the pronunciation guide.")
+                .font(ContinuumTheme.kidCaptionFont)
+                .foregroundStyle(ContinuumTheme.stormBlueDeep.opacity(0.85))
+                .multilineTextAlignment(.center)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .frame(height: 300)
+        .background(.white.opacity(0.85))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 2)
+        )
+    }
+
+    @ViewBuilder
+    private var actionButtons: some View {
+        if clip != nil, segmentFinished {
+            VStack(spacing: 12) {
+                Button {
+                    segmentFinished = false
+                    playbackToken += 1
+                } label: {
+                    Label("Replay clip", systemImage: "arrow.counterclockwise.circle.fill")
+                        .font(ContinuumTheme.kidButtonFont)
+                        .foregroundStyle(ContinuumTheme.stormBlueDeep)
+                        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                        .background(ContinuumTheme.lightningGlow)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 2)
+                        )
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    showFullVideoPrompt = true
+                } label: {
+                    Label("Watch full video", systemImage: "arrow.up.right.square")
+                        .font(ContinuumTheme.kidButtonFont)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                        .background(ContinuumTheme.stormBlueDeep)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+            }
+        } else if clip != nil, playerReady, playbackToken == 0 {
+            Button {
+                segmentFinished = false
+                playbackToken += 1
+            } label: {
+                Label("Play clip", systemImage: "play.fill")
+                    .font(ContinuumTheme.kidButtonFont)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                    .background(ContinuumTheme.stormBlueDeep)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
+        } else if clip == nil {
+            Button {
+                showFullVideoPrompt = true
+            } label: {
+                Label("Open pronunciation guide", systemImage: "arrow.up.right.square")
+                    .font(ContinuumTheme.kidButtonFont)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                    .background(ContinuumTheme.stormBlueDeep)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    /// Opens the shared YouTube guide, starting at the clip when available.
+    private func openFullVideo() {
+        let url = clip?.fullVideoURLAtClip ?? URL(string: "https://www.youtube.com/watch?v=\(PronunciationVideoCatalog.sharedVideoID)")!
+        UIApplication.shared.open(url)
     }
 }

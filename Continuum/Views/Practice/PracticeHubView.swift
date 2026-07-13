@@ -339,9 +339,9 @@ private struct ActivityTileTheme {
             )
         case .tryDemo:
             return ActivityTileTheme(
-                gradient: [ContinuumTheme.stormBlue, ContinuumTheme.homeLavender],
-                foreground: ContinuumTheme.tabPurple,
-                border: ContinuumTheme.tabPurple
+                gradient: [ContinuumTheme.homeLavender, ContinuumTheme.stormBlue],
+                foreground: ContinuumTheme.stormBlueDeep,
+                border: ContinuumTheme.stormBlueDeep
             )
         case .test:
             return ActivityTileTheme(
