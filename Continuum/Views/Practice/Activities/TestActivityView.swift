@@ -23,20 +23,13 @@ struct TestActivityView: View {
 
                 VStack(spacing: 12) {
                     if viewModel.isRecording {
-                        LiveAudioMetersView(
-                            audioLevel: viewModel.liveAudioLevel,
-                            duration: viewModel.liveDuration,
-                            targetDuration: viewModel.targetRecordingDuration,
-                            recordingProgress: viewModel.recordingProgress,
-                            voicingLevel: viewModel.liveVoicingLevel
-                        )
-                        Text("Hold \(target.displayLabel) for the full bar, then we’ll score automatically.")
+                        recordingProgressCard
+                        Text("Hold \(target.displayLabel) for the full bar. Your score appears when recording ends.")
                             .font(.caption)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
-                        CoachingMessagesView(messages: viewModel.liveHints)
                     } else if let score = viewModel.lastScore {
-                        scoreCard(score: score)
+                        overallScoreCard(score: score)
                         CoachingMessagesView(messages: score.messages)
                     } else {
                         Text(target.linkedPhoneme.audioInstruction)
@@ -53,7 +46,7 @@ struct TestActivityView: View {
             }
         }
         .task {
-            viewModel.selectedPhoneme = target.linkedPhoneme
+            viewModel.configurePracticeTarget(soundID: target.id, phoneme: target.linkedPhoneme)
             await viewModel.preparePermissions()
         }
         .alert("Notice", isPresented: errorAlertBinding) {
@@ -75,25 +68,37 @@ struct TestActivityView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    private func scoreCard(score: PronunciationScore) -> some View {
-        VStack(spacing: 8) {
+    private var recordingProgressCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
-                VStack(alignment: .leading) {
-                    Text("Accuracy")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text("\(score.correctness)%")
-                        .font(.largeTitle.bold())
-                }
+                Text("Recording")
+                    .font(.caption)
                 Spacer()
-                VStack(alignment: .trailing) {
-                    Text("Confidence")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(String(format: "%.0f%%", score.confidence * 100))
-                        .font(.title2.bold())
-                }
+                Text(String(
+                    format: "%.1f / %.1fs",
+                    viewModel.liveDuration,
+                    viewModel.targetRecordingDuration
+                ))
+                .font(.caption.monospacedDigit())
             }
+            ProgressView(value: viewModel.recordingProgress)
+                .tint(.orange)
+        }
+        .padding(12)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func overallScoreCard(score: PronunciationScore) -> some View {
+        VStack(spacing: 8) {
+            Text("Your Score")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text("\(score.correctness)%")
+                .font(.system(size: 56, weight: .bold, design: .rounded))
+                .frame(maxWidth: .infinity, alignment: .center)
 
             Text(score.scoringMethodLabel)
                 .font(.caption2)

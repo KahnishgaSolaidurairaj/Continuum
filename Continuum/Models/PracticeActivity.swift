@@ -37,18 +37,18 @@ enum PracticeActivity: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-/// One of the 44 English phonemes the child can practice.
+/// One practice sound the child can select in the Practice tab.
 struct PracticeTarget: Identifiable, Hashable, Sendable {
     let id: String
-    let englishSound: EnglishSound
+    let practiceSound: PracticeSound
 
-    var symbol: String { englishSound.displayName }
-    var exampleWord: String { englishSound.primaryExample }
-    var linkedPhoneme: Phoneme { englishSound.linkedPhoneme }
+    var symbol: String { practiceSound.displayName }
+    var exampleWord: String { practiceSound.primaryExample }
+    var linkedPhoneme: Phoneme { practiceSound.linkedPhoneme }
 
-    /// All 44 English sounds available in the Practice tab.
-    static let allPhonemes: [PracticeTarget] = EnglishSound.allSounds.map { sound in
-        PracticeTarget(id: sound.id, englishSound: sound)
+    /// All practice sounds available in the Practice tab.
+    static let allPhonemes: [PracticeTarget] = PracticeSoundCatalog.allSounds.map { sound in
+        PracticeTarget(id: sound.id, practiceSound: sound)
     }
 
     /// Backward-compatible alias used by older call sites.
@@ -56,10 +56,10 @@ struct PracticeTarget: Identifiable, Hashable, Sendable {
 
     /// Display label used in headers and buttons.
     var displayLabel: String {
-        englishSound.displayName
+        practiceSound.displayName
     }
 
     var traceCharacter: String {
-        englishSound.traceCharacter
+        practiceSound.traceCharacter
     }
 }

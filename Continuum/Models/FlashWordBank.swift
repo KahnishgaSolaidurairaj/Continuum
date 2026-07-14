@@ -18,7 +18,7 @@ enum FlashLevel: Int, CaseIterable, Identifiable, Sendable {
 
     var subtitle: String {
         switch self {
-        case .sound: return "Sound + word"
+        case .sound: return "Sound"
         case .shortWords: return "Short words"
         case .longWords: return "Longer words"
         }
@@ -35,16 +35,16 @@ enum FlashWordBank {
     static func words(for target: PracticeTarget, level: FlashLevel) -> [String] {
         switch level {
         case .sound:
-            return [target.englishSound.level1Example.word]
+            return []
         case .shortWords:
-            return target.englishSound.level2Examples.map(\.word)
+            return target.practiceSound.level2Examples.map(\.word)
         case .longWords:
-            return target.englishSound.level3Examples.map(\.word)
+            return target.practiceSound.level3Examples.map(\.word)
         }
     }
 
     /// Returns highlight ranges for a flash word when known.
     static func highlights(for target: PracticeTarget, word: String) -> [SoundHighlight] {
-        target.englishSound.highlights(for: word)
+        target.practiceSound.highlights(for: word)
     }
 }

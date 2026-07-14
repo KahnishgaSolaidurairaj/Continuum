@@ -1,9 +1,8 @@
 import SwiftUI
+import SwiftData
 
 /// Practice tab entry: pick a target, browse activities, launch one full-screen.
 struct PracticeHubView: View {
-    let initialTarget: PracticeTarget?
-
     @State private var selectedTarget: PracticeTarget?
     @State private var activeActivity: PracticeActivity?
 
@@ -34,20 +33,10 @@ struct PracticeHubView: View {
                 }
             }
         }
-        .onAppear {
-            if selectedTarget == nil {
-                selectedTarget = initialTarget
-            }
-        }
-        .onChange(of: initialTarget?.id) { _, _ in
-            if let initialTarget {
-                selectedTarget = initialTarget
-            }
-        }
     }
 }
 
-/// Wireframe step 1: choose one of the 44 English sounds.
+/// Wireframe step 1: choose one of the 47 practice sounds.
 struct PhonemeSelectionView: View {
     let onSelect: (PracticeTarget) -> Void
 
@@ -64,15 +53,15 @@ struct PhonemeSelectionView: View {
                     .font(ContinuumTheme.kidSectionHeaderFont)
                     .frame(maxWidth: .infinity)
 
-                soundSection(title: "Vowels", sounds: EnglishSound.vowels)
-                soundSection(title: "Consonants", sounds: EnglishSound.consonants)
-                soundSection(title: "Vowel Teams", sounds: EnglishSound.vowelTeams)
+                soundSection(title: "Vowels", sounds: PracticeSoundCatalog.vowels)
+                soundSection(title: "Consonants", sounds: PracticeSoundCatalog.consonants)
+                soundSection(title: "Vowel Teams", sounds: PracticeSoundCatalog.vowelTeams)
             }
             .padding()
         }
     }
 
-    private func soundSection(title: String, sounds: [EnglishSound]) -> some View {
+    private func soundSection(title: String, sounds: [PracticeSound]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(ContinuumTheme.kidSubheadFont)
@@ -81,9 +70,7 @@ struct PhonemeSelectionView: View {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: columnCount), spacing: 12) {
                 ForEach(sounds) { sound in
                     Button {
-                        if let target = PracticeTarget.allPhonemes.first(where: { $0.id == sound.id }) {
-                            onSelect(target)
-                        }
+                        onSelect(PracticeTarget(id: sound.id, practiceSound: sound))
                     } label: {
                         VStack(spacing: 8) {
                             Text(sound.displayName)
@@ -92,13 +79,15 @@ struct PhonemeSelectionView: View {
                                 .lineLimit(2)
                                 .minimumScaleFactor(0.8)
 
-                            HighlightedWordText(
-                                word: sound.level1Example.word,
-                                highlights: sound.level1Example.highlights,
-                                font: ContinuumTheme.kidSubheadFont,
-                                baseColor: .primary,
-                                highlightColor: ContinuumTheme.tabPurple
-                            )
+                            if let example = sound.level2Examples.first {
+                                HighlightedWordText(
+                                    word: example.word,
+                                    highlights: example.highlights,
+                                    font: ContinuumTheme.kidSubheadFont,
+                                    baseColor: .primary,
+                                    highlightColor: ContinuumTheme.tabPurple
+                                )
+                            }
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 12)
@@ -358,6 +347,13 @@ struct ActivityDetailView: View {
     let target: PracticeTarget
     let activity: PracticeActivity
 
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+
+    @State private var tracker = ActivitySessionTracker()
+    @State private var showMoodSheet = false
+
     var body: some View {
         Group {
             switch activity {
@@ -372,6 +368,39 @@ struct ActivityDetailView: View {
             }
         }
         .kidFriendlyNavigationTitle(activity.subtitle)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("I'm Done") {
+                    showMoodSheet = true
+                }
+                .font(ContinuumTheme.kidButtonFont)
+                .foregroundStyle(ContinuumTheme.tabPurple)
+            }
+        }
+        .onAppear {
+            tracker.start(activity: activity, target: target)
+        }
+        .onDisappear {
+            if tracker.hasActiveSession {
+                tracker.abandon(modelContext: modelContext)
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .active:
+                tracker.resume()
+            case .background, .inactive:
+                tracker.pause()
+            @unknown default:
+                break
+            }
+        }
+        .sheet(isPresented: $showMoodSheet) {
+            ActivityMoodSheet { mood in
+                tracker.end(mood: mood, modelContext: modelContext)
+                dismiss()
+            }
+        }
     }
 }
 

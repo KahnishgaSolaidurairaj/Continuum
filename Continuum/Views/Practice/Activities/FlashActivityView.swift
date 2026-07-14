@@ -8,6 +8,7 @@ struct FlashActivityView: View {
     @State private var wordIndex = 0
 
     private let speechService = SpeechSynthesisService()
+    private let referencePlayback = ReferenceAudioPlaybackService()
 
     private var levelWords: [String] {
         FlashWordBank.words(for: target, level: selectedLevel)
@@ -36,7 +37,7 @@ struct FlashActivityView: View {
                     nextWordButton
                 }
 
-                if !hasWordsForSelectedLevel {
+                if !hasWordsForSelectedLevel && selectedLevel != .sound {
                     Text("More words coming soon for this level.")
                         .font(ContinuumTheme.kidCaptionFont)
                         .foregroundStyle(ContinuumTheme.stormBlue)
@@ -59,6 +60,9 @@ struct FlashActivityView: View {
         }
         .onChange(of: selectedLevel) { _, _ in
             wordIndex = 0
+        }
+        .onDisappear {
+            referencePlayback.stop()
         }
     }
 
@@ -125,20 +129,17 @@ struct FlashActivityView: View {
             LightningCornerDecoration()
 
             VStack(spacing: 18) {
-                practiceBadge
+                if selectedLevel != .sound {
+                    practiceBadge
+                }
 
                 if selectedLevel == .sound {
                     Text(target.displayLabel)
-                        .font(.system(size: resolvedHeight * 0.16, weight: .bold, design: .rounded))
+                        .font(.system(size: resolvedHeight * 0.22, weight: .bold, design: .rounded))
                         .foregroundStyle(ContinuumTheme.stormBlueDeep)
                         .minimumScaleFactor(0.5)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
-
-                    highlightedWordView(
-                        word: target.exampleWord,
-                        font: .system(size: resolvedHeight * 0.14, weight: .semibold, design: .rounded)
-                    )
                 } else if hasWordsForSelectedLevel {
                     highlightedWordView(
                         word: currentWord,
@@ -199,7 +200,7 @@ struct FlashActivityView: View {
     private var hearItButton: some View {
         Button {
             if selectedLevel == .sound {
-                speechService.speak(target)
+                referencePlayback.playReference(for: target.id)
             } else {
                 speechService.speakWord(currentWord)
             }

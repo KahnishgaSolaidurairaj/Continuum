@@ -183,4 +183,59 @@ enum FeatureExtractor {
 
         return peak
     }
+
+    /// Returns the fraction of sample windows above an RMS threshold.
+    /// - Parameters:
+    ///   - chunks: Captured microphone chunks for one attempt.
+    ///   - threshold: RMS threshold used to detect active audio.
+    /// - Returns: Ratio of active windows in `0...1`.
+    static func activeSpeechRatio(
+        from chunks: [AudioChunk],
+        threshold: Float = 0.01
+    ) -> Float {
+        guard let firstChunk = chunks.first else { return 0 }
+
+        let samples = chunks.flatMap(\.samples)
+        let sampleRate = firstChunk.sampleRate
+        let window = max(256, Int(sampleRate * 0.01))
+        guard samples.count >= window else { return 0 }
+
+        let step = max(1, window / 2)
+        var activeWindows = 0
+        var totalWindows = 0
+
+        var start = 0
+        while start + window <= samples.count {
+            let windowSamples = samples[start..<(start + window)]
+            let sumSquares = windowSamples.reduce(Float.zero) { partial, sample in
+                partial + sample * sample
+            }
+            let windowRMS = sqrt(sumSquares / Float(windowSamples.count))
+            if windowRMS >= threshold {
+                activeWindows += 1
+            }
+            totalWindows += 1
+            start += step
+        }
+
+        guard totalWindows > 0 else { return 0 }
+        return Float(activeWindows) / Float(totalWindows)
+    }
+
+    /// Returns the fraction of samples at or above a saturation ceiling.
+    /// - Parameters:
+    ///   - chunks: Captured microphone chunks for one attempt.
+    ///   - ceiling: Absolute sample level treated as hard saturation.
+    /// - Returns: Ratio of saturated samples in `0...1`.
+    static func saturationRatio(from chunks: [AudioChunk], ceiling: Float = 0.999) -> Float {
+        let samples = chunks.flatMap(\.samples)
+        guard !samples.isEmpty else { return 0 }
+
+        let saturatedCount = samples.reduce(into: 0) { count, sample in
+            if abs(sample) >= ceiling {
+                count += 1
+            }
+        }
+        return Float(saturatedCount) / Float(samples.count)
+    }
 }

@@ -171,10 +171,20 @@ enum PronunciationScorer {
         )
     }
 
+    private static let minimumActiveSpeechRatio: Float = 0.12
+    private static let activeSpeechThreshold: Float = 0.01
+
     /// Rejects attempts with unusable audio before ML scoring is trusted.
-    /// - Parameter audio: Aggregated audio features.
+    /// - Parameters:
+    ///   - audio: Aggregated audio features.
+    ///   - chunks: Raw captured microphone chunks used for saturation detection.
+    ///   - voiceProcessingActive: Whether Apple voice processing shaped the capture.
     /// - Returns: A critical coaching message when audio should be rejected.
-    static func audioQualityFailure(for audio: AudioFeatures) -> CoachingMessage? {
+    static func audioQualityFailure(
+        for audio: AudioFeatures,
+        chunks: [AudioChunk] = [],
+        voiceProcessingActive: Bool = false
+    ) -> CoachingMessage? {
         if audio.duration < 0.08 {
             return CoachingMessage(
                 text: "Too short — hold the sound a little longer.",
@@ -187,13 +197,39 @@ enum PronunciationScorer {
                 severity: .critical
             )
         }
-        if audio.peakEnergy > 0.98 {
+        let speechRatio = FeatureExtractor.activeSpeechRatio(
+            from: chunks,
+            threshold: activeSpeechThreshold
+        )
+        if speechRatio < minimumActiveSpeechRatio {
+            return CoachingMessage(
+                text: "No clear sound detected. Speak a little louder and try again.",
+                severity: .critical
+            )
+        }
+        if isClipped(audio: audio, chunks: chunks, voiceProcessingActive: voiceProcessingActive) {
             return CoachingMessage(
                 text: "Audio clipped — move slightly back from the microphone.",
                 severity: .critical
             )
         }
         return nil
+    }
+
+    /// Detects destructive clipping instead of normal voice-processing limiter peaks.
+    private static func isClipped(
+        audio: AudioFeatures,
+        chunks: [AudioChunk],
+        voiceProcessingActive: Bool
+    ) -> Bool {
+        let saturation = FeatureExtractor.saturationRatio(from: chunks)
+
+        if voiceProcessingActive {
+            // Voice processing AGC intentionally rides near full scale; require sustained saturation.
+            return saturation > 0.08
+        }
+
+        return audio.peakEnergy > 0.98 || saturation > 0.03
     }
 
     /// Scores an attempt with rules as a gate and embedding similarity as the primary scorer.
@@ -205,12 +241,18 @@ enum PronunciationScorer {
     /// - Returns: Final score from embeddings when available, otherwise rule-based scoring.
     @MainActor
     static func scoreAttempt(
+        soundID: String,
         phoneme: Phoneme,
         audio: AudioFeatures,
         chunks: [AudioChunk],
-        embeddingScorer: EmbeddingPronunciationScorer
+        embeddingScorer: EmbeddingPronunciationScorer,
+        voiceProcessingActive: Bool = false
     ) -> PronunciationScore {
-        if let failure = audioQualityFailure(for: audio) {
+        if let failure = audioQualityFailure(
+            for: audio,
+            chunks: chunks,
+            voiceProcessingActive: voiceProcessingActive
+        ) {
             return PronunciationScore(
                 correctness: 0,
                 confidence: 0.1,
@@ -219,7 +261,7 @@ enum PronunciationScorer {
             )
         }
 
-        if let embeddingScore = embeddingScorer.score(phoneme: phoneme, chunks: chunks) {
+        if let embeddingScore = embeddingScorer.score(soundID: soundID, phoneme: phoneme, chunks: chunks) {
             return embeddingScore
         }
 
