@@ -10,5 +10,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: PracticeSessionRecord.self, inMemory: true)
+        .modelContainer(for: [PracticeSessionRecord.self, ActivityEngagementRecord.self], inMemory: true)
 }

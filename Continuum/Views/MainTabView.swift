@@ -10,50 +10,57 @@ enum AppTab: Hashable {
 /// Root tab shell matching the wireframe home / practice / dashboard flow.
 struct MainTabView: View {
     @State private var selectedTab: AppTab = .home
-    @State private var practiceTarget: PracticeTarget?
+    @State private var practiceRootID = UUID()
 
     var body: some View {
         VStack(spacing: 0) {
             Group {
                 switch selectedTab {
                 case .home:
-                    HomeView(
-                        onStartPractice: { target in
-                            practiceTarget = target
-                            selectedTab = .practice
-                        },
-                        onOpenPracticeTab: {
-                            selectedTab = .practice
-                        }
-                    )
+                    HomeView(onOpenPracticeTab: openPracticeHub)
                 case .practice:
-                    PracticeHubView(initialTarget: practiceTarget)
+                    PracticeHubView()
+                        .id(practiceRootID)
                 case .dashboard:
                     DashboardView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            ContinuumTabBar(selectedTab: $selectedTab)
+            ContinuumTabBar(selectedTab: $selectedTab, onTabSelected: selectTab)
         }
         .ignoresSafeArea(edges: .bottom)
+    }
+
+    /// Opens the practice tab at phoneme selection every time.
+    private func openPracticeHub() {
+        practiceRootID = UUID()
+        selectedTab = .practice
+    }
+
+    /// Switches tabs and resets practice navigation when Practice is chosen.
+    /// - Parameter tab: Destination tab.
+    private func selectTab(_ tab: AppTab) {
+        if tab == .practice {
+            practiceRootID = UUID()
+        }
+        selectedTab = tab
     }
 }
 
 /// Custom purple bottom navigation from the wireframes.
 struct ContinuumTabBar: View {
     @Binding var selectedTab: AppTab
+    let onTabSelected: (AppTab) -> Void
 
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             tabButton(tab: .home, title: "Home", systemImage: "house.fill")
-            Spacer()
             tabButton(tab: .practice, title: "Practice", systemImage: "play.circle.fill", isRaised: true)
-            Spacer()
             tabButton(tab: .dashboard, title: "Dashboard", systemImage: "chart.bar.fill")
         }
-        .padding(.horizontal, 36)
-        .padding(.top, 14)
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
         .padding(.bottom, 24)
         .background(ContinuumTheme.tabPurple)
         .foregroundStyle(.white)
@@ -61,17 +68,16 @@ struct ContinuumTabBar: View {
 
     private func tabButton(tab: AppTab, title: String, systemImage: String, isRaised: Bool = false) -> some View {
         Button {
-            selectedTab = tab
+            onTabSelected(tab)
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 Image(systemName: systemImage)
-                    .font(isRaised ? .system(size: 40) : .title)
-                    .offset(y: isRaised ? -8 : 0)
-                if !isRaised {
-                    Text(title)
-                        .font(ContinuumTheme.kidCaptionFont)
-                }
+                    .font(isRaised ? .system(size: 34) : .title2)
+                    .offset(y: isRaised ? -4 : 0)
+                Text(title)
+                    .font(ContinuumTheme.kidCaptionFont)
             }
+            .frame(maxWidth: .infinity)
             .opacity(selectedTab == tab ? 1 : 0.65)
         }
         .buttonStyle(.plain)

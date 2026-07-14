@@ -71,7 +71,7 @@ struct PronunciationScore: Codable, Sendable {
         case .hybridFallback:
             return "Rejected before ML scoring"
         case .embeddingSimilarity:
-            return "Scored with embedding similarity"
+            return "Compared to Flashcard reference"
         }
     }
 }

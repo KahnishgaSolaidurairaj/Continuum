@@ -7,7 +7,6 @@ final class PronunciationCoachViewModel {
     var selectedPhoneme: Phoneme = .m
     var isRecording = false
     var microphoneAuthorized = false
-    var liveHints: [CoachingMessage] = []
     var lastScore: PronunciationScore?
     var personalizedTips: [CoachingMessage] = []
     var errorMessage: String?
@@ -23,7 +22,9 @@ final class PronunciationCoachViewModel {
     private var audioChunks: [AudioChunk] = []
     private var userProfile = UserProfileStore.load()
     private var autoStopTask: Task<Void, Never>?
+    private var progressTask: Task<Void, Never>?
     private var activePracticeTargetID: String?
+    private var recordingStartedAt: Date?
 
     init() {
         audioCapture.onChunkCaptured = { [weak self] chunk in
@@ -43,6 +44,16 @@ final class PronunciationCoachViewModel {
         if !microphoneAuthorized {
             errorMessage = "Microphone access is required to analyze pronunciation."
         }
+    }
+
+    /// Binds the view model to a practice sound before recording.
+    /// - Parameters:
+    ///   - soundID: Practice sound identifier used for scoring.
+    ///   - phoneme: Linked phoneme used for rule-based fallback hints.
+    func configurePracticeTarget(soundID: String, phoneme: Phoneme) {
+        selectedPhoneme = phoneme
+        activePracticeTargetID = soundID
+        refreshTargetDuration()
     }
 
     /// Begins a fixed-length microphone capture window for the selected phoneme.
@@ -67,12 +78,14 @@ final class PronunciationCoachViewModel {
         liveDuration = 0
         liveVoicingLevel = 0
         recordingProgress = 0
+        recordingStartedAt = Date()
         refreshTargetDuration()
         activePracticeTargetID = practiceTargetID
 
         do {
             try audioCapture.start()
             isRecording = true
+            startProgressUpdates()
             scheduleAutoStop(modelContext: modelContext)
         } catch {
             errorMessage = "Could not start audio capture: \(error.localizedDescription)"
@@ -83,11 +96,13 @@ final class PronunciationCoachViewModel {
     func cancelRecording() {
         guard isRecording else { return }
         autoStopTask?.cancel()
+        progressTask?.cancel()
         audioCapture.stop()
         isRecording = false
         audioChunks = []
         recordingProgress = 0
         liveDuration = 0
+        recordingStartedAt = nil
     }
 
     /// Ends capture, scores the attempt, and persists results.
@@ -96,16 +111,22 @@ final class PronunciationCoachViewModel {
         guard isRecording else { return }
 
         autoStopTask?.cancel()
+        progressTask?.cancel()
+        let voiceProcessingWasActive = audioCapture.isVoiceProcessingActive
         audioCapture.stop()
         isRecording = false
         recordingProgress = 1
+        liveDuration = targetRecordingDuration
+        recordingStartedAt = nil
 
         let audio = FeatureExtractor.extractAudio(from: audioChunks)
         let score = PronunciationScorer.scoreAttempt(
+            soundID: activePracticeTargetID ?? selectedPhoneme.modelLabel,
             phoneme: selectedPhoneme,
             audio: audio,
             chunks: audioChunks,
-            embeddingScorer: embeddingScorer
+            embeddingScorer: embeddingScorer,
+            voiceProcessingActive: voiceProcessingWasActive
         )
 
         lastScore = score
@@ -140,21 +161,32 @@ final class PronunciationCoachViewModel {
         }
     }
 
+    private func startProgressUpdates() {
+        progressTask?.cancel()
+        progressTask = Task { @MainActor in
+            while isRecording, let recordingStartedAt {
+                let elapsed = Date().timeIntervalSince(recordingStartedAt)
+                liveDuration = min(elapsed, targetRecordingDuration)
+                if targetRecordingDuration > 0 {
+                    recordingProgress = min(1, elapsed / targetRecordingDuration)
+                }
+                try? await Task.sleep(nanoseconds: 50_000_000)
+            }
+        }
+    }
+
     private func refreshTargetDuration() {
-        targetRecordingDuration = PhonemeReferenceCatalog.recordingDuration(for: selectedPhoneme)
+        if let activePracticeTargetID {
+            targetRecordingDuration = PhonemeReferenceCatalog.recordingDuration(forSoundID: activePracticeTargetID)
+        } else {
+            targetRecordingDuration = PhonemeReferenceCatalog.targetRecordingDuration
+        }
     }
 
     private func updateLiveAudioMetrics() {
         let audio = FeatureExtractor.extractAudio(from: audioChunks)
         liveAudioLevel = min(1, audio.rmsEnergy * 20)
-        liveDuration = audio.duration
         liveVoicingLevel = audio.voicedEnergyRatio
-        if targetRecordingDuration > 0 {
-            recordingProgress = min(1, liveDuration / targetRecordingDuration)
-        } else {
-            recordingProgress = 0
-        }
-        liveHints = PronunciationScorer.liveAudioHints(phoneme: selectedPhoneme, audio: audio)
     }
 
     private func persistAttempt(

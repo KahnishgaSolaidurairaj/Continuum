@@ -4,6 +4,10 @@ import SwiftData
 /// Parent/clinician dashboard with calendar heatmap, progress rings, and summary.
 struct DashboardView: View {
     @Query(sort: \PracticeSessionRecord.timestamp, order: .reverse) private var sessions: [PracticeSessionRecord]
+    @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse) private var engagements: [ActivityEngagementRecord]
+
+    @State private var selectedDate = Calendar.current.startOfDay(for: .now)
+    @State private var displayedMonth = Calendar.current.startOfMonth(for: .now)
 
     var body: some View {
         ScrollView {
@@ -12,7 +16,13 @@ struct DashboardView: View {
                     .font(ContinuumTheme.kidSectionHeaderFont)
                     .padding(.top, 8)
 
-                PracticeCalendarCard(sessionDates: sessions.map(\.timestamp))
+                PracticeCalendarCard(
+                    engagements: engagements,
+                    selectedDate: $selectedDate,
+                    displayedMonth: $displayedMonth
+                )
+                ActivityTimeCard(engagements: engagements, date: selectedDate)
+                ActivityMoodCard(engagements: engagements, date: selectedDate)
                 ProgressRingsRow(sessions: sessions)
                 PracticeGraphCard(sessions: sessions)
                 DashboardSummaryCard(sessions: sessions)
@@ -23,25 +33,41 @@ struct DashboardView: View {
     }
 }
 
-/// Monthly calendar with darker dots on heavier practice days.
-struct PracticeCalendarCard: View {
-    let sessionDates: [Date]
+/// Shows how many minutes were spent in each practice game on a selected day.
+struct ActivityTimeCard: View {
+    let engagements: [ActivityEngagementRecord]
+    let date: Date
+
+    private var durations: [PracticeActivity: TimeInterval] {
+        ActivityEngagementAnalytics.durationsByActivity(on: date, records: engagements)
+    }
+
+    private var hasActivity: Bool {
+        !durations.values.allSatisfy { $0 == 0 }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(currentMonthTitle)
+            Label("Time by game — \(date.dashboardLabel)", systemImage: "clock.fill")
                 .font(ContinuumTheme.kidSubheadFont)
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
-                ForEach(dayItems, id: \.day) { item in
-                    VStack(spacing: 4) {
-                        Text("\(item.day)")
-                            .font(ContinuumTheme.kidCaptionFont)
-                        Circle()
-                            .fill(item.intensityColor)
-                            .frame(width: 10, height: 10)
+            if !hasActivity {
+                Text(emptyStateMessage)
+                    .font(ContinuumTheme.kidBodyFont)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(PracticeActivity.allCases) { activity in
+                    let duration = durations[activity] ?? 0
+                    if duration > 0 {
+                        HStack {
+                            Text(activity.subtitle)
+                                .font(ContinuumTheme.kidBodyFont)
+                            Spacer()
+                            Text(ActivityEngagementAnalytics.formattedMinutes(duration))
+                                .font(ContinuumTheme.kidBodyFont.weight(.semibold))
+                                .foregroundStyle(ContinuumTheme.tabPurple)
+                        }
                     }
-                    .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -50,28 +76,189 @@ struct PracticeCalendarCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private var currentMonthTitle: String {
-        Date.now.formatted(.dateTime.month(.wide).year())
-    }
-
-    private var dayItems: [CalendarDayItem] {
-        let calendar = Calendar.current
-        let now = Date.now
-        let range = calendar.range(of: .day, in: .month, for: now) ?? 1..<31
-
-        return range.map { day in
-            var components = calendar.dateComponents([.year, .month], from: now)
-            components.day = day
-            let date = calendar.date(from: components) ?? now
-            let count = sessionDates.filter { calendar.isDate($0, inSameDayAs: date) }.count
-            return CalendarDayItem(day: day, sessionCount: count)
-        }
+    private var emptyStateMessage: String {
+        Calendar.current.isDateInToday(date)
+            ? "Complete a practice activity to start tracking time."
+            : "No practice time recorded for this day."
     }
 }
 
-private struct CalendarDayItem {
+/// Lists moods logged at the end of each practice activity on a selected day.
+struct ActivityMoodCard: View {
+    let engagements: [ActivityEngagementRecord]
+    let date: Date
+
+    private var moodVisits: [ActivityEngagementRecord] {
+        ActivityEngagementAnalytics.engagements(on: date, records: engagements)
+            .filter { $0.mood != nil }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Moods — \(date.dashboardLabel)", systemImage: "face.smiling")
+                .font(ContinuumTheme.kidSubheadFont)
+
+            if moodVisits.isEmpty {
+                Text(emptyStateMessage)
+                    .font(ContinuumTheme.kidBodyFont)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(moodVisits, id: \.id) { visit in
+                    HStack(spacing: 12) {
+                        Text(MoodChoice.emoji(for: visit.mood ?? ""))
+                            .font(.title2)
+                        Text("\(visit.activity?.subtitle ?? "Activity") — \(visit.mood ?? "")")
+                            .font(ContinuumTheme.kidBodyFont)
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(.white.opacity(0.55))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var emptyStateMessage: String {
+        Calendar.current.isDateInToday(date)
+            ? "Moods appear here after finishing an activity."
+            : "No moods logged for this day."
+    }
+}
+
+/// Interactive monthly calendar with selectable days and engagement intensity dots.
+struct PracticeCalendarCard: View {
+    let engagements: [ActivityEngagementRecord]
+    @Binding var selectedDate: Date
+    @Binding var displayedMonth: Date
+
+    private let calendar = Calendar.current
+    private let weekdaySymbols = Calendar.current.shortWeekdaySymbols
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            monthHeader
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
+                ForEach(weekdaySymbols, id: \.self) { symbol in
+                    Text(symbol)
+                        .font(ContinuumTheme.kidCaptionFont)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+
+                ForEach(dayItems) { item in
+                    if let date = item.date {
+                        Button {
+                            selectedDate = calendar.startOfDay(for: date)
+                        } label: {
+                            dayCell(for: item, date: date)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        Color.clear
+                            .frame(height: 44)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(.white.opacity(0.55))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var monthHeader: some View {
+        HStack {
+            Button {
+                shiftMonth(by: -1)
+            } label: {
+                Image(systemName: "chevron.left.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Previous month")
+
+            Spacer()
+
+            Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
+                .font(ContinuumTheme.kidSubheadFont)
+
+            Spacer()
+
+            Button {
+                shiftMonth(by: 1)
+            } label: {
+                Image(systemName: "chevron.right.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Next month")
+        }
+    }
+
+    private func dayCell(for item: CalendarDayItem, date: Date) -> some View {
+        let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
+        let isToday = calendar.isDateInToday(date)
+
+        return VStack(spacing: 4) {
+            Text("\(item.day)")
+                .font(ContinuumTheme.kidCaptionFont.weight(isSelected ? .bold : .regular))
+                .foregroundStyle(isSelected ? .white : .primary)
+
+            Circle()
+                .fill(item.intensityColor)
+                .frame(width: 8, height: 8)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isSelected ? ContinuumTheme.tabPurple : .clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(isToday && !isSelected ? ContinuumTheme.tabPurple : .clear, lineWidth: 2)
+        )
+        .accessibilityLabel("\(date.formatted(date: .abbreviated, time: .omitted)), \(item.sessionCount) activities")
+    }
+
+    private var dayItems: [CalendarDayItem] {
+        let monthStart = calendar.startOfMonth(for: displayedMonth)
+        let dayRange = calendar.range(of: .day, in: .month, for: monthStart) ?? 1..<31
+        let firstWeekday = calendar.component(.weekday, from: monthStart)
+        let leadingSpaces = (firstWeekday - calendar.firstWeekday + 7) % 7
+
+        var items: [CalendarDayItem] = Array(repeating: CalendarDayItem(day: 0, date: nil, sessionCount: 0), count: leadingSpaces)
+
+        for day in dayRange {
+            var components = calendar.dateComponents([.year, .month], from: monthStart)
+            components.day = day
+            let date = calendar.date(from: components) ?? monthStart
+            let count = ActivityEngagementAnalytics.engagements(on: date, records: engagements).count
+            items.append(CalendarDayItem(day: day, date: date, sessionCount: count))
+        }
+
+        return items
+    }
+
+    private func shiftMonth(by value: Int) {
+        guard let newMonth = calendar.date(byAdding: .month, value: value, to: displayedMonth) else { return }
+        displayedMonth = calendar.startOfMonth(for: newMonth)
+    }
+}
+
+private struct CalendarDayItem: Identifiable {
     let day: Int
+    let date: Date?
     let sessionCount: Int
+
+    var id: String {
+        if let date {
+            return date.timeIntervalSince1970.description
+        }
+        return "spacer-\(day)"
+    }
 
     var intensityColor: Color {
         switch sessionCount {
@@ -80,6 +267,23 @@ private struct CalendarDayItem {
         case 2: return ContinuumTheme.tabPurple.opacity(0.6)
         default: return ContinuumTheme.tabPurple
         }
+    }
+}
+
+private extension Date {
+    var dashboardLabel: String {
+        if Calendar.current.isDateInToday(self) {
+            return "Today"
+        }
+        return formatted(.dateTime.month(.abbreviated).day().year())
+    }
+}
+
+private extension Calendar {
+    /// Returns the first instant of the month containing the given date.
+    func startOfMonth(for date: Date) -> Date {
+        let components = dateComponents([.year, .month], from: date)
+        return self.date(from: components) ?? date
     }
 }
 

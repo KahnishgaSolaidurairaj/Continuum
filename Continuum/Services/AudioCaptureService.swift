@@ -1,14 +1,26 @@
 import AVFoundation
 import Foundation
+import os
 
 /// Captures microphone audio with timestamps aligned to `CACurrentMediaTime()`.
+///
+/// Audio-session handoff: Flash reference playback uses `.playback` in
+/// `ReferenceAudioPlaybackService`. Test recording reconfigures the shared session
+/// here to `.playAndRecord` + `.spokenAudio` with Apple voice processing enabled.
 final class AudioCaptureService {
     private let engine = AVAudioEngine()
+    private let logger = Logger(subsystem: "com.continuum", category: "AudioCapture")
     private var isRunning = false
     private(set) var sampleRate: Double = 44_100
 
+    /// Whether Apple's voice processing pipeline is active for the current capture session.
+    private(set) var isVoiceProcessingActive = false
+
     var onChunkCaptured: ((AudioChunk) -> Void)?
     var onBufferCaptured: ((AVAudioPCMBuffer) -> Void)?
+
+    /// Called when capture starts without voice processing after a configuration failure.
+    var onVoiceProcessingUnavailable: (() -> Void)?
 
     /// Active microphone format after `start()` has been called.
     var inputFormat: AVAudioFormat? {
@@ -32,10 +44,18 @@ final class AudioCaptureService {
         guard !isRunning else { return }
 
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playAndRecord, mode: .measurement, options: [.defaultToSpeaker, .allowBluetooth])
+        try session.setCategory(
+            .playAndRecord,
+            mode: .spokenAudio,
+            options: [.defaultToSpeaker, .allowBluetooth]
+        )
         try session.setActive(true)
+        try preferBuiltInMicrophone(session: session)
+        try reduceInputGainWhenVoiceProcessing(session: session)
 
         let inputNode = engine.inputNode
+        isVoiceProcessingActive = enableVoiceProcessing(on: inputNode)
+
         let format = inputNode.outputFormat(forBus: 0)
         sampleRate = format.sampleRate
 
@@ -57,9 +77,44 @@ final class AudioCaptureService {
     /// Stops microphone capture and tears down the audio tap.
     func stop() {
         guard isRunning else { return }
-        engine.inputNode.removeTap(onBus: 0)
+        let inputNode = engine.inputNode
+        inputNode.removeTap(onBus: 0)
+        if isVoiceProcessingActive {
+            try? inputNode.setVoiceProcessingEnabled(false)
+            isVoiceProcessingActive = false
+        }
         engine.stop()
         isRunning = false
+    }
+
+    /// Routes capture through the built-in mic when available for better noise handling.
+    private func preferBuiltInMicrophone(session: AVAudioSession) throws {
+        guard
+            let builtInMic = session.availableInputs?.first(where: { $0.portType == .builtInMic })
+        else {
+            return
+        }
+        try session.setPreferredInput(builtInMic)
+    }
+
+    /// Lowers hardware input gain when supported so voice-processing AGC does not peg the waveform.
+    private func reduceInputGainWhenVoiceProcessing(session: AVAudioSession) throws {
+        guard session.isInputGainSettable else { return }
+        try session.setInputGain(0.65)
+    }
+
+    /// Enables Apple echo cancellation and noise suppression when supported.
+    /// - Parameter inputNode: The engine input node to configure.
+    /// - Returns: Whether voice processing is active.
+    private func enableVoiceProcessing(on inputNode: AVAudioInputNode) -> Bool {
+        do {
+            try inputNode.setVoiceProcessingEnabled(true)
+            return true
+        } catch {
+            logger.warning("Voice processing unavailable, using unprocessed capture: \(error.localizedDescription)")
+            onVoiceProcessingUnavailable?()
+            return false
+        }
     }
 
     private static func extractSamples(from buffer: AVAudioPCMBuffer) -> [Float] {

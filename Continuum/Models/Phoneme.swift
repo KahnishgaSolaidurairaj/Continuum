@@ -18,7 +18,7 @@ enum ArticulationKind: Sendable {
 enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
     // MARK: - Consonants (24)
 
-    case p, b, t, d, k, g
+    case p, b, t, d, k, g, ks, kw
     case m, n, ng
     case f, v, theta, eth, s, z, sh, zh, ch, j, h
     case l, r, w, y
@@ -39,6 +39,8 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
         case .d: return "d"
         case .k: return "k"
         case .g: return "g"
+        case .ks: return "ks"
+        case .kw: return "kw"
         case .m: return "m"
         case .n: return "n"
         case .ng: return "ŋ"
@@ -89,6 +91,8 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
         case .d: return "D"
         case .k: return "K"
         case .g: return "G"
+        case .ks: return "KS"
+        case .kw: return "KW"
         case .m: return "M"
         case .n: return "N"
         case .ng: return "NG"
@@ -139,6 +143,8 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
         case .d: return "dog"
         case .k: return "cat"
         case .g: return "go"
+        case .ks: return "box"
+        case .kw: return "queen"
         case .m: return "mom"
         case .n: return "nap"
         case .ng: return "sing"
@@ -219,7 +225,7 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
 
     /// All consonant phonemes in practice order.
     static var consonants: [Phoneme] {
-        [.p, .b, .t, .d, .k, .g, .m, .n, .ng, .f, .v, .theta, .eth, .s, .z, .sh, .zh, .ch, .j, .h, .l, .r, .w, .y]
+        [.p, .b, .t, .d, .k, .g, .ks, .kw, .m, .n, .ng, .f, .v, .theta, .eth, .s, .z, .sh, .zh, .ch, .j, .h, .l, .r, .w, .y]
     }
 
     /// All vowel phonemes in practice order.
@@ -285,14 +291,14 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
     /// Rule-based scoring category for this phoneme.
     var articulationKind: ArticulationKind {
         switch self {
-        case .p, .t, .k: return .stopUnvoiced
+        case .p, .t, .k, .ks: return .stopUnvoiced
         case .b, .d, .g: return .stopVoiced
         case .m, .n, .ng: return .nasal
         case .f, .theta, .s, .sh, .h: return .fricativeUnvoiced
         case .v, .eth, .z, .zh: return .fricativeVoiced
         case .ch: return .affricateUnvoiced
         case .j: return .affricateVoiced
-        case .w, .y: return .glide
+        case .w, .y, .kw: return .glide
         case .l, .r: return .liquid
         case .i, .ih, .ay, .eh, .ae, .ah, .aw, .oh, .u_short, .u, .uh, .schwa, .ie, .ow, .oy, .er, .ar, .or_vowel, .air, .ire:
             return .vowel

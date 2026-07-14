@@ -1,15 +1,20 @@
 import SwiftUI
+import SwiftData
 
 /// Home screen with mascot, mood logging, motivation, and practice prompt.
 struct HomeView: View {
-    let onStartPractice: (PracticeTarget) -> Void
     let onOpenPracticeTab: () -> Void
 
-    @State private var showMoodSheet = false
+    @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse)
+    private var engagements: [ActivityEngagementRecord]
+
     @State private var showGoalSheet = false
     @State private var motivationMessage = BrocaMotivation.randomMessage()
-    @State private var selectedMood = PracticeProgressStore.todayMood
     @State private var dailyGoalMinutes = PracticeProgressStore.dailyGoalMinutes
+
+    private var latestMood: String? {
+        ActivityEngagementAnalytics.latestMoodToday(records: engagements)
+    }
 
     private var suggestedTarget: PracticeTarget {
         if let lastID = PracticeProgressStore.lastPracticeTargetID,
@@ -25,9 +30,6 @@ struct HomeView: View {
             middleSection
         }
         .background(ContinuumTheme.homePink)
-        .sheet(isPresented: $showMoodSheet) {
-            MoodLogSheet(selectedMood: $selectedMood)
-        }
         .sheet(isPresented: $showGoalSheet) {
             DailyGoalSheet(goalMinutes: $dailyGoalMinutes)
         }
@@ -65,7 +67,7 @@ struct HomeView: View {
         ScrollViewReader { scrollProxy in
             ScrollView {
                 VStack(spacing: 24) {
-                    logMoodButton
+                    moodSummaryCard
 
                     HomeMotivationCard(message: motivationMessage) {
                         motivationMessage = BrocaMotivation.randomMessage()
@@ -89,47 +91,43 @@ struct HomeView: View {
         .background(ContinuumTheme.homeLavender)
     }
 
-    /// Opens the mood sheet with a large, emoji-led button.
-    private var logMoodButton: some View {
-        Button {
-            showMoodSheet = true
-        } label: {
-            HStack(spacing: 14) {
-                Text(selectedMoodEmoji)
-                    .font(.system(size: 36))
+    /// Shows the latest mood logged from a completed practice activity today.
+    private var moodSummaryCard: some View {
+        HStack(spacing: 14) {
+            Text(selectedMoodEmoji)
+                .font(.system(size: 36))
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Log your Mood")
-                        .font(ContinuumTheme.kidButtonFont)
-                    if let mood = selectedMood {
-                        Text("Today: \(mood)")
-                            .font(ContinuumTheme.kidCaptionFont)
-                            .foregroundStyle(.secondary)
-                    }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Today's Mood")
+                    .font(ContinuumTheme.kidButtonFont)
+                if let mood = latestMood {
+                    Text("Latest: \(mood)")
+                        .font(ContinuumTheme.kidCaptionFont)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Finish an activity to log how you feel")
+                        .font(ContinuumTheme.kidCaptionFont)
+                        .foregroundStyle(.secondary)
                 }
-
-                Spacer()
-
-                Image(systemName: "chevron.right.circle.fill")
-                    .font(.title)
-                    .foregroundStyle(ContinuumTheme.tabPurple)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-            .background(.white.opacity(0.9))
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(ContinuumTheme.cardBorder.opacity(0.2), lineWidth: 2)
-            )
+
+            Spacer()
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Log your mood")
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+        .background(.white.opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(ContinuumTheme.cardBorder.opacity(0.2), lineWidth: 2)
+        )
+        .accessibilityLabel(latestMood.map { "Today's mood: \($0)" } ?? "No mood logged yet today")
     }
 
     private var selectedMoodEmoji: String {
-        MoodChoice.all.first(where: { $0.label == selectedMood })?.emoji ?? "😊"
+        guard let latestMood else { return "😊" }
+        return MoodChoice.emoji(for: latestMood)
     }
 
     /// Shows the suggested sound to practice today.
@@ -178,7 +176,7 @@ struct HomeView: View {
     /// Centered call-to-action to start practicing.
     private var practiceButton: some View {
         Button {
-            onStartPractice(suggestedTarget)
+            onOpenPracticeTab()
         } label: {
             Text("Practice")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -329,72 +327,6 @@ private struct ConfettiPiece: Identifiable {
     var rotation: Double
     let targetRotation: Double
     var opacity: Double
-}
-
-/// A mood option with emoji icon for visual selection.
-struct MoodChoice: Identifiable {
-    let id: String
-    let label: String
-    let emoji: String
-
-    static let all: [MoodChoice] = [
-        MoodChoice(id: "Happy", label: "Happy", emoji: "😊"),
-        MoodChoice(id: "Okay", label: "Okay", emoji: "🙂"),
-        MoodChoice(id: "Frustrated", label: "Frustrated", emoji: "😤"),
-        MoodChoice(id: "Tired", label: "Tired", emoji: "😴"),
-        MoodChoice(id: "Excited", label: "Excited", emoji: "🤩")
-    ]
-}
-
-/// Sheet for logging the child's mood before or after practice.
-struct MoodLogSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @Binding var selectedMood: String?
-
-    var body: some View {
-        NavigationStack {
-            GeometryReader { geometry in
-                VStack(spacing: 14) {
-                    ForEach(MoodChoice.all) { mood in
-                        Button {
-                            selectedMood = mood.label
-                            PracticeProgressStore.todayMood = mood.label
-                            dismiss()
-                        } label: {
-                            HStack(spacing: 16) {
-                                Text(mood.emoji)
-                                    .font(.system(size: 40))
-
-                                Text(mood.label)
-                                    .font(ContinuumTheme.kidBodyFont.weight(.semibold))
-                                    .foregroundStyle(.primary)
-
-                                Spacer()
-
-                                if selectedMood == mood.label {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.title2)
-                                        .foregroundStyle(ContinuumTheme.tabPurple)
-                                }
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                            .kidChoiceButtonStyle(isSelected: selectedMood == mood.label)
-                        }
-                        .buttonStyle(.plain)
-                        .contentShape(Rectangle())
-                    }
-                }
-                .padding(24)
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-            }
-            .background(ContinuumTheme.homeLavender)
-            .kidFriendlyNavigationTitle("Log your mood")
-        }
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
-    }
 }
 
 /// Sheet for setting the daily practice goal in minutes.

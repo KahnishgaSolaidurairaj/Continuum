@@ -4,7 +4,7 @@ import SwiftData
 @main
 struct ContinuumApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([PracticeSessionRecord.self])
+        let schema = Schema([PracticeSessionRecord.self, ActivityEngagementRecord.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
