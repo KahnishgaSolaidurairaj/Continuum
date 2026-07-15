@@ -36,11 +36,13 @@ final class EmbeddingPronunciationScorer {
     ///   - chunks: Captured microphone chunks for the attempt.
     /// - Returns: Embedding-based score, or `nil` when assets are unavailable.
     func score(soundID: String, phoneme: Phoneme, chunks: [AudioChunk]) -> PronunciationScore? {
+        let canonicalID = PracticeSoundAssetBridge.canonicalSoundID(soundID)
+        let assetKey = PracticeSoundAssetBridge.assetKey(forSoundID: canonicalID)
         guard
             isReady,
             let model,
             let references,
-            let reference = references.phonemes[soundID]
+            let reference = references.phonemes[assetKey]
         else {
             return nil
         }

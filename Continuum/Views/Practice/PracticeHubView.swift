@@ -36,7 +36,7 @@ struct PracticeHubView: View {
     }
 }
 
-/// Wireframe step 1: choose one of the 47 practice sounds.
+/// Wireframe step 1: choose one of the 44 English sounds.
 struct PhonemeSelectionView: View {
     let onSelect: (PracticeTarget) -> Void
 
@@ -79,15 +79,13 @@ struct PhonemeSelectionView: View {
                                 .lineLimit(2)
                                 .minimumScaleFactor(0.8)
 
-                            if let example = sound.level2Examples.first {
-                                HighlightedWordText(
-                                    word: example.word,
-                                    highlights: example.highlights,
-                                    font: ContinuumTheme.kidSubheadFont,
-                                    baseColor: .primary,
-                                    highlightColor: ContinuumTheme.tabPurple
-                                )
-                            }
+                            HighlightedWordText(
+                                word: sound.level1Example.word,
+                                highlights: sound.level1Example.highlights,
+                                font: ContinuumTheme.kidSubheadFont,
+                                baseColor: .primary,
+                                highlightColor: ContinuumTheme.tabPurple
+                            )
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 12)

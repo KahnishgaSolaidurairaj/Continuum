@@ -35,7 +35,7 @@ enum FlashWordBank {
     static func words(for target: PracticeTarget, level: FlashLevel) -> [String] {
         switch level {
         case .sound:
-            return []
+            return [target.practiceSound.level1Example.word]
         case .shortWords:
             return target.practiceSound.level2Examples.map(\.word)
         case .longWords:
