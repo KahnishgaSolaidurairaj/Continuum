@@ -23,10 +23,11 @@ enum PronunciationVideoCatalog {
     static let sharedVideoID = "tpN9CPwZ-oE"
 
     /// Returns the clip for a practice sound when a timestamp range is configured.
-    /// - Parameter soundID: The `PracticeSound.id` from `PracticeSoundsManifest.json`.
+    /// - Parameter soundID: The curriculum sound identifier (e.g. `short_a`, `ch`).
     /// - Returns: The clip to play, or `nil` when no timestamp is mapped for that sound.
     static func clip(for soundID: String) -> PronunciationVideoClip? {
-        guard let range = clipRanges[soundID] else { return nil }
+        let canonicalID = PracticeSoundAssetBridge.canonicalSoundID(soundID)
+        guard let range = clipRanges[canonicalID] else { return nil }
         return PronunciationVideoClip(
             videoID: sharedVideoID,
             startSeconds: range.start,
@@ -34,20 +35,20 @@ enum PronunciationVideoCatalog {
         )
     }
 
-    /// Start/end seconds keyed by manifest sound ID (and legacy aliases).
+    /// Start/end seconds keyed by curriculum sound ID.
     private static let clipRanges: [String: (start: Double, end: Double)] = [
-        // Vowels — IDs match PracticeSoundsManifest.json
-        "a": (57, 65),              // /a/
-        "ae": (57, 65),             // Short /ae/ (same clip as Short /a/)
-        "e": (65, 72),              // Short /e/
-        "i": (72, 90),              // Short /i/
-        "o": (90, 97),              // Short /o/
-        "uh": (97, 104),            // Short /u/
-        "ee": (116, 123),           // Long /e/
-        "ie": (123, 131),           // Long /i/
-        "oa": (131, 142),           // Long /o/
-        "u": (142, 152),            // Long /u/
-        "oo": (152, 160),           // Long /oo/
+        // Vowels
+        "short_a": (57, 65),
+        "short_e": (65, 72),
+        "short_i": (72, 90),
+        "short_o": (90, 97),
+        "short_u": (97, 104),
+        "long_a": (105, 116),
+        "long_e": (116, 123),
+        "long_i": (123, 131),
+        "long_o": (131, 142),
+        "long_u": (142, 152),
+        "long_oo": (152, 160),
 
         // Consonants
         "b": (178, 186),
@@ -70,36 +71,20 @@ enum PronunciationVideoCatalog {
         "z": (372, 382),
         "ch": (384, 391),
         "sh": (391, 403),
-        "th": (403, 412),           // Unvoiced /th/
+        "th_voiceless": (403, 412),
         "th_voiced": (412, 421),
+        "hw": (421, 447),
         "ng": (447, 458),
+        "nk": (458, 466),
+        "zh": (549, 556),
 
         // Vowel teams
-        "er": (471, 482),           // /er/ — same video section as /ur/
+        "ur": (471, 482),
         "ar": (482, 491),
         "or": (491, 498),
         "oi": (503, 526),
-        "ou": (526, 534),           // /ou/ — same video section as /ow/
+        "ow": (526, 534),
         "oo_short": (534, 541),
-        "aw": (541, 549),
-        "zh": (549, 556),
-
-        // Legacy EnglishSound IDs (backward compatibility)
-        "short_a": (57, 65),
-        "short_e": (65, 72),
-        "short_i": (72, 90),
-        "short_o": (90, 97),
-        "short_u": (97, 104),
-        "long_a": (105, 116),
-        "long_e": (116, 123),
-        "long_i": (123, 131),
-        "long_o": (131, 142),
-        "long_u": (142, 152),
-        "long_oo": (152, 160),
-        "th_voiceless": (403, 412),
-        "hw": (421, 447),
-        "nk": (458, 466),
-        "ur": (471, 482),
-        "ow": (526, 534)
+        "aw": (541, 549)
     ]
 }

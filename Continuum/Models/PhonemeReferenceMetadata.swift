@@ -132,7 +132,10 @@ enum PhonemeReferenceCatalog {
     /// - Parameter soundID: The practice sound identifier.
     /// - Returns: Reference metadata, or `nil` when assets are missing.
     static func reference(forSoundID soundID: String) -> PhonemeReference? {
-        shared?.phonemes[soundID]
+        let assetKey = PracticeSoundAssetBridge.assetKey(
+            forSoundID: PracticeSoundAssetBridge.canonicalSoundID(soundID)
+        )
+        return shared?.phonemes[assetKey]
     }
 
     /// Returns the forced recording duration for a practice sound.

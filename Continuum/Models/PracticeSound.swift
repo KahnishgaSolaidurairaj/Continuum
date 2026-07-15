@@ -7,7 +7,7 @@ enum PracticeSoundCategory: String, Codable, Sendable {
     case vowelTeam
 }
 
-/// One practice sound loaded from the bundled PhonemeAudio manifest.
+/// One practice sound derived from the 44-sound English curriculum.
 struct PracticeSound: Identifiable, Hashable, Sendable {
     let id: String
     let displayName: String
@@ -15,54 +15,82 @@ struct PracticeSound: Identifiable, Hashable, Sendable {
     let category: PracticeSoundCategory
     let linkedPhoneme: Phoneme
     let playbackFile: String
+    let level1Example: EnglishExample
     let level2Examples: [EnglishExample]
     let level3Examples: [EnglishExample]
 
     var symbol: String { displayName }
 
     var primaryExample: String {
-        level2Examples.first?.word ?? displayName
+        level1Example.word
     }
 
     /// Highlights for a known flash word when available.
     func highlights(for word: String) -> [SoundHighlight] {
-        let examples = level2Examples + level3Examples
+        let examples = [level1Example] + level2Examples + level3Examples
         return examples.first(where: { $0.word.caseInsensitiveCompare(word) == .orderedSame })?.highlights ?? []
     }
 }
 
-/// Decodable manifest payload bundled with the app.
-private struct PracticeSoundsManifest: Codable {
-    let version: Int
-    let targetDurationSeconds: Double
-    let sounds: [PracticeSoundRecord]
+/// Maps curriculum sound IDs to bundled reference-audio and embedding asset keys.
+enum PracticeSoundAssetBridge {
+    /// Reference-audio / embedding key used in bundled phoneme assets.
+    static func assetKey(forSoundID soundID: String) -> String {
+        curriculumToAssetKey[soundID] ?? soundID
+    }
+
+    /// Resolves legacy manifest IDs to current curriculum IDs.
+    static func canonicalSoundID(_ soundID: String) -> String {
+        legacySoundIDAliases[soundID] ?? soundID
+    }
+
+    /// Primary reference clip filename for a curriculum sound.
+    static func playbackFile(forSoundID soundID: String) -> String {
+        let assetKey = assetKey(forSoundID: soundID)
+        return "\(assetKey)_ref_01.wav"
+    }
+
+    private static let curriculumToAssetKey: [String: String] = [
+        "short_a": "ae",
+        "short_e": "e",
+        "short_i": "i",
+        "short_o": "o",
+        "short_u": "uh",
+        "long_a": "ae",
+        "long_e": "ee",
+        "long_i": "ie",
+        "long_o": "oa",
+        "long_u": "u",
+        "long_oo": "oo",
+        "th_voiceless": "th",
+        "th_voiced": "th_voiced",
+        "hw": "w",
+        "nk": "n",
+        "ur": "er",
+        "ow": "ou"
+    ]
+
+    private static let legacySoundIDAliases: [String: String] = [
+        "a": "short_a",
+        "ae": "short_a",
+        "e": "short_e",
+        "i": "short_i",
+        "o": "short_o",
+        "uh": "short_u",
+        "ee": "long_e",
+        "ie": "long_i",
+        "oa": "long_o",
+        "u": "long_u",
+        "oo": "long_oo",
+        "th": "th_voiceless",
+        "er": "ur",
+        "ou": "ow"
+    ]
 }
 
-private struct PracticeSoundRecord: Codable {
-    let id: String
-    let displayName: String
-    let traceCharacter: String
-    let category: PracticeSoundCategory
-    let linkedPhoneme: String
-    let playbackFile: String
-    let level2Words: [ManifestWordExample]
-    let level3Words: [ManifestWordExample]
-}
-
-private struct ManifestWordExample: Codable {
-    let word: String
-    let highlights: [ManifestHighlight]
-}
-
-private struct ManifestHighlight: Codable {
-    let start: Int
-    let length: Int
-}
-
-/// Loads bundled practice sounds generated from PhonemeAudio ingest.
+/// Loads the 44 English sounds for practice flows.
 enum PracticeSoundCatalog {
-    private static let resourceName = "PracticeSoundsManifest"
-    private static let loadedSounds: [PracticeSound] = loadSounds()
+    private static let loadedSounds: [PracticeSound] = buildSounds()
 
     /// Every practice sound available in the Practice tab.
     static var allSounds: [PracticeSound] { loadedSounds }
@@ -81,48 +109,38 @@ enum PracticeSoundCatalog {
 
     /// Bundled recording duration used by the Test activity.
     static var targetRecordingDuration: TimeInterval {
-        manifest()?.targetDurationSeconds ?? 1.0
+        PhonemeReferenceCatalog.targetRecordingDuration
     }
 
-    /// Returns one practice sound by ID.
+    /// Returns one practice sound by ID, including legacy manifest aliases.
     /// - Parameter id: Practice sound identifier.
     /// - Returns: Matching sound, if present.
     static func sound(withID id: String) -> PracticeSound? {
-        loadedSounds.first(where: { $0.id == id })
+        let canonicalID = PracticeSoundAssetBridge.canonicalSoundID(id)
+        return loadedSounds.first(where: { $0.id == canonicalID })
     }
 
-    private static func manifest() -> PracticeSoundsManifest? {
-        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let manifest = try? JSONDecoder().decode(PracticeSoundsManifest.self, from: data) else {
-            return nil
-        }
-        return manifest
-    }
-
-    private static func loadSounds() -> [PracticeSound] {
-        guard let manifest = manifest() else { return [] }
-        return manifest.sounds.compactMap { record in
-            guard let phoneme = Phoneme(rawValue: record.linkedPhoneme) else { return nil }
-            return PracticeSound(
-                id: record.id,
-                displayName: record.displayName,
-                traceCharacter: record.traceCharacter,
-                category: record.category,
-                linkedPhoneme: phoneme,
-                playbackFile: record.playbackFile,
-                level2Examples: record.level2Words.map(convertExample),
-                level3Examples: record.level3Words.map(convertExample)
+    private static func buildSounds() -> [PracticeSound] {
+        EnglishSound.allSounds.map { englishSound in
+            PracticeSound(
+                id: englishSound.id,
+                displayName: englishSound.displayName,
+                traceCharacter: englishSound.traceCharacter,
+                category: mapCategory(englishSound.category),
+                linkedPhoneme: englishSound.linkedPhoneme,
+                playbackFile: PracticeSoundAssetBridge.playbackFile(forSoundID: englishSound.id),
+                level1Example: englishSound.level1Example,
+                level2Examples: englishSound.level2Examples,
+                level3Examples: englishSound.level3Examples
             )
         }
     }
 
-    private static func convertExample(_ example: ManifestWordExample) -> EnglishExample {
-        EnglishExample(
-            word: example.word,
-            highlights: example.highlights.map {
-                SoundHighlight(start: $0.start, length: $0.length)
-            }
-        )
+    private static func mapCategory(_ category: EnglishSoundCategory) -> PracticeSoundCategory {
+        switch category {
+        case .vowel: return .vowel
+        case .consonant: return .consonant
+        case .vowelTeam: return .vowelTeam
+        }
     }
 }
