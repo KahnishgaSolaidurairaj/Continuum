@@ -8,6 +8,7 @@ struct TryActivityView: View {
     @State private var playerReady = false
     @State private var segmentFinished = false
     @State private var showFullVideoPrompt = false
+    @State private var playbackError = false
 
     private var clip: PronunciationVideoClip? {
         PronunciationVideoCatalog.clip(for: target.id)
@@ -54,11 +55,17 @@ struct TryActivityView: View {
                 YouTubeSegmentPlayerView(
                     clip: clip,
                     playbackToken: playbackToken,
-                    onReady: { playerReady = true },
-                    onSegmentFinished: { segmentFinished = true }
+                    onReady: {
+                        playerReady = true
+                        playbackError = false
+                    },
+                    onSegmentFinished: { segmentFinished = true },
+                    onPlaybackError: { playbackError = true }
                 )
 
-                if !playerReady {
+                if playbackError {
+                    playbackErrorOverlay
+                } else if !playerReady {
                     ProgressView("Loading video…")
                         .tint(ContinuumTheme.stormBlueDeep)
                         .foregroundStyle(ContinuumTheme.stormBlueDeep)
@@ -90,6 +97,35 @@ struct TryActivityView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Play example clip")
+    }
+
+    private var playbackErrorOverlay: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 36))
+                .foregroundStyle(.yellow)
+
+            Text("Couldn't play inside the app")
+                .font(ContinuumTheme.kidSubheadFont)
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+
+            Button {
+                showFullVideoPrompt = true
+            } label: {
+                Text("Watch on YouTube")
+                    .font(ContinuumTheme.kidButtonFont)
+                    .foregroundStyle(ContinuumTheme.stormBlueDeep)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(.white)
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.black.opacity(0.72))
     }
 
     private var missingClipCard: some View {
@@ -151,12 +187,24 @@ struct TryActivityView: View {
                 }
                 .buttonStyle(.plain)
             }
-        } else if clip != nil, playerReady, playbackToken == 0 {
+        } else if clip != nil, (playerReady || playbackError), playbackToken == 0, !playbackError {
             Button {
                 segmentFinished = false
                 playbackToken += 1
             } label: {
                 Label("Play clip", systemImage: "play.fill")
+                    .font(ContinuumTheme.kidButtonFont)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                    .background(ContinuumTheme.stormBlueDeep)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
+        } else if clip != nil, playbackError {
+            Button {
+                showFullVideoPrompt = true
+            } label: {
+                Label("Open in YouTube", systemImage: "arrow.up.right.square")
                     .font(ContinuumTheme.kidButtonFont)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
