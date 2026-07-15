@@ -1,50 +1,4 @@
 import SwiftUI
-import SwiftData
-
-/// Live audio meters for the simulator-friendly demo.
-struct LiveAudioMetersView: View {
-    let audioLevel: Float
-    let duration: TimeInterval
-    let targetDuration: TimeInterval
-    let recordingProgress: Double
-    let voicingLevel: Float
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            meterRow(title: "Audio level", value: audioLevel)
-            meterRow(title: "Voicing", value: voicingLevel)
-
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("Recording")
-                        .font(.caption)
-                    Spacer()
-                    Text(String(format: "%.1f / %.1fs", duration, targetDuration))
-                        .font(.caption.monospacedDigit())
-                }
-                ProgressView(value: recordingProgress)
-                    .tint(.orange)
-            }
-        }
-        .padding(12)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
-    private func meterRow(title: String, value: Float) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(title)
-                    .font(.caption)
-                Spacer()
-                Text(String(format: "%.0f%%", value * 100))
-                    .font(.caption.monospacedDigit())
-            }
-            ProgressView(value: Double(min(max(value, 0), 1)))
-                .tint(.blue)
-        }
-    }
-}
 
 /// Background visual for the audio-only demo.
 struct AudioDemoBackgroundView: View {
@@ -92,38 +46,6 @@ struct AudioDemoBackgroundView: View {
     }
 }
 
-/// Live visual meters for lip closure, jaw opening, and rounding.
-struct LiveMetersView: View {
-    let lipClosure: Float
-    let jawOpen: Float
-    let lipRounding: Float
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            meterRow(title: "Lip closure", value: lipClosure)
-            meterRow(title: "Jaw open", value: jawOpen)
-            meterRow(title: "Lip rounding", value: lipRounding)
-        }
-        .padding(12)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
-    private func meterRow(title: String, value: Float) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(title)
-                    .font(.caption)
-                Spacer()
-                Text(String(format: "%.0f%%", value * 100))
-                    .font(.caption.monospacedDigit())
-            }
-            ProgressView(value: Double(min(max(value, 0), 1)))
-                .tint(.green)
-        }
-    }
-}
-
 /// Displays live or post-attempt coaching messages.
 struct CoachingMessagesView: View {
     let messages: [CoachingMessage]
@@ -160,76 +82,5 @@ struct CoachingMessagesView: View {
         case .warning: return .yellow
         case .critical: return .red
         }
-    }
-}
-
-/// Lists saved practice attempts from SwiftData.
-struct SessionHistoryView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query(sort: \PracticeSessionRecord.timestamp, order: .reverse) private var sessions: [PracticeSessionRecord]
-    @State private var exportMessage: String?
-
-    var body: some View {
-        List(sessions) { session in
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("/\(session.targetPhoneme)/")
-                        .font(.headline.monospaced())
-                    Spacer()
-                    Text("\(session.correctness)%")
-                        .font(.headline)
-                        .foregroundStyle(scoreColor(session.correctness))
-                }
-                Text(session.timestamp.formatted(date: .abbreviated, time: .shortened))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(session.coachingSummary)
-                    .font(.caption)
-                    .lineLimit(2)
-            }
-            .padding(.vertical, 4)
-        }
-        .kidFriendlyNavigationTitle("Practice History")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Export") {
-                    exportSessions()
-                }
-                .disabled(sessions.isEmpty)
-            }
-        }
-        .alert("Export", isPresented: exportAlertBinding) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(exportMessage ?? "")
-        }
-    }
-
-    private func scoreColor(_ score: Int) -> Color {
-        switch score {
-        case 80...: return .green
-        case 50..<80: return .orange
-        default: return .red
-        }
-    }
-
-    private func exportSessions() {
-        do {
-            let url = try SessionExportService.exportAll(modelContext: modelContext)
-            exportMessage = "Exported \(sessions.count) sessions to \(url.lastPathComponent)."
-        } catch {
-            exportMessage = error.localizedDescription
-        }
-    }
-
-    private var exportAlertBinding: Binding<Bool> {
-        Binding(
-            get: { exportMessage != nil },
-            set: { isPresented in
-                if !isPresented {
-                    exportMessage = nil
-                }
-            }
-        )
     }
 }

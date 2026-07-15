@@ -1,35 +1,82 @@
 import SwiftUI
 import SwiftData
 
-/// Parent/clinician dashboard with calendar heatmap, progress rings, and summary.
+/// Parent/clinician dashboard with calendar heatmap and practice analytics.
 struct DashboardView: View {
     @Query(sort: \PracticeSessionRecord.timestamp, order: .reverse) private var sessions: [PracticeSessionRecord]
     @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse) private var engagements: [ActivityEngagementRecord]
 
     @State private var selectedDate = Calendar.current.startOfDay(for: .now)
     @State private var displayedMonth = Calendar.current.startOfMonth(for: .now)
+    @State private var selectedGroup: SoundGroupFilter = .all
+    @State private var selectedSoundID: String?
+
+    @State private var scrollOffset: CGFloat = 0
+
+    private var weeklySummary: WeeklyDashboardSummary {
+        DashboardAnalytics.weeklySummary(
+            engagements: engagements,
+            sessions: sessions,
+            streakDays: PracticeProgressStore.currentStreak
+        )
+    }
+
+    private var topPracticedSounds: [PracticedSoundStat] {
+        DashboardAnalytics.topPracticedSounds(on: selectedDate, from: engagements)
+    }
+
+    private var strengthsAndNeeds: (strengths: [PhonemePerformanceStat], needs: [PhonemePerformanceStat]) {
+        DashboardAnalytics.strengthsAndNeeds(from: sessions)
+    }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                Text("Dashboard")
-                    .font(ContinuumTheme.kidSectionHeaderFont)
-                    .padding(.top, 8)
+        ZStack {
+            DashboardScrollBackground(scrollOffset: scrollOffset)
+                .ignoresSafeArea()
 
-                PracticeCalendarCard(
-                    engagements: engagements,
-                    selectedDate: $selectedDate,
-                    displayedMonth: $displayedMonth
-                )
-                ActivityTimeCard(engagements: engagements, date: selectedDate)
-                ActivityMoodCard(engagements: engagements, date: selectedDate)
-                ProgressRingsRow(sessions: sessions)
-                PracticeGraphCard(sessions: sessions)
-                DashboardSummaryCard(sessions: sessions)
+            ScrollView {
+                VStack(spacing: DashboardLayout.sectionSpacing) {
+                    DashboardScrollOffsetReader()
+
+                    Text("Dashboard")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 8)
+
+                    ThisWeekSummaryCard(summary: weeklySummary)
+
+                    PracticeCalendarCard(
+                        engagements: engagements,
+                        selectedDate: $selectedDate,
+                        displayedMonth: $displayedMonth
+                    )
+
+                    HStack(alignment: .top, spacing: 10) {
+                        ActivityTimeCard(engagements: engagements, date: selectedDate)
+                        TopPracticedSoundsCard(date: selectedDate, stats: topPracticedSounds)
+                    }
+
+                    ActivityMoodCard(engagements: engagements, date: selectedDate)
+
+                    SpeechAccuracyLineGraphCard(
+                        date: selectedDate,
+                        sessions: sessions,
+                        selectedGroup: $selectedGroup,
+                        selectedSoundID: $selectedSoundID
+                    )
+
+                    StrengthsNeedsCard(
+                        strengths: strengthsAndNeeds.strengths,
+                        needs: strengthsAndNeeds.needs
+                    )
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
             }
-            .padding()
+            .coordinateSpace(name: "dashboardScroll")
+            .onPreferenceChange(DashboardScrollOffsetKey.self) { scrollOffset = $0 }
         }
-        .background(ContinuumTheme.dashboardPurple)
     }
 }
 
@@ -47,33 +94,41 @@ struct ActivityTimeCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Time by game — \(date.dashboardLabel)", systemImage: "clock.fill")
-                .font(ContinuumTheme.kidSubheadFont)
+        DashboardCard(height: DashboardLayout.statPairHeight) {
+            VStack(alignment: .leading, spacing: 12) {
+                DashboardCardHeader(
+                    title: "Time by game",
+                    systemImage: "clock.fill",
+                    subtitle: date.dashboardLabel
+                )
 
-            if !hasActivity {
-                Text(emptyStateMessage)
-                    .font(ContinuumTheme.kidBodyFont)
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(PracticeActivity.allCases) { activity in
-                    let duration = durations[activity] ?? 0
-                    if duration > 0 {
-                        HStack {
-                            Text(activity.subtitle)
-                                .font(ContinuumTheme.kidBodyFont)
-                            Spacer()
-                            Text(ActivityEngagementAnalytics.formattedMinutes(duration))
-                                .font(ContinuumTheme.kidBodyFont.weight(.semibold))
-                                .foregroundStyle(ContinuumTheme.tabPurple)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: DashboardLayout.miniBoxSpacing) {
+                        if !hasActivity {
+                            Text(emptyStateMessage)
+                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, minHeight: 120, alignment: .center)
+                        } else {
+                            ForEach(PracticeActivity.allCases) { activity in
+                                let duration = durations[activity] ?? 0
+                                if duration > 0 {
+                                    DashboardMiniBox(
+                                        systemImage: activity.systemImage,
+                                        text: activity.subtitle,
+                                        trailingText: ActivityEngagementAnalytics.formattedMinutes(duration)
+                                    )
+                                }
+                            }
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .frame(maxHeight: .infinity)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
-        .padding()
-        .background(.white.opacity(0.55))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .frame(maxWidth: .infinity)
     }
 
     private var emptyStateMessage: String {
@@ -94,35 +149,137 @@ struct ActivityMoodCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Moods — \(date.dashboardLabel)", systemImage: "face.smiling")
-                .font(ContinuumTheme.kidSubheadFont)
+        DashboardCard(height: DashboardLayout.moodsHeight) {
+            VStack(alignment: .leading, spacing: 12) {
+                DashboardCardHeader(
+                    title: "Moods",
+                    systemImage: "face.smiling",
+                    subtitle: date.dashboardLabel
+                )
 
-            if moodVisits.isEmpty {
-                Text(emptyStateMessage)
-                    .font(ContinuumTheme.kidBodyFont)
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(moodVisits, id: \.id) { visit in
-                    HStack(spacing: 12) {
-                        Text(MoodChoice.emoji(for: visit.mood ?? ""))
-                            .font(.title2)
-                        Text("\(visit.activity?.subtitle ?? "Activity") — \(visit.mood ?? "")")
-                            .font(ContinuumTheme.kidBodyFont)
-                        Spacer()
+                if moodVisits.isEmpty {
+                    Text(emptyStateMessage)
+                        .font(ContinuumTheme.kidBodyFont)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else {
+                    moodColumnHeaders
+
+                    ScrollView {
+                        HStack(alignment: .top, spacing: 0) {
+                            ForEach(Array(PracticeActivity.allCases.enumerated()), id: \.element.id) { index, activity in
+                                MoodActivityColumn(visits: moodVisits(for: activity))
+
+                                if index < PracticeActivity.allCases.count - 1 {
+                                    Divider()
+                                }
+                            }
+                        }
                     }
+                    .frame(maxHeight: .infinity)
+                }
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+    }
+
+    private var moodColumnHeaders: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(PracticeActivity.allCases.enumerated()), id: \.element.id) { index, activity in
+                VStack(spacing: 4) {
+                    Image(systemName: activity.systemImage)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(ContinuumTheme.tabPurple)
+
+                    Text(activity.subtitle)
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(.black)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+                .frame(maxWidth: .infinity)
+
+                if index < PracticeActivity.allCases.count - 1 {
+                    Color.clear.frame(width: 1)
                 }
             }
         }
-        .padding()
-        .background(.white.opacity(0.55))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.bottom, 4)
+    }
+
+    /// Returns mood visits for one practice game, newest first.
+    private func moodVisits(for activity: PracticeActivity) -> [ActivityEngagementRecord] {
+        moodVisits
+            .filter { $0.activityRawValue == activity.rawValue }
+            .sorted { $0.endedAt > $1.endedAt }
     }
 
     private var emptyStateMessage: String {
         Calendar.current.isDateInToday(date)
             ? "Moods appear here after finishing an activity."
             : "No moods logged for this day."
+    }
+}
+
+/// One practice-game column in the moods grid.
+private struct MoodActivityColumn: View {
+    let visits: [ActivityEngagementRecord]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if visits.isEmpty {
+                Text("—")
+                    .font(ContinuumTheme.kidCaptionFont)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
+            } else {
+                ForEach(visits, id: \.id) { visit in
+                    MoodVisitEntry(visit: visit)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .padding(.horizontal, 6)
+    }
+}
+
+/// Compact mood entry with emoji, timestamp, and practiced sound.
+private struct MoodVisitEntry: View {
+    let visit: ActivityEngagementRecord
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Text(MoodChoice.emoji(for: visit.mood ?? ""))
+                    .font(.title3)
+
+                Text(visit.mood ?? "")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            }
+
+            Text(visit.endedAt.formatted(date: .omitted, time: .shortened))
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
+
+            Text(soundLabel)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(ContinuumTheme.tabPurple)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(8)
+        .background(ContinuumTheme.dashboardPurple.opacity(0.22))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(visit.activity?.subtitle ?? "Activity"), \(soundLabel), \(visit.mood ?? ""), \(visit.endedAt.formatted(date: .omitted, time: .shortened))")
+    }
+
+    private var soundLabel: String {
+        PracticeSoundCatalog.sound(withID: visit.targetSoundID)?.displayName ?? visit.targetSoundID
     }
 }
 
@@ -136,35 +293,53 @@ struct PracticeCalendarCard: View {
     private let weekdaySymbols = Calendar.current.shortWeekdaySymbols
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            monthHeader
+        DashboardCard(height: DashboardLayout.calendarHeight) {
+            VStack(alignment: .leading, spacing: 10) {
+                monthHeader
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
-                ForEach(weekdaySymbols, id: \.self) { symbol in
-                    Text(symbol)
-                        .font(ContinuumTheme.kidCaptionFont)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity)
-                }
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 6) {
+                    ForEach(weekdaySymbols, id: \.self) { symbol in
+                        Text(symbol)
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
+                    }
 
-                ForEach(dayItems) { item in
-                    if let date = item.date {
-                        Button {
-                            selectedDate = calendar.startOfDay(for: date)
-                        } label: {
-                            dayCell(for: item, date: date)
+                    ForEach(dayItems) { item in
+                        if let date = item.date {
+                            Button {
+                                selectedDate = calendar.startOfDay(for: date)
+                            } label: {
+                                dayCell(for: item, date: date)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            Color.clear
+                                .frame(height: 36)
                         }
-                        .buttonStyle(.plain)
-                    } else {
-                        Color.clear
-                            .frame(height: 44)
                     }
                 }
+
+                Spacer(minLength: 0)
+
+                HStack(spacing: 16) {
+                    legendItem(color: ContinuumTheme.tabPurple, label: "Practiced")
+                    legendItem(color: .gray.opacity(0.25), label: "No practice")
+                }
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
-        .padding()
-        .background(.white.opacity(0.55))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func legendItem(color: Color, label: String) -> some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(color)
+                .frame(width: 8, height: 8)
+            Text(label)
+        }
     }
 
     private var monthHeader: some View {
@@ -173,7 +348,7 @@ struct PracticeCalendarCard: View {
                 shiftMonth(by: -1)
             } label: {
                 Image(systemName: "chevron.left.circle.fill")
-                    .font(.title2)
+                    .font(.title3)
                     .foregroundStyle(ContinuumTheme.tabPurple)
             }
             .buttonStyle(.plain)
@@ -182,7 +357,8 @@ struct PracticeCalendarCard: View {
             Spacer()
 
             Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
-                .font(ContinuumTheme.kidSubheadFont)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(.black)
 
             Spacer()
 
@@ -190,7 +366,7 @@ struct PracticeCalendarCard: View {
                 shiftMonth(by: 1)
             } label: {
                 Image(systemName: "chevron.right.circle.fill")
-                    .font(.title2)
+                    .font(.title3)
                     .foregroundStyle(ContinuumTheme.tabPurple)
             }
             .buttonStyle(.plain)
@@ -202,23 +378,23 @@ struct PracticeCalendarCard: View {
         let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         let isToday = calendar.isDateInToday(date)
 
-        return VStack(spacing: 4) {
+        return VStack(spacing: 3) {
             Text("\(item.day)")
-                .font(ContinuumTheme.kidCaptionFont.weight(isSelected ? .bold : .regular))
+                .font(.system(size: 14, weight: isSelected ? .bold : .medium, design: .rounded))
                 .foregroundStyle(isSelected ? .white : .primary)
 
             Circle()
                 .fill(item.intensityColor)
-                .frame(width: 8, height: 8)
+                .frame(width: 6, height: 6)
         }
-        .frame(maxWidth: .infinity, minHeight: 44)
+        .frame(maxWidth: .infinity, minHeight: 36)
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(isSelected ? ContinuumTheme.tabPurple : .clear)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(isToday && !isSelected ? ContinuumTheme.tabPurple : .clear, lineWidth: 2)
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(isToday && !isSelected ? ContinuumTheme.tabPurple : .clear, lineWidth: 1.5)
         )
         .accessibilityLabel("\(date.formatted(date: .abbreviated, time: .omitted)), \(item.sessionCount) activities")
     }
@@ -262,7 +438,7 @@ private struct CalendarDayItem: Identifiable {
 
     var intensityColor: Color {
         switch sessionCount {
-        case 0: return .clear
+        case 0: return .gray.opacity(0.25)
         case 1: return ContinuumTheme.tabPurple.opacity(0.35)
         case 2: return ContinuumTheme.tabPurple.opacity(0.6)
         default: return ContinuumTheme.tabPurple
@@ -284,150 +460,5 @@ private extension Calendar {
     func startOfMonth(for date: Date) -> Date {
         let components = dateComponents([.year, .month], from: date)
         return self.date(from: components) ?? date
-    }
-}
-
-/// Four progress rings from the wireframe dashboard.
-struct ProgressRingsRow: View {
-    let sessions: [PracticeSessionRecord]
-
-    var body: some View {
-        LazyVGrid(columns: [GridItem(), GridItem()], spacing: 16) {
-            ProgressRingView(title: "Speech Accuracy", value: speechAccuracy)
-            ProgressRingView(title: "Motor Skills", value: 0.15)
-            ProgressRingView(title: "Mastery on new Skills", value: masteryRate)
-            ProgressRingView(title: "Listening", value: 0.01)
-        }
-    }
-
-    private var speechAccuracy: Double {
-        guard !sessions.isEmpty else { return 0 }
-        let total = sessions.reduce(0) { $0 + $1.correctness }
-        return Double(total) / Double(sessions.count) / 100.0
-    }
-
-    private var masteryRate: Double {
-        guard !sessions.isEmpty else { return 0 }
-        let mastered = sessions.filter { $0.correctness >= 80 }.count
-        return Double(mastered) / Double(sessions.count)
-    }
-}
-
-/// Single donut-style progress ring.
-struct ProgressRingView: View {
-    let title: String
-    let value: Double
-
-    var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .stroke(.white.opacity(0.5), lineWidth: 10)
-                Circle()
-                    .trim(from: 0, to: value)
-                    .stroke(ContinuumTheme.tabPurple, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                Text("\(Int(value * 100))%")
-                    .font(ContinuumTheme.kidSubheadFont)
-            }
-            .frame(width: 88, height: 88)
-
-            Text(title)
-                .font(ContinuumTheme.kidCaptionFont)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(.white.opacity(0.55))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-}
-
-/// Placeholder graph card for future chart integration.
-struct PracticeGraphCard: View {
-    let sessions: [PracticeSessionRecord]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Practice over time", systemImage: "chart.xyaxis.line")
-                .font(ContinuumTheme.kidSubheadFont)
-
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.white.opacity(0.45))
-                .frame(height: 180)
-                .overlay {
-                    if sessions.isEmpty {
-                        Text("Complete a Test activity to see your graph.")
-                            .font(ContinuumTheme.kidBodyFont)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        SimpleBarChart(values: sessions.prefix(7).map { Double($0.correctness) }.reversed())
-                            .padding()
-                    }
-                }
-        }
-        .padding()
-        .background(.white.opacity(0.55))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-}
-
-/// Lightweight bar chart for the dashboard MVP.
-struct SimpleBarChart: View {
-    let values: [Double]
-
-    var body: some View {
-        HStack(alignment: .bottom, spacing: 8) {
-            ForEach(Array(values.enumerated()), id: \.offset) { _, value in
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(ContinuumTheme.tabPurple)
-                    .frame(maxWidth: .infinity, minHeight: 4, maxHeight: 120)
-                    .scaleEffect(y: max(0.05, value / 100.0), anchor: .bottom)
-            }
-        }
-    }
-}
-
-/// Strengths / needs improvement summary card.
-struct DashboardSummaryCard: View {
-    let sessions: [PracticeSessionRecord]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            summaryRow(title: "Strengths", detail: strengthsText)
-            summaryRow(title: "Needs Improvement", detail: needsImprovementText)
-            summaryRow(title: "Recommended", detail: recommendedText)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ContinuumTheme.practiceCream)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-
-    private var strengthsText: String {
-        guard let best = sessions.max(by: { $0.correctness < $1.correctness }) else {
-            return "Complete your first practice session."
-        }
-        return "/\(best.targetPhoneme)/ sounds! Growth: \(best.correctness)%"
-    }
-
-    private var needsImprovementText: String {
-        guard let weakest = sessions.min(by: { $0.correctness < $1.correctness }) else {
-            return "Listening and Detection"
-        }
-        return "/\(weakest.targetPhoneme)/ — try Flash and Test again."
-    }
-
-    private var recommendedText: String {
-        sessions.isEmpty ? "Start with /m/ in the Test activity." : "Repeat your lowest-scoring sound tomorrow."
-    }
-
-    private func summaryRow(title: String, detail: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(ContinuumTheme.kidSubheadFont)
-            Text(detail)
-                .font(ContinuumTheme.kidBodyFont)
-        }
     }
 }

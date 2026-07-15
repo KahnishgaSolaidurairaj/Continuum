@@ -113,120 +113,135 @@ struct ActivityCarouselView: View {
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    private let gridColumns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-
     private var usesColumnLayout: Bool {
         horizontalSizeClass == .compact
     }
 
     var body: some View {
         GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: 20) {
-                    HStack {
-                        Button(action: onBack) {
-                            Label("Back", systemImage: "chevron.left")
-                                .font(ContinuumTheme.kidButtonFont)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(.white.opacity(0.85))
-                                .clipShape(Capsule())
-                        }
-                        Spacer()
-                    }
+            VStack(spacing: 6) {
+                headerSection
 
-                    Text("Practice \(target.displayLabel)")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .multilineTextAlignment(.center)
-
-                    phonemePreviewCard(
-                        cardHeight: max(geometry.size.height * 0.22, usesColumnLayout ? 160 : 200),
-                        symbolSize: min(geometry.size.width * 0.38, geometry.size.height * 0.16)
-                    )
-
-                    Text("Choose an activity")
-                        .font(ContinuumTheme.kidSectionHeaderFont)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: .infinity)
-
-                    if usesColumnLayout {
-                        VStack(spacing: 16) {
-                            ForEach(PracticeActivity.allCases) { activity in
-                                Button {
-                                    onSelectActivity(activity)
-                                } label: {
-                                    activityTile(
-                                        for: activity,
-                                        layout: .column,
-                                        tileSide: activityTileSide(in: geometry)
-                                    )
-                                }
-                                .buttonStyle(.plain)
+                if usesColumnLayout {
+                    VStack(spacing: 8) {
+                        ForEach(PracticeActivity.allCases) { activity in
+                            Button {
+                                onSelectActivity(activity)
+                            } label: {
+                                activityTile(
+                                    for: activity,
+                                    layout: .column,
+                                    fillsAvailableSpace: true
+                                )
                             }
-                        }
-                    } else {
-                        LazyVGrid(columns: gridColumns, spacing: 16) {
-                            ForEach(PracticeActivity.allCases) { activity in
-                                Button {
-                                    onSelectActivity(activity)
-                                } label: {
-                                    activityTile(
-                                        for: activity,
-                                        layout: .grid,
-                                        tileSide: activityTileSide(in: geometry)
-                                    )
-                                }
-                                .buttonStyle(.plain)
-                            }
+                            .buttonStyle(.plain)
+                            .frame(maxHeight: .infinity)
                         }
                     }
+                    .frame(maxHeight: .infinity)
+                } else {
+                    let activities = PracticeActivity.allCases
+                    VStack(spacing: 10) {
+                        HStack(spacing: 10) {
+                            gameButton(for: activities[0], layout: .grid)
+                            gameButton(for: activities[1], layout: .grid)
+                        }
+                        .frame(maxHeight: .infinity)
+
+                        HStack(spacing: 10) {
+                            gameButton(for: activities[2], layout: .grid)
+                            gameButton(for: activities[3], layout: .grid)
+                        }
+                        .frame(maxHeight: .infinity)
+                    }
+                    .frame(maxHeight: .infinity)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 12)
-                .padding(.bottom, 24)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.horizontal, 14)
+            .padding(.top, 4)
+            .padding(.bottom, 12)
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
         }
+    }
+
+    private var headerSection: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Button(action: onBack) {
+                    Label("Back", systemImage: "chevron.left")
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.white.opacity(0.9))
+                        .clipShape(Capsule())
+                        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                }
+                Spacer()
+            }
+
+            Text("Practice \(target.displayLabel)")
+                .font(.system(size: usesColumnLayout ? 26 : 32, weight: .bold, design: .rounded))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+
+            phonemePreviewCard(
+                cardHeight: usesColumnLayout ? 56 : 96,
+                symbolSize: usesColumnLayout ? 32 : 46
+            )
+
+            Text("Choose an activity")
+                .font(.system(size: usesColumnLayout ? 21 : 24, weight: .bold, design: .rounded))
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+        }
+    }
+
+    private func gameButton(for activity: PracticeActivity, layout: ActivityTileLayout) -> some View {
+        Button {
+            onSelectActivity(activity)
+        } label: {
+            activityTile(
+                for: activity,
+                layout: layout,
+                fillsAvailableSpace: true
+            )
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     /// Large preview card showing the practice phoneme; tap to return to sound selection.
     private func phonemePreviewCard(cardHeight: CGFloat, symbolSize: CGFloat) -> some View {
         Button(action: onBack) {
             ZStack {
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(.white.opacity(0.75))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .stroke(ContinuumTheme.cardBorder.opacity(0.2), lineWidth: 2)
+                RoundedRectangle(cornerRadius: 22)
+                    .fill(
+                        LinearGradient(
+                            colors: [.white, ContinuumTheme.homeLavender.opacity(0.45)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22)
+                            .stroke(ContinuumTheme.tabPurple.opacity(0.18), lineWidth: 2)
+                    )
+                    .shadow(color: ContinuumTheme.tabPurple.opacity(0.12), radius: 8, y: 4)
 
                 Text(target.traceCharacter.uppercased())
                     .font(.system(size: symbolSize, weight: .bold, design: .rounded))
-                    .foregroundStyle(.black.opacity(0.72))
+                    .foregroundStyle(ContinuumTheme.pencilLead)
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
             .frame(height: cardHeight)
-            .contentShape(RoundedRectangle(cornerRadius: 24))
+            .contentShape(RoundedRectangle(cornerRadius: 22))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Back to all sounds")
         .accessibilityHint("Returns to the sound selection screen")
-    }
-
-    /// Side length for square activity tiles on iPad, or row height reference on iPhone.
-    private func activityTileSide(in geometry: GeometryProxy) -> CGFloat {
-        let horizontalPadding: CGFloat = 40
-        if usesColumnLayout {
-            return max(geometry.size.width - horizontalPadding, 280)
-        }
-        let spacing: CGFloat = 16
-        let availableWidth = geometry.size.width - horizontalPadding - spacing
-        return max(availableWidth / 2, 150)
     }
 
     private enum ActivityTileLayout {
@@ -238,36 +253,36 @@ struct ActivityCarouselView: View {
     private func activityTile(
         for activity: PracticeActivity,
         layout: ActivityTileLayout,
-        tileSide: CGFloat
+        fillsAvailableSpace: Bool = false
     ) -> some View {
         let theme = ActivityTileTheme.theme(for: activity)
-        let iconSize: CGFloat = layout == .grid ? tileSide * 0.34 : 52
+        let iconSize: CGFloat = layout == .grid ? 40 : 38
+        let titleFont: Font = .system(size: layout == .column ? 24 : 22, weight: .bold, design: .rounded)
+        let subtitleFont: Font = .system(size: layout == .column ? 17 : 16, weight: .semibold, design: .rounded)
 
         let tileContent = Group {
             switch layout {
             case .grid:
-                VStack(spacing: 14) {
-                    Image(systemName: activity.systemImage)
-                        .font(.system(size: iconSize))
+                VStack(spacing: 10) {
+                    iconBadge(systemName: activity.systemImage, size: iconSize, theme: theme)
                     Text(activity.subtitle)
-                        .font(ContinuumTheme.kidSectionHeaderFont)
+                        .font(titleFont)
                     Text(activity.title)
-                        .font(ContinuumTheme.kidSubheadFont)
+                        .font(subtitleFont)
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .minimumScaleFactor(0.85)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .column:
-                HStack(spacing: 18) {
-                    Image(systemName: activity.systemImage)
-                        .font(.system(size: iconSize))
-                        .frame(width: iconSize + 8)
+                HStack(spacing: 14) {
+                    iconBadge(systemName: activity.systemImage, size: iconSize, theme: theme)
 
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(activity.subtitle)
-                            .font(ContinuumTheme.kidSectionHeaderFont)
+                            .font(titleFont)
                         Text(activity.title)
-                            .font(ContinuumTheme.kidSubheadFont)
+                            .font(subtitleFont)
                             .multilineTextAlignment(.leading)
                             .lineLimit(2)
                             .minimumScaleFactor(0.85)
@@ -275,66 +290,95 @@ struct ActivityCarouselView: View {
 
                     Spacer(minLength: 0)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             }
         }
         .foregroundStyle(theme.foreground)
 
         return tileContent
             .frame(maxWidth: .infinity)
-            .frame(
-                width: layout == .grid ? tileSide : nil,
-                height: layout == .grid ? tileSide : nil
-            )
-            .frame(minHeight: layout == .column ? ContinuumTheme.kidMinTapHeight + 36 : nil)
-            .padding(.vertical, layout == .column ? 18 : 0)
+            .frame(maxHeight: fillsAvailableSpace ? .infinity : nil)
             .background(
-                LinearGradient(
-                    colors: theme.gradient,
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(theme.fill)
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            LinearGradient(
+                                colors: [theme.highlight, .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
             )
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(theme.border, lineWidth: 2.5)
             )
-            .shadow(color: theme.border.opacity(0.2), radius: 6, y: 3)
+            .shadow(color: theme.shadow.opacity(0.28), radius: 8, y: 5)
+            .shadow(color: .white.opacity(0.45), radius: 0, y: -1)
+    }
+
+    private func iconBadge(systemName: String, size: CGFloat, theme: ActivityTileTheme) -> some View {
+        ZStack {
+            Circle()
+                .fill(theme.badgeFill)
+                .frame(width: size + 26, height: size + 26)
+            Image(systemName: systemName)
+                .font(.system(size: size, weight: .bold))
+        }
     }
 }
 
 /// Color styling for each practice activity tile.
 private struct ActivityTileTheme {
-    let gradient: [Color]
+    let fill: Color
     let foreground: Color
     let border: Color
+    let shadow: Color
+    let highlight: Color
+    let badgeFill: Color
 
     static func theme(for activity: PracticeActivity) -> ActivityTileTheme {
         switch activity {
         case .sandbox:
             return ActivityTileTheme(
-                gradient: [ContinuumTheme.beachSunYellow, ContinuumTheme.beachCoral],
+                fill: Color(red: 1.0, green: 0.82, blue: 0.38),
                 foreground: ContinuumTheme.beachCoralPen,
-                border: ContinuumTheme.beachCoralPen.opacity(0.85)
+                border: ContinuumTheme.beachCoral.opacity(0.9),
+                shadow: ContinuumTheme.beachCoralPen,
+                highlight: Color.white.opacity(0.42),
+                badgeFill: Color.white.opacity(0.35)
             )
         case .flash:
             return ActivityTileTheme(
-                gradient: [ContinuumTheme.lightningGlow, ContinuumTheme.stormBlue],
-                foreground: ContinuumTheme.stormBlueDeep,
-                border: ContinuumTheme.stormBlueDeep
+                fill: Color(red: 0.30, green: 0.62, blue: 0.98),
+                foreground: .white,
+                border: ContinuumTheme.stormBlueDeep,
+                shadow: ContinuumTheme.stormBlueDeep,
+                highlight: Color.white.opacity(0.35),
+                badgeFill: Color.white.opacity(0.24)
             )
         case .tryDemo:
             return ActivityTileTheme(
-                gradient: [ContinuumTheme.homeLavender, ContinuumTheme.stormBlue],
+                fill: Color(red: 0.80, green: 0.72, blue: 0.98),
                 foreground: ContinuumTheme.stormBlueDeep,
-                border: ContinuumTheme.stormBlueDeep
+                border: ContinuumTheme.tabPurple.opacity(0.55),
+                shadow: ContinuumTheme.tabPurple,
+                highlight: Color.white.opacity(0.4),
+                badgeFill: Color.white.opacity(0.34)
             )
         case .test:
             return ActivityTileTheme(
-                gradient: [ContinuumTheme.homePink, ContinuumTheme.tabPurple],
-                foreground: Color(red: 0.82, green: 0.36, blue: 0.54),
-                border: ContinuumTheme.tabPurple
+                fill: Color(red: 0.72, green: 0.52, blue: 0.92),
+                foreground: .white,
+                border: ContinuumTheme.tabPurple,
+                shadow: ContinuumTheme.tabPurple,
+                highlight: Color.white.opacity(0.32),
+                badgeFill: Color.white.opacity(0.22)
             )
         }
     }

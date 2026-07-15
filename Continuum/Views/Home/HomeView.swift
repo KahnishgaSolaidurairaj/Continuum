@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Home screen with mascot, mood logging, motivation, and practice prompt.
+/// Home screen with mascot hero, suggestions grid, motivation, and practice prompts.
 struct HomeView: View {
     let onOpenPracticeTab: () -> Void
 
@@ -9,6 +9,7 @@ struct HomeView: View {
     private var engagements: [ActivityEngagementRecord]
 
     @State private var showGoalSheet = false
+    @State private var showWarmUpSheet = false
     @State private var motivationMessage = BrocaMotivation.randomMessage()
     @State private var dailyGoalMinutes = PracticeProgressStore.dailyGoalMinutes
 
@@ -24,309 +25,434 @@ struct HomeView: View {
         return PracticeTarget.allPhonemes[0]
     }
 
+    private var todayPracticeMinutes: Int {
+        let seconds = ActivityEngagementAnalytics.engagements(on: .now, records: engagements)
+            .reduce(0) { $0 + $1.durationSeconds }
+        return max(Int((seconds / 60.0).rounded()), seconds > 0 ? 1 : 0)
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            topSection
-            middleSection
+        ScrollView {
+            VStack(spacing: 0) {
+                heroHeader
+                mainPanel
+                    .padding(.top, -20)
+            }
         }
-        .background(ContinuumTheme.homePink)
+        .background(
+            LinearGradient(
+                colors: [ContinuumTheme.homePink, ContinuumTheme.homeOffWhite],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        )
         .sheet(isPresented: $showGoalSheet) {
             DailyGoalSheet(goalMinutes: $dailyGoalMinutes)
         }
+        .sheet(isPresented: $showWarmUpSheet) {
+            WarmUpSheet()
+        }
     }
 
-    /// Pink header with Broca and the weekly streak.
-    private var topSection: some View {
-        VStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(.white.opacity(0.75))
-                    .frame(width: 170, height: 170)
-                Image("BrocaBear")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 130, height: 130)
-                    .accessibilityLabel("Broca the Bear")
-            }
+    /// Hills header with welcome copy and Broca mascot.
+    private var heroHeader: some View {
+        GeometryReader { geometry in
+            let mascotSize = min(geometry.size.width * 0.44, 196)
 
-            Text("Weekly streak: \(PracticeProgressStore.currentStreak) days")
-                .font(ContinuumTheme.kidSubheadFont)
+            ZStack(alignment: .bottom) {
+                HomeHillsBackground()
+
+                HStack(alignment: .bottom, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Welcome to")
+                            .font(.system(size: 36, weight: .semibold, design: .rounded))
+                            .foregroundStyle(ContinuumTheme.pencilLead)
+
+                        Text("Continuum")
+                            .font(.system(size: 68, weight: .bold, design: .rounded))
+                            .foregroundStyle(ContinuumTheme.pencilLead)
+                            .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
+                            .minimumScaleFactor(0.8)
+                            .lineLimit(1)
+
+                        Text("Continue therapy at home")
+                            .font(.system(size: 26, weight: .medium, design: .rounded))
+                            .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Image("BrocaBear")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: mascotSize, height: mascotSize)
+                        .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
+                        .accessibilityLabel("Broca the Bear")
+                }
                 .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(.white.opacity(0.65))
-                .clipShape(Capsule())
+                .padding(.bottom, 30)
+            }
         }
-        .frame(maxWidth: .infinity)
+        .frame(height: 250)
+    }
+
+    /// White rounded panel with actions, suggestions, motivation, and streak.
+    private var mainPanel: some View {
+        VStack(spacing: 14) {
+            primaryActionRow
+            suggestionsSection
+            motivationRow
+            streakRow
+        }
+        .padding(.horizontal, 18)
         .padding(.top, 20)
         .padding(.bottom, 24)
-        .background(ContinuumTheme.homePink)
+        .frame(maxWidth: .infinity, alignment: .top)
+        .background(
+            RoundedRectangle(cornerRadius: 34, style: .continuous)
+                .fill(Color.white.opacity(0.98))
+                .shadow(color: ContinuumTheme.tabPurple.opacity(0.12), radius: 16, y: -6)
+        )
+        .padding(.horizontal, 12)
     }
 
-    /// Lavender content area with mood, motivation, suggestion, goal, and practice.
-    private var middleSection: some View {
-        ScrollViewReader { scrollProxy in
-            ScrollView {
-                VStack(spacing: 24) {
-                    moodSummaryCard
+    /// Warm up and practice call-to-action buttons from the mockup.
+    private var primaryActionRow: some View {
+        HStack(spacing: 14) {
+            Button {
+                showWarmUpSheet = true
+            } label: {
+                Text("Warm up")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.homeMintText)
+                    .frame(maxWidth: .infinity, minHeight: 64)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(red: 0.78, green: 0.96, blue: 0.82), ContinuumTheme.homeMint],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(Capsule())
+                    .shadow(color: ContinuumTheme.homeMintText.opacity(0.22), radius: 8, y: 4)
+            }
+            .buttonStyle(.plain)
 
-                    HomeMotivationCard(message: motivationMessage) {
-                        motivationMessage = BrocaMotivation.randomMessage()
-                    } onLetsGo: {
-                        withAnimation {
-                            scrollProxy.scrollTo("practiceButton", anchor: .center)
-                        }
-                    }
+            Button {
+                onOpenPracticeTab()
+            } label: {
+                Text("Practice \(suggestedTarget.symbol)")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(maxWidth: .infinity, minHeight: 64)
+                    .background(
+                        LinearGradient(
+                            colors: [ContinuumTheme.homeLavender, Color(red: 0.80, green: 0.72, blue: 0.98)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .clipShape(Capsule())
+                    .shadow(color: ContinuumTheme.tabPurple.opacity(0.2), radius: 8, y: 4)
+            }
+            .buttonStyle(.plain)
+        }
+    }
 
-                    suggestionSection
+    /// 2x2 suggestions grid with quick actions.
+    private var suggestionsSection: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Label("Suggestions", systemImage: "sparkles")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.pencilLead)
+                Spacer()
+            }
 
-                    todayGoalButton
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(), spacing: 12),
+                    GridItem(.flexible(), spacing: 12)
+                ],
+                spacing: 12
+            ) {
+                HomeSuggestionCard(
+                    icon: "target",
+                    title: "Practice focus",
+                    description: "Keep working on “\(suggestedTarget.symbol)”",
+                    buttonTitle: "Continue",
+                    tint: .purple,
+                    action: onOpenPracticeTab
+                )
 
-                    practiceButton
-                        .id("practiceButton")
-                }
-                .padding(24)
+                HomeSuggestionCard(
+                    icon: "face.smiling",
+                    title: "Warm up more",
+                    description: latestMood.map { "Latest mood: \($0)" } ?? "Get your voice ready",
+                    buttonTitle: "Warm up",
+                    tint: .green,
+                    action: { showWarmUpSheet = true }
+                )
+
+                HomeSuggestionCard(
+                    icon: "headphones",
+                    title: "Try Flash",
+                    description: "Flash cards for “\(suggestedTarget.symbol)”",
+                    buttonTitle: "Try Flash",
+                    tint: .purple,
+                    action: onOpenPracticeTab
+                )
+
+                HomeSuggestionCard(
+                    icon: "flag.fill",
+                    title: "Today's goal",
+                    description: "\(todayPracticeMinutes) of \(dailyGoalMinutes) minutes",
+                    buttonTitle: "Start goal",
+                    tint: .green,
+                    action: { showGoalSheet = true }
+                )
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(ContinuumTheme.homeLavender)
     }
 
-    /// Shows the latest mood logged from a completed practice activity today.
-    private var moodSummaryCard: some View {
+    /// Quote row with mascot thumbnail and motivation refresh.
+    private var motivationRow: some View {
         HStack(spacing: 14) {
-            Text(selectedMoodEmoji)
-                .font(.system(size: 36))
+            Image("BrocaBear")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 54, height: 54)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(ContinuumTheme.tabPurple.opacity(0.35), lineWidth: 2))
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Today's Mood")
-                    .font(ContinuumTheme.kidButtonFont)
-                if let mood = latestMood {
-                    Text("Latest: \(mood)")
-                        .font(ContinuumTheme.kidCaptionFont)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Finish an activity to log how you feel")
-                        .font(ContinuumTheme.kidCaptionFont)
-                        .foregroundStyle(.secondary)
-                }
+            HStack(alignment: .top, spacing: 4) {
+                Text("“")
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.tabPurple.opacity(0.7))
+                    .offset(y: -6)
+                Text(motivationMessage)
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.pencilLead)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button("Motivation") {
+                motivationMessage = BrocaMotivation.randomMessage()
+            }
+            .font(.system(size: 15, weight: .bold, design: .rounded))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                LinearGradient(
+                    colors: [ContinuumTheme.tabPurple, Color(red: 0.68, green: 0.52, blue: 0.92)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(Capsule())
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [ContinuumTheme.homeLavender.opacity(0.7), ContinuumTheme.homePink.opacity(0.45)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 22))
+    }
+
+    /// Streak tracker with recent day checkmarks.
+    private var streakRow: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(red: 0.78, green: 0.96, blue: 0.82), ContinuumTheme.homeMint],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 50, height: 50)
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(ContinuumTheme.homeMintText)
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("\(PracticeProgressStore.currentStreak) day streak")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.pencilLead)
+                Text("Keep it up! You're doing great.")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
             }
 
             Spacer()
+
+            HStack(spacing: 8) {
+                ForEach(recentPracticeFlags, id: \.offset) { item in
+                    ZStack {
+                        Circle()
+                            .fill(item.practiced ? ContinuumTheme.homeMint : Color.white)
+                            .frame(width: 26, height: 26)
+                            .overlay(
+                                Circle()
+                                    .stroke(item.practiced ? ContinuumTheme.homeMintText.opacity(0.5) : Color.gray.opacity(0.25), lineWidth: 1.5)
+                            )
+                        if item.practiced {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(ContinuumTheme.homeMintText)
+                        }
+                    }
+                }
+            }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-        .background(.white.opacity(0.9))
+        .padding(16)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(ContinuumTheme.homeMint.opacity(0.8), lineWidth: 2)
+        )
+        .shadow(color: ContinuumTheme.homeMintText.opacity(0.12), radius: 6, y: 3)
+    }
+
+    private var recentPracticeFlags: [(offset: Int, practiced: Bool)] {
+        let calendar = Calendar.current
+        let practicedDays = Set(PracticeProgressStore.practiceDates().map { calendar.startOfDay(for: $0) })
+        return (0..<5).map { offset in
+            let day = calendar.date(byAdding: .day, value: -(4 - offset), to: calendar.startOfDay(for: .now)) ?? .now
+            return (offset, practicedDays.contains(calendar.startOfDay(for: day)))
+        }
+    }
+}
+
+/// Soft hills background for the home hero header.
+private struct HomeHillsBackground: View {
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            LinearGradient(
+                colors: [
+                    Color(red: 1.0, green: 0.88, blue: 0.92),
+                    Color(red: 0.98, green: 0.84, blue: 0.80),
+                    Color(red: 0.94, green: 0.90, blue: 0.86)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            HomeHillShape()
+                .fill(Color(red: 0.95, green: 0.80, blue: 0.78).opacity(0.9))
+                .frame(height: 130)
+                .offset(y: 20)
+
+            HomeHillShape()
+                .fill(Color(red: 0.88, green: 0.72, blue: 0.70).opacity(0.65))
+                .frame(height: 100)
+                .scaleEffect(x: -1, y: 1)
+                .offset(x: -70, y: 30)
+        }
+    }
+}
+
+/// Simple rolling hill used behind the home hero.
+private struct HomeHillShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: rect.maxY))
+        path.addCurve(
+            to: CGPoint(x: rect.maxX, y: rect.maxY),
+            control1: CGPoint(x: rect.width * 0.25, y: rect.minY),
+            control2: CGPoint(x: rect.width * 0.72, y: rect.maxY * 0.45)
+        )
+        path.closeSubpath()
+        return path
+    }
+}
+
+/// One suggestion tile in the home 2x2 grid.
+private struct HomeSuggestionCard: View {
+    enum Tint {
+        case purple
+        case green
+    }
+
+    let icon: String
+    let title: String
+    let description: String
+    let buttonTitle: String
+    let tint: Tint
+    let action: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(accentColor.opacity(0.22))
+                        .frame(width: 54, height: 54)
+                    Image(systemName: icon)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(accentColor)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(title)
+                        .font(.system(size: 21, weight: .bold, design: .rounded))
+                        .foregroundStyle(ContinuumTheme.pencilLead)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.85)
+                    Text(description)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.75))
+                        .lineLimit(4)
+                        .minimumScaleFactor(0.85)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            Spacer(minLength: 8)
+
+            Button(buttonTitle, action: action)
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(accentColor)
+                .clipShape(Capsule())
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .buttonStyle(.plain)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, minHeight: 168, maxHeight: .infinity, alignment: .topLeading)
+        .background(
+            LinearGradient(
+                colors: [accentColor.opacity(0.16), accentColor.opacity(0.08)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .stroke(ContinuumTheme.cardBorder.opacity(0.2), lineWidth: 2)
+                .stroke(accentColor.opacity(0.28), lineWidth: 2)
         )
-        .accessibilityLabel(latestMood.map { "Today's mood: \($0)" } ?? "No mood logged yet today")
+        .shadow(color: accentColor.opacity(0.14), radius: 6, y: 3)
     }
 
-    private var selectedMoodEmoji: String {
-        guard let latestMood else { return "😊" }
-        return MoodChoice.emoji(for: latestMood)
+    private var accentColor: Color {
+        tint == .green ? ContinuumTheme.homeMintText : ContinuumTheme.tabPurple
     }
-
-    /// Shows the suggested sound to practice today.
-    private var suggestionSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Suggestion")
-                .font(ContinuumTheme.kidCaptionFont)
-                .foregroundStyle(.secondary)
-
-            Text("You left off with “\(suggestedTarget.symbol)”. Today let's focus on “\(suggestedTarget.symbol)”")
-                .font(ContinuumTheme.kidBodyFont.weight(.semibold))
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    /// Opens the goal sheet so the child can set today's practice target.
-    private var todayGoalButton: some View {
-        Button {
-            showGoalSheet = true
-        } label: {
-            HStack {
-                Label {
-                    Text("Today's goal: \(dailyGoalMinutes) minutes")
-                        .font(ContinuumTheme.kidSubheadFont)
-                } icon: {
-                    Image(systemName: "target")
-                        .font(.title2)
-                }
-
-                Spacer()
-
-                Text("Change")
-                    .font(ContinuumTheme.kidButtonFont)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-            .background(.white.opacity(0.65))
-            .clipShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Change today's goal")
-    }
-
-    /// Centered call-to-action to start practicing.
-    private var practiceButton: some View {
-        Button {
-            onOpenPracticeTab()
-        } label: {
-            Text("Practice")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .padding(.horizontal, 48)
-                .padding(.vertical, 22)
-                .frame(minWidth: 220, minHeight: 72)
-                .background(.white.opacity(0.92))
-                .foregroundStyle(.primary)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18)
-                        .stroke(ContinuumTheme.cardBorder, lineWidth: 3)
-                )
-        }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
-        .padding(.top, 8)
-        .padding(.bottom, 16)
-    }
-}
-
-/// Inline motivation card shown when the home screen opens.
-struct HomeMotivationCard: View {
-    let message: String
-    let onAnother: () -> Void
-    let onLetsGo: () -> Void
-
-    @State private var confettiTrigger = 0
-
-    var body: some View {
-        ZStack {
-            VStack(spacing: 18) {
-                Image("BrocaBear")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-
-                Text("Broca says…")
-                    .font(ContinuumTheme.kidSubheadFont)
-                    .foregroundStyle(.secondary)
-
-                Text(message)
-                    .font(ContinuumTheme.kidBodyFont.weight(.semibold))
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                HStack(spacing: 14) {
-                    Button("Another one", action: onAnother)
-                        .kidSecondaryButtonStyle()
-                        .frame(maxWidth: .infinity)
-
-                    Button("Let's go!") {
-                        confettiTrigger += 1
-                        onLetsGo()
-                    }
-                    .kidPrimaryButtonStyle()
-                    .frame(maxWidth: .infinity)
-                }
-            }
-            .padding(24)
-            .frame(maxWidth: .infinity)
-            .background(.white.opacity(0.92))
-            .clipShape(RoundedRectangle(cornerRadius: 22))
-            .overlay(
-                RoundedRectangle(cornerRadius: 22)
-                    .stroke(ContinuumTheme.cardBorder.opacity(0.15), lineWidth: 2)
-            )
-
-            ConfettiEmojiBurst(trigger: confettiTrigger)
-                .clipShape(RoundedRectangle(cornerRadius: 22))
-        }
-    }
-}
-
-/// Bursts confetti emojis across the motivation card when triggered.
-private struct ConfettiEmojiBurst: View {
-    let trigger: Int
-
-    private let emojis = ["🎉", "🎊", "✨", "🎈", "⭐", "🌟"]
-
-    @State private var pieces: [ConfettiPiece] = []
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                ForEach(pieces) { piece in
-                    Text(piece.emoji)
-                        .font(.system(size: piece.fontSize))
-                        .rotationEffect(.degrees(piece.rotation))
-                        .offset(x: piece.offsetX, y: piece.offsetY)
-                        .opacity(piece.opacity)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .onChange(of: trigger) { _, _ in
-                launchConfetti(in: geometry.size)
-            }
-        }
-        .allowsHitTesting(false)
-    }
-
-    /// Spawns and animates confetti emoji particles from the card center.
-    private func launchConfetti(in size: CGSize) {
-        _ = size
-
-        pieces = (0..<18).map { index in
-            let angle = (Double(index) / 18.0) * (.pi * 2)
-            let spread = CGFloat.random(in: 70...150)
-            return ConfettiPiece(
-                emoji: emojis[index % emojis.count],
-                fontSize: CGFloat.random(in: 22...34),
-                offsetX: 0,
-                offsetY: 0,
-                targetOffsetX: cos(angle) * spread,
-                targetOffsetY: sin(angle) * spread - 30,
-                rotation: 0,
-                targetRotation: Double.random(in: -180...180),
-                opacity: 1
-            )
-        }
-
-        withAnimation(.easeOut(duration: 1.1)) {
-            pieces = pieces.map { piece in
-                var updated = piece
-                updated.offsetX = piece.targetOffsetX
-                updated.offsetY = piece.targetOffsetY
-                updated.rotation = piece.targetRotation
-                updated.opacity = 0
-                return updated
-            }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            pieces = []
-        }
-    }
-}
-
-/// A single animated confetti emoji particle.
-private struct ConfettiPiece: Identifiable {
-    let id = UUID()
-    let emoji: String
-    let fontSize: CGFloat
-    var offsetX: CGFloat
-    var offsetY: CGFloat
-    let targetOffsetX: CGFloat
-    let targetOffsetY: CGFloat
-    var rotation: Double
-    let targetRotation: Double
-    var opacity: Double
 }
 
 /// Sheet for setting the daily practice goal in minutes.

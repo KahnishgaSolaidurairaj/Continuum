@@ -6,32 +6,32 @@ import SwiftData
 final class PracticeSessionRecord {
     var id: UUID
     var targetPhoneme: String
+    var targetSoundID: String?
     var timestamp: Date
     var correctness: Int
     var confidence: Double
     var coachingSummary: String
-    var visualFeaturesJSON: Data
     var audioFeaturesJSON: Data
     var ruleResultsJSON: Data
 
     init(
         id: UUID = UUID(),
         targetPhoneme: String,
+        targetSoundID: String? = nil,
         timestamp: Date = .now,
         correctness: Int,
         confidence: Double,
         coachingSummary: String,
-        visualFeaturesJSON: Data,
         audioFeaturesJSON: Data,
         ruleResultsJSON: Data
     ) {
         self.id = id
         self.targetPhoneme = targetPhoneme
+        self.targetSoundID = targetSoundID
         self.timestamp = timestamp
         self.correctness = correctness
         self.confidence = confidence
         self.coachingSummary = coachingSummary
-        self.visualFeaturesJSON = visualFeaturesJSON
         self.audioFeaturesJSON = audioFeaturesJSON
         self.ruleResultsJSON = ruleResultsJSON
     }
@@ -39,8 +39,6 @@ final class PracticeSessionRecord {
 
 /// Lightweight profile summarizing recurring pronunciation issues.
 struct UserPronunciationProfile: Codable, Sendable {
-    var weakLipClosureCount: Int = 0
-    var excessiveRoundingCount: Int = 0
     var weakAirflowCount: Int = 0
     var weakVoicingCount: Int = 0
     var shortDurationCount: Int = 0
@@ -50,18 +48,6 @@ struct UserPronunciationProfile: Codable, Sendable {
     func personalizedTips() -> [CoachingMessage] {
         var tips: [CoachingMessage] = []
 
-        if weakLipClosureCount >= 3 {
-            tips.append(CoachingMessage(
-                text: "Focus on fully closing your lips before each bilabial sound.",
-                severity: .warning
-            ))
-        }
-        if excessiveRoundingCount >= 3 {
-            tips.append(CoachingMessage(
-                text: "Practice neutral lips — you tend to round more than needed.",
-                severity: .warning
-            ))
-        }
         if weakAirflowCount >= 3 {
             tips.append(CoachingMessage(
                 text: "Try stronger, steady airflow for fricatives like /f/ and /v/.",

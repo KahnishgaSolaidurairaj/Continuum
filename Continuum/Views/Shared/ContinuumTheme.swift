@@ -7,6 +7,9 @@ enum ContinuumTheme {
     static let tabPurple = Color(red: 0.58, green: 0.48, blue: 0.78)
     static let dashboardPurple = Color(red: 0.78, green: 0.73, blue: 0.92)
     static let practiceCream = Color(red: 0.98, green: 0.96, blue: 0.88)
+    static let homeOffWhite = Color(red: 0.97, green: 0.96, blue: 0.98)
+    static let homeMint = Color(red: 0.82, green: 0.94, blue: 0.86)
+    static let homeMintText = Color(red: 0.18, green: 0.48, blue: 0.34)
     static let cardBorder = Color.black.opacity(0.85)
 
     // Beach sandbox palette
