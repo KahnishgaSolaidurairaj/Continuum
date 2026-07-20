@@ -38,7 +38,9 @@ struct HomeView: View {
                 mainPanel
                     .padding(.top, -20)
             }
+            .padding(.bottom, ContinuumTabBar.contentBottomPadding)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             LinearGradient(
                 colors: [ContinuumTheme.homePink, ContinuumTheme.homeOffWhite],
@@ -180,15 +182,6 @@ struct HomeView: View {
                 spacing: 12
             ) {
                 HomeSuggestionCard(
-                    icon: "target",
-                    title: "Practice focus",
-                    description: "Keep working on “\(suggestedTarget.symbol)”",
-                    buttonTitle: "Continue",
-                    tint: .purple,
-                    action: onOpenPracticeTab
-                )
-
-                HomeSuggestionCard(
                     icon: "face.smiling",
                     title: "Warm up more",
                     description: latestMood.map { "Latest mood: \($0)" } ?? "Get your voice ready",
@@ -198,10 +191,10 @@ struct HomeView: View {
                 )
 
                 HomeSuggestionCard(
-                    icon: "headphones",
-                    title: "Try Flash",
-                    description: "Flash cards for “\(suggestedTarget.symbol)”",
-                    buttonTitle: "Try Flash",
+                    icon: "target",
+                    title: "Practice focus",
+                    description: "Keep working on “\(suggestedTarget.symbol)”",
+                    buttonTitle: "Continue",
                     tint: .purple,
                     action: onOpenPracticeTab
                 )
@@ -210,9 +203,18 @@ struct HomeView: View {
                     icon: "flag.fill",
                     title: "Today's goal",
                     description: "\(todayPracticeMinutes) of \(dailyGoalMinutes) minutes",
-                    buttonTitle: "Start goal",
+                    buttonTitle: "Change goal",
                     tint: .green,
                     action: { showGoalSheet = true }
+                )
+
+                HomeSuggestionCard(
+                    icon: "headphones",
+                    title: "Try Flash",
+                    description: "Flash cards for “\(suggestedTarget.symbol)”",
+                    buttonTitle: "Try Flash",
+                    tint: .purple,
+                    action: onOpenPracticeTab
                 )
             }
         }

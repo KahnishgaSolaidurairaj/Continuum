@@ -22,7 +22,7 @@ struct TopPracticedSoundsCard: View {
                     VStack(alignment: .leading, spacing: 10) {
                         if stats.isEmpty {
                             Text("No practice sounds recorded for this day.")
-                                .font(ContinuumTheme.kidBodyFont)
+                                .font(DashboardTypography.body)
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, minHeight: 120, alignment: .center)
                         } else {
@@ -30,25 +30,25 @@ struct TopPracticedSoundsCard: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
                                         Text(stat.displayName)
-                                            .font(ContinuumTheme.kidBodyFont)
+                                            .font(DashboardTypography.body)
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.85)
                                         Spacer(minLength: 4)
                                         Text("\(stat.visitCount)")
-                                            .font(ContinuumTheme.kidBodyFont.weight(.semibold))
+                                            .font(DashboardTypography.bodyEmphasis)
                                             .foregroundStyle(ContinuumTheme.tabPurple)
                                     }
 
                                     GeometryReader { geometry in
-                                        RoundedRectangle(cornerRadius: 6)
+                                        RoundedRectangle(cornerRadius: 7)
                                             .fill(ContinuumTheme.tabPurple.opacity(0.18))
                                             .overlay(alignment: .leading) {
-                                                RoundedRectangle(cornerRadius: 6)
+                                                RoundedRectangle(cornerRadius: 7)
                                                     .fill(ContinuumTheme.tabPurple)
                                                     .frame(width: geometry.size.width * barWidth(for: stat))
                                             }
                                     }
-                                    .frame(height: 12)
+                                    .frame(height: 14)
                                 }
                             }
                         }

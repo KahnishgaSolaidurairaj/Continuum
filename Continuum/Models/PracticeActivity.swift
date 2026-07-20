@@ -12,9 +12,19 @@ enum PracticeActivity: String, CaseIterable, Identifiable, Sendable {
     var title: String {
         switch self {
         case .sandbox: return "Trace with your finger"
-        case .flash: return "Flashcard"
+        case .flash: return "Listen to the sound"
         case .tryDemo: return "See an example"
         case .test: return "Try it yourself"
+        }
+    }
+
+    /// Short call-to-action label on the practice activity card.
+    var actionLabel: String {
+        switch self {
+        case .sandbox: return "Start Trace"
+        case .flash: return "Start Flash"
+        case .tryDemo: return "Watch Demo"
+        case .test: return "Start Test"
         }
     }
 
@@ -30,8 +40,8 @@ enum PracticeActivity: String, CaseIterable, Identifiable, Sendable {
     var systemImage: String {
         switch self {
         case .sandbox: return "hand.draw"
-        case .flash: return "speaker.wave.2.fill"
-        case .tryDemo: return "play.rectangle.fill"
+        case .flash: return "headphones"
+        case .tryDemo: return "play.circle.fill"
         case .test: return "mic.fill"
         }
     }

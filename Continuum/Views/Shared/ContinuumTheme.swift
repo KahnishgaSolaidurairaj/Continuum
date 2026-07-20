@@ -29,6 +29,20 @@ enum ContinuumTheme {
     static let stormBlueDeep = Color(red: 0.18, green: 0.38, blue: 0.72)
     static let stormSky = Color(red: 0.78, green: 0.88, blue: 0.98)
 
+    // Practice hub palette
+    static let practicePageLavender = Color(red: 0.93, green: 0.90, blue: 0.98)
+    static let practicePageCream = Color(red: 0.99, green: 0.98, blue: 0.94)
+    static let navInactive = Color(red: 0.62, green: 0.64, blue: 0.70)
+    static let navBarShadow = Color.black.opacity(0.08)
+
+    static let sandboxMint = Color(red: 0.25, green: 0.65, blue: 0.45)
+    static let sandboxMintSoft = Color(red: 0.92, green: 0.97, blue: 0.93)
+    static let flashLavenderSoft = Color(red: 0.94, green: 0.91, blue: 0.98)
+    static let tryBlueSoft = Color(red: 0.90, green: 0.94, blue: 0.99)
+    static let testMagenta = Color(red: 0.62, green: 0.28, blue: 0.58)
+    static let testPinkSoft = Color(red: 0.98, green: 0.91, blue: 0.94)
+    static let subtitleGray = Color(red: 0.45, green: 0.47, blue: 0.52)
+
     /// Large rounded title for kid-readable navigation and section headers.
     static let kidNavigationTitleFont: Font = .system(size: 34, weight: .bold, design: .rounded)
     static let kidSectionHeaderFont: Font = .system(size: 30, weight: .bold, design: .rounded)
