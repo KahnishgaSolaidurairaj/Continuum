@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "targetDurationSeconds": 2.0,
+  "targetDurationSeconds": 2.5,
   "sounds": [
     {
       "id": "short_a",
