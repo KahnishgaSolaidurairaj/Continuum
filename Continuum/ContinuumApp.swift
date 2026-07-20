@@ -10,7 +10,13 @@ struct ContinuumApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Older installs may have an incompatible store after schema changes.
+            SwiftDataStoreRecovery.deleteStore(matching: modelConfiguration)
+            do {
+                return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            } catch {
+                fatalError("Could not create ModelContainer: \(error)")
+            }
         }
     }()
 

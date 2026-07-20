@@ -107,9 +107,9 @@ enum PracticeSoundCatalog {
         loadedSounds.filter { $0.category == .vowelTeam }
     }
 
-    /// Bundled recording duration used by the Test activity.
+    /// Bundled recording duration used by legacy flows.
     static var targetRecordingDuration: TimeInterval {
-        PhonemeReferenceCatalog.targetRecordingDuration
+        PracticeSoundsManifestLoader.targetRecordingDuration
     }
 
     /// Returns one practice sound by ID, including legacy manifest aliases.
@@ -121,7 +121,12 @@ enum PracticeSoundCatalog {
     }
 
     private static func buildSounds() -> [PracticeSound] {
-        EnglishSound.allSounds.map { englishSound in
+        let manifestSounds = PracticeSoundsManifestLoader.loadPracticeSounds()
+        if !manifestSounds.isEmpty {
+            return manifestSounds
+        }
+
+        return EnglishSound.allSounds.map { englishSound in
             PracticeSound(
                 id: englishSound.id,
                 displayName: englishSound.displayName,

@@ -53,6 +53,9 @@ struct ContinuumTabBar: View {
     @Binding var selectedTab: AppTab
     let onTabSelected: (AppTab) -> Void
 
+    /// Approximate layout height used to keep tab content from crowding the bar.
+    static let layoutHeight: CGFloat = 88
+
     var body: some View {
         HStack(spacing: 0) {
             tabButton(tab: .home, title: "Home", systemImage: "house.fill")

@@ -1,12 +1,12 @@
 import SwiftUI
 import SwiftData
 
-/// Test activity: record pronunciation and receive audio-based feedback.
+/// Test activity: record a spoken word and receive speech-recognition feedback.
 struct TestActivityView: View {
     let target: PracticeTarget
 
     @Environment(\.modelContext) private var modelContext
-    @State private var viewModel = PronunciationCoachViewModel()
+    @State private var viewModel = WordTestViewModel()
 
     var body: some View {
         ZStack {
@@ -22,17 +22,36 @@ struct TestActivityView: View {
                 Spacer()
 
                 VStack(spacing: 12) {
-                    if viewModel.isRecording {
+                    wordPromptCard
+
+                    if viewModel.isPreparingSpeech {
+                        statusCard(
+                            title: "Preparing speech recognition…",
+                            subtitle: "This may take a moment on first launch."
+                        )
+                    } else if viewModel.isAnalyzing {
+                        statusCard(
+                            title: "Checking…",
+                            subtitle: "Listening for \(viewModel.currentWord)."
+                        )
+                    } else if viewModel.isRecording {
                         recordingProgressCard
-                        Text("Hold \(target.displayLabel) for the full bar. Your score appears when recording ends.")
+                        Text("Say **\(viewModel.currentWord)** clearly for the full bar.")
                             .font(.caption)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
                     } else if let score = viewModel.lastScore {
                         overallScoreCard(score: score)
                         CoachingMessagesView(messages: score.messages)
+                        if let heard = viewModel.heardTranscript,
+                           score.correctness < 70,
+                           !heard.isEmpty {
+                            Text("Heard: \"\(heard)\"")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     } else {
-                        Text(target.linkedPhoneme.audioInstruction)
+                        Text("Say this word clearly.")
                             .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .padding()
@@ -41,12 +60,18 @@ struct TestActivityView: View {
                     }
 
                     recordButton
+
+                    if !viewModel.testWords.isEmpty {
+                        Text(viewModel.wordPositionLabel)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .padding()
             }
         }
         .task {
-            viewModel.configurePracticeTarget(soundID: target.id, phoneme: target.linkedPhoneme)
+            viewModel.configurePracticeTarget(target)
             await viewModel.preparePermissions()
         }
         .alert("Notice", isPresented: errorAlertBinding) {
@@ -64,6 +89,43 @@ struct TestActivityView: View {
                 .font(ContinuumTheme.kidSubheadFont)
         }
         .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var wordPromptCard: some View {
+        VStack(spacing: 8) {
+            Text("Say this word")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            HighlightedWordText(
+                word: viewModel.currentWord,
+                highlights: FlashWordBank.highlights(for: target, word: viewModel.currentWord),
+                font: .system(size: 42, weight: .bold, design: .rounded),
+                baseColor: .primary,
+                highlightColor: .orange
+            )
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+        }
+        .padding(12)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func statusCard(title: String, subtitle: String) -> some View {
+        VStack(spacing: 8) {
+            ProgressView()
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+            Text(subtitle)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
@@ -133,13 +195,13 @@ struct TestActivityView: View {
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
             }
-            .disabled(!viewModel.microphoneAuthorized)
+            .disabled(!viewModel.microphoneAuthorized || !viewModel.speechRecognitionReady || viewModel.isAnalyzing)
 
             if !viewModel.isRecording {
                 Text(String(
-                    format: "Recording length matches the reference sound (%.1fs for %@).",
+                    format: "Recording length adjusts to the word (%.1fs for %@).",
                     viewModel.targetRecordingDuration,
-                    target.displayLabel
+                    viewModel.currentWord
                 ))
                 .font(.caption2)
                 .multilineTextAlignment(.center)

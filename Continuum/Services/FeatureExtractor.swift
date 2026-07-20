@@ -1,56 +1,7 @@
 import Foundation
 
-/// Converts raw face and audio samples into attempt-level features.
+/// Converts captured microphone audio into attempt-level features.
 enum FeatureExtractor {
-    /// Aggregates visual measurements from tracked face frames.
-    /// - Parameter frames: Timestamped ARKit frames for one attempt.
-    /// - Returns: Visual feature summary.
-    static func extractVisual(from frames: [FaceFrame]) -> VisualFeatures {
-        guard !frames.isEmpty else {
-            return VisualFeatures(
-                maximumJawOpen: 0,
-                averageJawOpen: 0,
-                maximumMouthClose: 0,
-                averageMouthClose: 0,
-                lipRounding: 0,
-                lipSpread: 0,
-                mouthSymmetry: 0,
-                headMovement: 0,
-                tongueVisibility: 0,
-                motionSpeed: 0,
-                frameCount: 0
-            )
-        }
-
-        let jawValues = frames.map(\.jawOpen)
-        let closeValues = frames.map(\.mouthClose)
-        let roundingValues = frames.map { ($0.mouthFunnel + $0.mouthPucker) / 2 }
-        let spreadValues = frames.map { ($0.mouthSmileLeft + $0.mouthSmileRight) / 2 }
-        let symmetryValues = frames.map { abs($0.mouthSmileLeft - $0.mouthSmileRight) }
-        let tongueValues = frames.map(\.tongueOut)
-
-        let headYaw = frames.map(\.headYaw)
-        let headPitch = frames.map(\.headPitch)
-        let headRoll = frames.map(\.headRoll)
-        let headMovement = combinedRange(headYaw) + combinedRange(headPitch) + combinedRange(headRoll)
-
-        let motionSpeed = averageFrameDelta(for: frames)
-
-        return VisualFeatures(
-            maximumJawOpen: jawValues.max() ?? 0,
-            averageJawOpen: average(jawValues),
-            maximumMouthClose: closeValues.max() ?? 0,
-            averageMouthClose: average(closeValues),
-            lipRounding: average(roundingValues),
-            lipSpread: average(spreadValues),
-            mouthSymmetry: average(symmetryValues),
-            headMovement: headMovement,
-            tongueVisibility: tongueValues.max() ?? 0,
-            motionSpeed: motionSpeed,
-            frameCount: frames.count
-        )
-    }
-
     /// Aggregates audio measurements from captured microphone chunks.
     /// - Parameter chunks: Timestamped audio chunks for one attempt.
     /// - Returns: Audio feature summary.
@@ -96,30 +47,6 @@ enum FeatureExtractor {
             burstPeak: burstPeak,
             sampleRate: firstChunk.sampleRate
         )
-    }
-
-    private static func average(_ values: [Float]) -> Float {
-        guard !values.isEmpty else { return 0 }
-        return values.reduce(0, +) / Float(values.count)
-    }
-
-    private static func combinedRange(_ values: [Float]) -> Float {
-        guard let minValue = values.min(), let maxValue = values.max() else { return 0 }
-        return maxValue - minValue
-    }
-
-    private static func averageFrameDelta(for frames: [FaceFrame]) -> Float {
-        guard frames.count > 1 else { return 0 }
-
-        var totalDelta: Float = 0
-        for index in 1..<frames.count {
-            let previous = frames[index - 1]
-            let current = frames[index]
-            totalDelta += abs(current.jawOpen - previous.jawOpen)
-            totalDelta += abs(current.mouthClose - previous.mouthClose)
-        }
-
-        return totalDelta / Float(frames.count - 1)
     }
 
     private static func rootMeanSquare(_ samples: [Float]) -> Float {

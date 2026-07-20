@@ -17,16 +17,6 @@ final class AudioCaptureService {
     private(set) var isVoiceProcessingActive = false
 
     var onChunkCaptured: ((AudioChunk) -> Void)?
-    var onBufferCaptured: ((AVAudioPCMBuffer) -> Void)?
-
-    /// Called when capture starts without voice processing after a configuration failure.
-    var onVoiceProcessingUnavailable: (() -> Void)?
-
-    /// Active microphone format after `start()` has been called.
-    var inputFormat: AVAudioFormat? {
-        guard isRunning else { return nil }
-        return engine.inputNode.outputFormat(forBus: 0)
-    }
 
     /// Requests microphone permission from the user.
     /// - Returns: Whether recording is allowed.
@@ -66,7 +56,6 @@ final class AudioCaptureService {
             let samples = Self.extractSamples(from: buffer)
             let chunk = AudioChunk(timestamp: timestamp, samples: samples, sampleRate: format.sampleRate)
             self.onChunkCaptured?(chunk)
-            self.onBufferCaptured?(buffer)
         }
 
         engine.prepare()
@@ -112,7 +101,6 @@ final class AudioCaptureService {
             return true
         } catch {
             logger.warning("Voice processing unavailable, using unprocessed capture: \(error.localizedDescription)")
-            onVoiceProcessingUnavailable?()
             return false
         }
     }

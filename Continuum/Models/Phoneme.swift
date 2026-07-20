@@ -215,30 +215,12 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
     /// Whether this phoneme is supported for audio-only demo coaching.
     var isAudioDemoSupported: Bool { true }
 
-    /// Whether this phoneme is supported well enough for rule-based coaching in MVP.
-    var isMVPSupported: Bool { true }
-
     /// Audio-focused coaching hint for the demo mode.
     var audioInstruction: String {
         "Say /\(symbol)/ in “\(exampleWord)” — \(instruction)"
     }
 
-    /// All consonant phonemes in practice order.
-    static var consonants: [Phoneme] {
-        [.p, .b, .t, .d, .k, .g, .ks, .kw, .m, .n, .ng, .f, .v, .theta, .eth, .s, .z, .sh, .zh, .ch, .j, .h, .l, .r, .w, .y]
-    }
-
-    /// All vowel phonemes in practice order.
-    static var vowels: [Phoneme] {
-        [.i, .ih, .ay, .eh, .ae, .ah, .aw, .oh, .u_short, .u, .uh, .schwa, .ie, .ow, .oy, .er, .ar, .or_vowel, .air, .ire]
-    }
-
-    /// Phonemes recommended for first release, in practice order.
-    static var mvpOrder: [Phoneme] {
-        [.m, .p, .b, .f, .v, .i, .u]
-    }
-
-    /// Folder / model label used by Create ML and bundled reference assets.
+    /// Folder label used by bundled reference assets.
     var modelLabel: String {
         switch self {
         case .theta: return "theta"
@@ -270,24 +252,6 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
         }
     }
 
-    /// Class label representing silence, coughs, and background noise.
-    static let noiseModelLabel = "noise"
-
-    /// Labels expected in `PhonemeClassifier.mlmodel`, including the noise class.
-    static var modelLabels: [String] {
-        allCases.map(\.modelLabel) + [noiseModelLabel]
-    }
-
-    /// How ML window confidences should be aggregated into one score for this sound.
-    var mlAggregation: MLAggregation {
-        switch articulationKind {
-        case .stopUnvoiced, .stopVoiced, .affricateUnvoiced, .affricateVoiced:
-            return .transient
-        default:
-            return .sustained
-        }
-    }
-
     /// Rule-based scoring category for this phoneme.
     var articulationKind: ArticulationKind {
         switch self {
@@ -304,10 +268,4 @@ enum Phoneme: String, CaseIterable, Codable, Identifiable, Sendable {
             return .vowel
         }
     }
-}
-
-/// Strategy for turning many per-window confidences into a single accuracy score.
-enum MLAggregation {
-    case sustained
-    case transient
 }

@@ -47,4 +47,23 @@ enum FlashWordBank {
     static func highlights(for target: PracticeTarget, word: String) -> [SoundHighlight] {
         target.practiceSound.highlights(for: word)
     }
+
+    /// Returns Level 2 and Level 3 words for the Test activity.
+    /// - Parameter target: The sound being practiced.
+    /// - Returns: Short and longer words in stable order.
+    static func testWords(for target: PracticeTarget) -> [String] {
+        target.practiceSound.level2Examples.map(\.word)
+            + target.practiceSound.level3Examples.map(\.word)
+    }
+
+    /// Returns whether a word belongs to the longer Level 3 pool.
+    /// - Parameters:
+    ///   - target: The sound being practiced.
+    ///   - word: Word to classify.
+    /// - Returns: `true` when the word is a Level 3 example.
+    static func isLongWord(for target: PracticeTarget, word: String) -> Bool {
+        target.practiceSound.level3Examples.contains {
+            $0.word.caseInsensitiveCompare(word) == .orderedSame
+        }
+    }
 }
