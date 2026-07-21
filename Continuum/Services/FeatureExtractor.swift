@@ -1,56 +1,7 @@
 import Foundation
 
-/// Converts raw face and audio samples into attempt-level features.
+/// Converts captured microphone audio into attempt-level features.
 enum FeatureExtractor {
-    /// Aggregates visual measurements from tracked face frames.
-    /// - Parameter frames: Timestamped ARKit frames for one attempt.
-    /// - Returns: Visual feature summary.
-    static func extractVisual(from frames: [FaceFrame]) -> VisualFeatures {
-        guard !frames.isEmpty else {
-            return VisualFeatures(
-                maximumJawOpen: 0,
-                averageJawOpen: 0,
-                maximumMouthClose: 0,
-                averageMouthClose: 0,
-                lipRounding: 0,
-                lipSpread: 0,
-                mouthSymmetry: 0,
-                headMovement: 0,
-                tongueVisibility: 0,
-                motionSpeed: 0,
-                frameCount: 0
-            )
-        }
-
-        let jawValues = frames.map(\.jawOpen)
-        let closeValues = frames.map(\.mouthClose)
-        let roundingValues = frames.map { ($0.mouthFunnel + $0.mouthPucker) / 2 }
-        let spreadValues = frames.map { ($0.mouthSmileLeft + $0.mouthSmileRight) / 2 }
-        let symmetryValues = frames.map { abs($0.mouthSmileLeft - $0.mouthSmileRight) }
-        let tongueValues = frames.map(\.tongueOut)
-
-        let headYaw = frames.map(\.headYaw)
-        let headPitch = frames.map(\.headPitch)
-        let headRoll = frames.map(\.headRoll)
-        let headMovement = combinedRange(headYaw) + combinedRange(headPitch) + combinedRange(headRoll)
-
-        let motionSpeed = averageFrameDelta(for: frames)
-
-        return VisualFeatures(
-            maximumJawOpen: jawValues.max() ?? 0,
-            averageJawOpen: average(jawValues),
-            maximumMouthClose: closeValues.max() ?? 0,
-            averageMouthClose: average(closeValues),
-            lipRounding: average(roundingValues),
-            lipSpread: average(spreadValues),
-            mouthSymmetry: average(symmetryValues),
-            headMovement: headMovement,
-            tongueVisibility: tongueValues.max() ?? 0,
-            motionSpeed: motionSpeed,
-            frameCount: frames.count
-        )
-    }
-
     /// Aggregates audio measurements from captured microphone chunks.
     /// - Parameter chunks: Timestamped audio chunks for one attempt.
     /// - Returns: Audio feature summary.
@@ -96,30 +47,6 @@ enum FeatureExtractor {
             burstPeak: burstPeak,
             sampleRate: firstChunk.sampleRate
         )
-    }
-
-    private static func average(_ values: [Float]) -> Float {
-        guard !values.isEmpty else { return 0 }
-        return values.reduce(0, +) / Float(values.count)
-    }
-
-    private static func combinedRange(_ values: [Float]) -> Float {
-        guard let minValue = values.min(), let maxValue = values.max() else { return 0 }
-        return maxValue - minValue
-    }
-
-    private static func averageFrameDelta(for frames: [FaceFrame]) -> Float {
-        guard frames.count > 1 else { return 0 }
-
-        var totalDelta: Float = 0
-        for index in 1..<frames.count {
-            let previous = frames[index - 1]
-            let current = frames[index]
-            totalDelta += abs(current.jawOpen - previous.jawOpen)
-            totalDelta += abs(current.mouthClose - previous.mouthClose)
-        }
-
-        return totalDelta / Float(frames.count - 1)
     }
 
     private static func rootMeanSquare(_ samples: [Float]) -> Float {
@@ -182,5 +109,60 @@ enum FeatureExtractor {
         }
 
         return peak
+    }
+
+    /// Returns the fraction of sample windows above an RMS threshold.
+    /// - Parameters:
+    ///   - chunks: Captured microphone chunks for one attempt.
+    ///   - threshold: RMS threshold used to detect active audio.
+    /// - Returns: Ratio of active windows in `0...1`.
+    static func activeSpeechRatio(
+        from chunks: [AudioChunk],
+        threshold: Float = 0.01
+    ) -> Float {
+        guard let firstChunk = chunks.first else { return 0 }
+
+        let samples = chunks.flatMap(\.samples)
+        let sampleRate = firstChunk.sampleRate
+        let window = max(256, Int(sampleRate * 0.01))
+        guard samples.count >= window else { return 0 }
+
+        let step = max(1, window / 2)
+        var activeWindows = 0
+        var totalWindows = 0
+
+        var start = 0
+        while start + window <= samples.count {
+            let windowSamples = samples[start..<(start + window)]
+            let sumSquares = windowSamples.reduce(Float.zero) { partial, sample in
+                partial + sample * sample
+            }
+            let windowRMS = sqrt(sumSquares / Float(windowSamples.count))
+            if windowRMS >= threshold {
+                activeWindows += 1
+            }
+            totalWindows += 1
+            start += step
+        }
+
+        guard totalWindows > 0 else { return 0 }
+        return Float(activeWindows) / Float(totalWindows)
+    }
+
+    /// Returns the fraction of samples at or above a saturation ceiling.
+    /// - Parameters:
+    ///   - chunks: Captured microphone chunks for one attempt.
+    ///   - ceiling: Absolute sample level treated as hard saturation.
+    /// - Returns: Ratio of saturated samples in `0...1`.
+    static func saturationRatio(from chunks: [AudioChunk], ceiling: Float = 0.999) -> Float {
+        let samples = chunks.flatMap(\.samples)
+        guard !samples.isEmpty else { return 0 }
+
+        let saturatedCount = samples.reduce(into: 0) { count, sample in
+            if abs(sample) >= ceiling {
+                count += 1
+            }
+        }
+        return Float(saturatedCount) / Float(samples.count)
     }
 }

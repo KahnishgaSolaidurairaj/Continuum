@@ -12,9 +12,19 @@ enum PracticeActivity: String, CaseIterable, Identifiable, Sendable {
     var title: String {
         switch self {
         case .sandbox: return "Trace with your finger"
-        case .flash: return "Flashcard"
+        case .flash: return "Listen to the sound"
         case .tryDemo: return "See an example"
         case .test: return "Try it yourself"
+        }
+    }
+
+    /// Short call-to-action label on the practice activity card.
+    var actionLabel: String {
+        switch self {
+        case .sandbox: return "Start Trace"
+        case .flash: return "Start Flash"
+        case .tryDemo: return "Watch Demo"
+        case .test: return "Start Test"
         }
     }
 
@@ -30,25 +40,25 @@ enum PracticeActivity: String, CaseIterable, Identifiable, Sendable {
     var systemImage: String {
         switch self {
         case .sandbox: return "hand.draw"
-        case .flash: return "speaker.wave.2.fill"
-        case .tryDemo: return "play.rectangle.fill"
+        case .flash: return "headphones"
+        case .tryDemo: return "play.circle.fill"
         case .test: return "mic.fill"
         }
     }
 }
 
-/// One of the 44 English phonemes the child can practice.
+/// One practice sound the child can select in the Practice tab.
 struct PracticeTarget: Identifiable, Hashable, Sendable {
     let id: String
-    let englishSound: EnglishSound
+    let practiceSound: PracticeSound
 
-    var symbol: String { englishSound.displayName }
-    var exampleWord: String { englishSound.primaryExample }
-    var linkedPhoneme: Phoneme { englishSound.linkedPhoneme }
+    var symbol: String { practiceSound.displayName }
+    var exampleWord: String { practiceSound.primaryExample }
+    var linkedPhoneme: Phoneme { practiceSound.linkedPhoneme }
 
-    /// All 44 English sounds available in the Practice tab.
-    static let allPhonemes: [PracticeTarget] = EnglishSound.allSounds.map { sound in
-        PracticeTarget(id: sound.id, englishSound: sound)
+    /// All practice sounds available in the Practice tab.
+    static let allPhonemes: [PracticeTarget] = PracticeSoundCatalog.allSounds.map { sound in
+        PracticeTarget(id: sound.id, practiceSound: sound)
     }
 
     /// Backward-compatible alias used by older call sites.
@@ -56,10 +66,10 @@ struct PracticeTarget: Identifiable, Hashable, Sendable {
 
     /// Display label used in headers and buttons.
     var displayLabel: String {
-        englishSound.displayName
+        practiceSound.displayName
     }
 
     var traceCharacter: String {
-        englishSound.traceCharacter
+        practiceSound.traceCharacter
     }
 }

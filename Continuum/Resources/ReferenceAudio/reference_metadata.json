@@ -1,80 +1,628 @@
 {
-  "version": 1,
-  "voice": "en-US",
+  "version": 2,
+  "targetDurationSeconds": 2.0,
   "sampleRate": 44100,
-  "preRollSilenceSeconds": 0.12,
+  "sampleCount": 88200,
   "phonemes": {
-    "m": {
-      "prompt": "mmmm",
-      "aggregation": "sustained",
-      "referenceAudioFile": "m.wav",
-      "referenceDurationSeconds": 0.5960090702947846,
+    "a": {
+      "referenceAudioFile": "a_ref_01.wav",
+      "playbackFile": "a_ref_01.wav",
+      "clipFiles": [
+        "a_ref_01.wav",
+        "a_ref_02.wav",
+        "a_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 26284
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
-    "p": {
-      "prompt": "puh",
-      "aggregation": "transient",
-      "referenceAudioFile": "p.wav",
-      "referenceDurationSeconds": 0.5379591836734694,
+    "ae": {
+      "referenceAudioFile": "ae_ref_01.wav",
+      "playbackFile": "ae_ref_01.wav",
+      "clipFiles": [
+        "ae_ref_01.wav",
+        "ae_ref_02.wav",
+        "ae_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 23724
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "air": {
+      "referenceAudioFile": "air_ref_01.wav",
+      "playbackFile": "air_ref_01.wav",
+      "clipFiles": [
+        "air_ref_01.wav",
+        "air_ref_02.wav",
+        "air_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ar": {
+      "referenceAudioFile": "ar_ref_01.wav",
+      "playbackFile": "ar_ref_01.wav",
+      "clipFiles": [
+        "ar_ref_01.wav",
+        "ar_ref_02.wav",
+        "ar_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "aw": {
+      "referenceAudioFile": "aw_ref_01.wav",
+      "playbackFile": "aw_ref_01.wav",
+      "clipFiles": [
+        "aw_ref_01.wav",
+        "aw_ref_02.wav",
+        "aw_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
     "b": {
-      "prompt": "buh",
-      "aggregation": "transient",
-      "referenceAudioFile": "b.wav",
-      "referenceDurationSeconds": 0.5263492063492063,
+      "referenceAudioFile": "b_ref_01.wav",
+      "playbackFile": "b_ref_01.wav",
+      "clipFiles": [
+        "b_ref_01.wav",
+        "b_ref_02.wav",
+        "b_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 23212
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ch": {
+      "referenceAudioFile": "ch_ref_01.wav",
+      "playbackFile": "ch_ref_01.wav",
+      "clipFiles": [
+        "ch_ref_01.wav",
+        "ch_ref_02.wav",
+        "ch_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "d": {
+      "referenceAudioFile": "d_ref_01.wav",
+      "playbackFile": "d_ref_01.wav",
+      "clipFiles": [
+        "d_ref_01.wav",
+        "d_ref_02.wav",
+        "d_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "e": {
+      "referenceAudioFile": "e_ref_01.wav",
+      "playbackFile": "e_ref_01.wav",
+      "clipFiles": [
+        "e_ref_01.wav",
+        "e_ref_02.wav",
+        "e_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ear": {
+      "referenceAudioFile": "ear_ref_01.wav",
+      "playbackFile": "ear_ref_01.wav",
+      "clipFiles": [
+        "ear_ref_01.wav",
+        "ear_ref_02.wav",
+        "ear_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ee": {
+      "referenceAudioFile": "ee_ref_01.wav",
+      "playbackFile": "ee_ref_01.wav",
+      "clipFiles": [
+        "ee_ref_01.wav",
+        "ee_ref_02.wav",
+        "ee_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "er": {
+      "referenceAudioFile": "er_ref_01.wav",
+      "playbackFile": "er_ref_01.wav",
+      "clipFiles": [
+        "er_ref_01.wav",
+        "er_ref_02.wav",
+        "er_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
     "f": {
-      "prompt": "ffff",
-      "aggregation": "sustained",
-      "referenceAudioFile": "f.wav",
-      "referenceDurationSeconds": 0.5727891156462585,
+      "referenceAudioFile": "f_ref_01.wav",
+      "playbackFile": "f_ref_01.wav",
+      "clipFiles": [
+        "f_ref_01.wav",
+        "f_ref_02.wav",
+        "f_ref_03.wav",
+        "f_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 25260
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
-    "v": {
-      "prompt": "vvvv",
-      "aggregation": "sustained",
-      "referenceAudioFile": "v.wav",
-      "referenceDurationSeconds": 0.6018140589569161,
+    "g": {
+      "referenceAudioFile": "g_ref_01.wav",
+      "playbackFile": "g_ref_01.wav",
+      "clipFiles": [
+        "g_ref_01.wav",
+        "g_ref_02.wav",
+        "g_ref_03.wav",
+        "g_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 26540
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "h": {
+      "referenceAudioFile": "h_ref_01.wav",
+      "playbackFile": "h_ref_01.wav",
+      "clipFiles": [
+        "h_ref_01.wav",
+        "h_ref_02.wav",
+        "h_ref_03.wav",
+        "h_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
     "i": {
-      "prompt": "eee",
-      "aggregation": "sustained",
-      "referenceAudioFile": "i.wav",
-      "referenceDurationSeconds": 0.712108843537415,
+      "referenceAudioFile": "i_ref_01.wav",
+      "playbackFile": "i_ref_01.wav",
+      "clipFiles": [
+        "i_ref_01.wav",
+        "i_ref_02.wav",
+        "i_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 31404
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ie": {
+      "referenceAudioFile": "ie_ref_01.wav",
+      "playbackFile": "ie_ref_01.wav",
+      "clipFiles": [
+        "ie_ref_01.wav",
+        "ie_ref_02.wav",
+        "ie_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "j": {
+      "referenceAudioFile": "j_ref_01.wav",
+      "playbackFile": "j_ref_01.wav",
+      "clipFiles": [
+        "j_ref_01.wav",
+        "j_ref_02.wav",
+        "j_ref_03.wav",
+        "j_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "k": {
+      "referenceAudioFile": "k_ref_01.wav",
+      "playbackFile": "k_ref_01.wav",
+      "clipFiles": [
+        "k_ref_01.wav",
+        "k_ref_02.wav",
+        "k_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ks": {
+      "referenceAudioFile": "ks_ref_01.wav",
+      "playbackFile": "ks_ref_01.wav",
+      "clipFiles": [
+        "ks_ref_01.wav",
+        "ks_ref_02.wav",
+        "ks_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "kw": {
+      "referenceAudioFile": "kw_ref_01.wav",
+      "playbackFile": "kw_ref_01.wav",
+      "clipFiles": [
+        "kw_ref_01.wav",
+        "kw_ref_02.wav",
+        "kw_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "l": {
+      "referenceAudioFile": "l_ref_01.wav",
+      "playbackFile": "l_ref_01.wav",
+      "clipFiles": [
+        "l_ref_01.wav",
+        "l_ref_02.wav",
+        "l_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "m": {
+      "referenceAudioFile": "m_ref_01.wav",
+      "playbackFile": "m_ref_01.wav",
+      "clipFiles": [
+        "m_ref_01.wav",
+        "m_ref_02.wav",
+        "m_ref_03.wav",
+        "m_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "n": {
+      "referenceAudioFile": "n_ref_01.wav",
+      "playbackFile": "n_ref_01.wav",
+      "clipFiles": [
+        "n_ref_01.wav",
+        "n_ref_02.wav",
+        "n_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ng": {
+      "referenceAudioFile": "ng_ref_01.wav",
+      "playbackFile": "ng_ref_01.wav",
+      "clipFiles": [
+        "ng_ref_01.wav",
+        "ng_ref_02.wav",
+        "ng_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "o": {
+      "referenceAudioFile": "o_ref_01.wav",
+      "playbackFile": "o_ref_01.wav",
+      "clipFiles": [
+        "o_ref_01.wav",
+        "o_ref_02.wav",
+        "o_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "oa": {
+      "referenceAudioFile": "oa_ref_01.wav",
+      "playbackFile": "oa_ref_01.wav",
+      "clipFiles": [
+        "oa_ref_01.wav",
+        "oa_ref_02.wav",
+        "oa_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "oi": {
+      "referenceAudioFile": "oi_ref_01.wav",
+      "playbackFile": "oi_ref_01.wav",
+      "clipFiles": [
+        "oi_ref_01.wav",
+        "oi_ref_02.wav",
+        "oi_ref_03.wav",
+        "oi_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "oo": {
+      "referenceAudioFile": "oo_ref_01.wav",
+      "playbackFile": "oo_ref_01.wav",
+      "clipFiles": [
+        "oo_ref_01.wav",
+        "oo_ref_02.wav",
+        "oo_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "oo_short": {
+      "referenceAudioFile": "oo_short_ref_01.wav",
+      "playbackFile": "oo_short_ref_01.wav",
+      "clipFiles": [
+        "oo_short_ref_01.wav",
+        "oo_short_ref_02.wav",
+        "oo_short_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "or": {
+      "referenceAudioFile": "or_ref_01.wav",
+      "playbackFile": "or_ref_01.wav",
+      "clipFiles": [
+        "or_ref_01.wav",
+        "or_ref_02.wav",
+        "or_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "ou": {
+      "referenceAudioFile": "ou_ref_01.wav",
+      "playbackFile": "ou_ref_01.wav",
+      "clipFiles": [
+        "ou_ref_01.wav",
+        "ou_ref_02.wav",
+        "ou_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "p": {
+      "referenceAudioFile": "p_ref_01.wav",
+      "playbackFile": "p_ref_01.wav",
+      "clipFiles": [
+        "p_ref_01.wav",
+        "p_ref_02.wav",
+        "p_ref_03.wav",
+        "p_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "r": {
+      "referenceAudioFile": "r_ref_01.wav",
+      "playbackFile": "r_ref_01.wav",
+      "clipFiles": [
+        "r_ref_01.wav",
+        "r_ref_02.wav",
+        "r_ref_03.wav",
+        "r_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "s": {
+      "referenceAudioFile": "s_ref_01.wav",
+      "playbackFile": "s_ref_01.wav",
+      "clipFiles": [
+        "s_ref_01.wav",
+        "s_ref_02.wav",
+        "s_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "sh": {
+      "referenceAudioFile": "sh_ref_01.wav",
+      "playbackFile": "sh_ref_01.wav",
+      "clipFiles": [
+        "sh_ref_01.wav",
+        "sh_ref_02.wav",
+        "sh_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "t": {
+      "referenceAudioFile": "t_ref_01.wav",
+      "playbackFile": "t_ref_01.wav",
+      "clipFiles": [
+        "t_ref_01.wav",
+        "t_ref_02.wav",
+        "t_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "th": {
+      "referenceAudioFile": "th_ref_01.wav",
+      "playbackFile": "th_ref_01.wav",
+      "clipFiles": [
+        "th_ref_01.wav",
+        "th_ref_02.wav",
+        "th_ref_03.wav",
+        "th_ref_04.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "th_voiced": {
+      "referenceAudioFile": "th_voiced_ref_01.wav",
+      "playbackFile": "th_voiced_ref_01.wav",
+      "clipFiles": [
+        "th_voiced_ref_01.wav",
+        "th_voiced_ref_02.wav",
+        "th_voiced_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
     "u": {
-      "prompt": "ooo",
-      "aggregation": "sustained",
-      "referenceAudioFile": "u.wav",
-      "referenceDurationSeconds": 0.43927437641723355,
+      "referenceAudioFile": "u_ref_01.wav",
+      "playbackFile": "u_ref_01.wav",
+      "clipFiles": [
+        "u_ref_01.wav",
+        "u_ref_02.wav",
+        "u_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 19372
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
-    "theta": {
-      "prompt": "thth",
-      "aggregation": "sustained",
-      "referenceAudioFile": "theta.wav",
-      "referenceDurationSeconds": 1.315827664399093,
+    "ue": {
+      "referenceAudioFile": "ue_ref_01.wav",
+      "playbackFile": "ue_ref_01.wav",
+      "clipFiles": [
+        "ue_ref_01.wav",
+        "ue_ref_02.wav",
+        "ue_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 58028
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     },
-    "eth": {
-      "prompt": "thth",
-      "aggregation": "sustained",
-      "referenceAudioFile": "eth.wav",
-      "referenceDurationSeconds": 1.315827664399093,
+    "uh": {
+      "referenceAudioFile": "uh_ref_01.wav",
+      "playbackFile": "uh_ref_01.wav",
+      "clipFiles": [
+        "uh_ref_01.wav",
+        "uh_ref_02.wav",
+        "uh_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
       "sampleRate": 44100,
-      "sampleCount": 58028
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "v": {
+      "referenceAudioFile": "v_ref_01.wav",
+      "playbackFile": "v_ref_01.wav",
+      "clipFiles": [
+        "v_ref_01.wav",
+        "v_ref_02.wav",
+        "v_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "w": {
+      "referenceAudioFile": "w_ref_01.wav",
+      "playbackFile": "w_ref_01.wav",
+      "clipFiles": [
+        "w_ref_01.wav",
+        "w_ref_02.wav",
+        "w_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "y": {
+      "referenceAudioFile": "y_ref_01.wav",
+      "playbackFile": "y_ref_01.wav",
+      "clipFiles": [
+        "y_ref_01.wav",
+        "y_ref_02.wav",
+        "y_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "z": {
+      "referenceAudioFile": "z_ref_01.wav",
+      "playbackFile": "z_ref_01.wav",
+      "clipFiles": [
+        "z_ref_01.wav",
+        "z_ref_02.wav",
+        "z_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
+    },
+    "zh": {
+      "referenceAudioFile": "zh_ref_01.wav",
+      "playbackFile": "zh_ref_01.wav",
+      "clipFiles": [
+        "zh_ref_01.wav",
+        "zh_ref_02.wav",
+        "zh_ref_03.wav"
+      ],
+      "referenceDurationSeconds": 2.0,
+      "sampleRate": 44100,
+      "sampleCount": 88200,
+      "aggregation": "centroid"
     }
   }
 }

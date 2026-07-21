@@ -1,20 +1,5 @@
 import Foundation
 
-/// Aggregated visual measurements from a pronunciation attempt.
-struct VisualFeatures: Codable, Sendable {
-    let maximumJawOpen: Float
-    let averageJawOpen: Float
-    let maximumMouthClose: Float
-    let averageMouthClose: Float
-    let lipRounding: Float
-    let lipSpread: Float
-    let mouthSymmetry: Float
-    let headMovement: Float
-    let tongueVisibility: Float
-    let motionSpeed: Float
-    let frameCount: Int
-}
-
 /// Aggregated audio measurements from a pronunciation attempt.
 struct AudioFeatures: Codable, Sendable {
     let duration: TimeInterval
@@ -49,9 +34,8 @@ struct CoachingMessage: Codable, Sendable, Identifiable {
 /// How an attempt was scored.
 enum ScoringMethod: String, Codable, Sendable {
     case rules
-    case machineLearning
     case hybridFallback
-    case embeddingSimilarity
+    case speechRecognition
 }
 
 /// Final scoring output for one attempt.
@@ -66,12 +50,10 @@ struct PronunciationScore: Codable, Sendable {
         switch scoringMethod {
         case .rules:
             return "Scored with rules"
-        case .machineLearning:
-            return "Scored with on-device ML"
         case .hybridFallback:
-            return "Rejected before ML scoring"
-        case .embeddingSimilarity:
-            return "Scored with embedding similarity"
+            return "Rejected before scoring"
+        case .speechRecognition:
+            return "Recognized your spoken word"
         }
     }
 }
