@@ -38,7 +38,10 @@ struct HomeView: View {
                 mainPanel
                     .padding(.top, -20)
             }
+            .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
+            .padding(.bottom, ContinuumTabBar.contentBottomPadding)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             LinearGradient(
                 colors: [ContinuumTheme.homePink, ContinuumTheme.homeOffWhite],
@@ -80,6 +83,7 @@ struct HomeView: View {
                             .font(.system(size: 26, weight: .medium, design: .rounded))
                             .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
                             .fixedSize(horizontal: false, vertical: true)
+                            .padding(.bottom, 20)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -90,11 +94,10 @@ struct HomeView: View {
                         .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
                         .accessibilityLabel("Broca the Bear")
                 }
-                .padding(.horizontal, 20)
                 .padding(.bottom, 30)
             }
         }
-        .frame(height: 250)
+        .frame(height: 270)
     }
 
     /// White rounded panel with actions, suggestions, motivation, and streak.
@@ -114,7 +117,6 @@ struct HomeView: View {
                 .fill(Color.white.opacity(0.98))
                 .shadow(color: ContinuumTheme.tabPurple.opacity(0.12), radius: 16, y: -6)
         )
-        .padding(.horizontal, 12)
     }
 
     /// Warm up and practice call-to-action buttons from the mockup.
@@ -180,15 +182,6 @@ struct HomeView: View {
                 spacing: 12
             ) {
                 HomeSuggestionCard(
-                    icon: "target",
-                    title: "Practice focus",
-                    description: "Keep working on “\(suggestedTarget.symbol)”",
-                    buttonTitle: "Continue",
-                    tint: .purple,
-                    action: onOpenPracticeTab
-                )
-
-                HomeSuggestionCard(
                     icon: "face.smiling",
                     title: "Warm up more",
                     description: latestMood.map { "Latest mood: \($0)" } ?? "Get your voice ready",
@@ -198,10 +191,10 @@ struct HomeView: View {
                 )
 
                 HomeSuggestionCard(
-                    icon: "headphones",
-                    title: "Try Flash",
-                    description: "Flash cards for “\(suggestedTarget.symbol)”",
-                    buttonTitle: "Try Flash",
+                    icon: "target",
+                    title: "Practice focus",
+                    description: "Keep working on “\(suggestedTarget.symbol)”",
+                    buttonTitle: "Continue",
                     tint: .purple,
                     action: onOpenPracticeTab
                 )
@@ -210,9 +203,18 @@ struct HomeView: View {
                     icon: "flag.fill",
                     title: "Today's goal",
                     description: "\(todayPracticeMinutes) of \(dailyGoalMinutes) minutes",
-                    buttonTitle: "Start goal",
+                    buttonTitle: "Change goal",
                     tint: .green,
                     action: { showGoalSheet = true }
+                )
+
+                HomeSuggestionCard(
+                    icon: "headphones",
+                    title: "Try Flash",
+                    description: "Flash cards for “\(suggestedTarget.symbol)”",
+                    buttonTitle: "Try Flash",
+                    tint: .purple,
+                    action: onOpenPracticeTab
                 )
             }
         }

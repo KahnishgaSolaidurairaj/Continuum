@@ -16,7 +16,7 @@ struct StrengthsNeedsCard: View {
 
                 if strengths.isEmpty && needs.isEmpty {
                     Text("Complete more Test activities this week.")
-                        .font(ContinuumTheme.kidBodyFont)
+                        .font(DashboardTypography.body)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 } else {
@@ -54,20 +54,20 @@ struct StrengthsNeedsCard: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(DashboardTypography.bodyEmphasis)
                 .foregroundStyle(.black)
 
             if stats.isEmpty {
                 Text("Not enough data yet.")
-                    .font(ContinuumTheme.kidCaptionFont)
+                    .font(DashboardTypography.cardSubtitle)
                     .foregroundStyle(.secondary)
             } else {
-                FlowLayout(spacing: 8) {
+                FlowLayout(spacing: 10) {
                     ForEach(stats) { stat in
                         Text("/\(stat.phonemeLabel)/")
-                            .font(ContinuumTheme.kidCaptionFont.weight(.semibold))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .font(DashboardTypography.cardSubtitle.weight(.semibold))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 10)
                             .background(background)
                             .foregroundStyle(foreground)
                             .clipShape(Capsule())

@@ -2,21 +2,33 @@ import SwiftUI
 
 /// Fixed heights for dashboard cards so the layout stays consistent.
 enum DashboardLayout {
-    static let thisWeekHeight: CGFloat = 228
-    static let calendarHeight: CGFloat = 360
-    static let statPairHeight: CGFloat = 280
-    static let moodsHeight: CGFloat = 360
-    static let speechAccuracyHeight: CGFloat = 380
-    static let analysisHeight: CGFloat = 220
+    static let thisWeekHeight: CGFloat = 286
+    static let calendarHeight: CGFloat = 410
+    static let statPairHeight: CGFloat = 320
+    static let moodsHeight: CGFloat = 420
+    static let speechAccuracyHeight: CGFloat = 430
+    static let analysisHeight: CGFloat = 260
     static let scrollFadeDistance: CGFloat = 720
-    static let sectionSpacing: CGFloat = 14
-    static let miniBoxRowHeight: CGFloat = 40
-    static let miniBoxSpacing: CGFloat = 8
+    static let sectionSpacing: CGFloat = 16
+    static let miniBoxRowHeight: CGFloat = 54
+    static let miniBoxSpacing: CGFloat = 10
 
     /// Matches the stacked height of the three weekly summary rows.
     static var miniBoxStackHeight: CGFloat {
         miniBoxRowHeight * 3 + miniBoxSpacing * 2
     }
+}
+
+/// Shared typography sized for kid- and parent-readable dashboard content.
+enum DashboardTypography {
+    static let cardTitle: Font = .system(size: 26, weight: .bold, design: .rounded)
+    static let cardSubtitle: Font = ContinuumTheme.kidSubheadFont
+    static let body: Font = ContinuumTheme.kidBodyFont
+    static let bodyEmphasis: Font = ContinuumTheme.kidBodyFont.weight(.semibold)
+    static let label: Font = ContinuumTheme.kidSubheadFont.weight(.bold)
+    static let caption: Font = ContinuumTheme.kidCaptionFont
+    static let headerIconSize: CGFloat = 24
+    static let rowIconSize: CGFloat = 22
 }
 
 /// Shared white card styling for dashboard sections.
@@ -33,12 +45,12 @@ struct DashboardCard<Content: View>: View {
         Group {
             if let height {
                 content
-                    .padding(18)
+                    .padding(20)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     .frame(height: height, alignment: .top)
             } else {
                 content
-                    .padding(18)
+                    .padding(20)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -65,22 +77,22 @@ struct DashboardCardHeader: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: DashboardTypography.headerIconSize, weight: .semibold))
                     .foregroundStyle(ContinuumTheme.tabPurple)
 
                 Text(title)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(DashboardTypography.cardTitle)
                     .foregroundStyle(.black)
             }
 
             if let subtitle {
                 Text(subtitle)
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .font(DashboardTypography.cardSubtitle)
                     .foregroundStyle(.secondary)
-                    .padding(.leading, 26)
+                    .padding(.leading, DashboardTypography.headerIconSize + 10)
             }
         }
     }
@@ -95,44 +107,83 @@ struct DashboardMiniBox: View {
     var minHeight: CGFloat = DashboardLayout.miniBoxRowHeight
 
     var body: some View {
-        HStack(alignment: .center, spacing: 8) {
+        HStack(alignment: .center, spacing: 12) {
             Image(systemName: systemImage)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: DashboardTypography.rowIconSize, weight: .semibold))
                 .foregroundStyle(ContinuumTheme.tabPurple)
-                .frame(width: 16)
+                .frame(width: 28)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 if let label {
                     Text(label)
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .font(DashboardTypography.label)
                         .foregroundStyle(.black)
                         .lineLimit(1)
                 }
 
                 Text(text)
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundStyle(.primary.opacity(0.85))
+                    .font(DashboardTypography.body)
+                    .foregroundStyle(.primary.opacity(0.9))
                     .lineLimit(label == nil ? 2 : 4)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.85)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             if let trailingText {
                 Spacer(minLength: 4)
                 Text(trailingText)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(DashboardTypography.bodyEmphasis)
                     .foregroundStyle(ContinuumTheme.tabPurple)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
         .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
         .background(ContinuumTheme.dashboardPurple.opacity(0.2))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(ContinuumTheme.tabPurple.opacity(0.1), lineWidth: 1)
+        )
+    }
+}
+
+/// Compact stat tile used for the three-across practice summary row.
+struct DashboardCompactStatBox: View {
+    let systemImage: String
+    let title: String
+    let valueLine: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.system(size: DashboardTypography.rowIconSize, weight: .semibold))
+                .foregroundStyle(ContinuumTheme.tabPurple)
+                .frame(width: 24)
+
+            Text(title)
+                .font(DashboardTypography.label)
+                .foregroundStyle(.black)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+
+            Spacer(minLength: 0)
+
+            Text(valueLine)
+                .font(DashboardTypography.bodyEmphasis)
+                .foregroundStyle(ContinuumTheme.tabPurple)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity, minHeight: DashboardLayout.miniBoxRowHeight)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 12)
+        .background(ContinuumTheme.dashboardPurple.opacity(0.2))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
                 .stroke(ContinuumTheme.tabPurple.opacity(0.1), lineWidth: 1)
         )
     }
@@ -160,15 +211,19 @@ struct DashboardScrollOffsetReader: View {
     }
 }
 
-/// Dashboard background that subtly lightens toward whitish purple while scrolling.
+/// Dashboard background that fades from purple at the top into home pink at the bottom.
 struct DashboardScrollBackground: View {
     let scrollOffset: CGFloat
 
     var body: some View {
-        fadedPurple
+        LinearGradient(
+            colors: [topColor, ContinuumTheme.homeLavender, ContinuumTheme.homePink],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
-    private var fadedPurple: Color {
+    private var topColor: Color {
         let scrollDepth = max(-scrollOffset, 0)
         let progress = min(scrollDepth / DashboardLayout.scrollFadeDistance, 1)
         let blend = progress * 0.38

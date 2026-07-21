@@ -51,12 +51,16 @@ struct WarmUpSheet: View {
                 Text("Completed")
                     .font(.system(size: 24, weight: .bold, design: .rounded))
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(ContinuumTheme.pencilLead)
             .frame(maxWidth: .infinity, minHeight: 72)
             .padding(.horizontal, 32)
             .padding(.vertical, 4)
-            .background(ContinuumTheme.beachCoral)
+            .background(ContinuumTheme.homePink)
             .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(ContinuumTheme.tabPurple.opacity(0.25), lineWidth: 2)
+            )
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Completed")

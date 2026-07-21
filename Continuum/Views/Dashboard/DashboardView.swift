@@ -39,12 +39,14 @@ struct DashboardView: View {
                     DashboardScrollOffsetReader()
 
                     Text("Dashboard")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .font(ContinuumTheme.kidSectionHeaderFont)
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 8)
 
                     ThisWeekSummaryCard(summary: weeklySummary)
+
+                    TodaysFocusCard(focusLine: weeklySummary.todaysFocusLine)
 
                     PracticeCalendarCard(
                         engagements: engagements,
@@ -71,12 +73,14 @@ struct DashboardView: View {
                         needs: strengthsAndNeeds.needs
                     )
                 }
-                .padding(.horizontal, 14)
+                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
                 .padding(.vertical, 12)
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
             }
             .coordinateSpace(name: "dashboardScroll")
             .onPreferenceChange(DashboardScrollOffsetKey.self) { scrollOffset = $0 }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -106,7 +110,7 @@ struct ActivityTimeCard: View {
                     VStack(alignment: .leading, spacing: DashboardLayout.miniBoxSpacing) {
                         if !hasActivity {
                             Text(emptyStateMessage)
-                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                                .font(DashboardTypography.body)
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, minHeight: 120, alignment: .center)
                         } else {
@@ -186,13 +190,13 @@ struct ActivityMoodCard: View {
     private var moodColumnHeaders: some View {
         HStack(spacing: 0) {
             ForEach(Array(PracticeActivity.allCases.enumerated()), id: \.element.id) { index, activity in
-                VStack(spacing: 4) {
+                VStack(spacing: 6) {
                     Image(systemName: activity.systemImage)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: DashboardTypography.rowIconSize, weight: .semibold))
                         .foregroundStyle(ContinuumTheme.tabPurple)
 
                     Text(activity.subtitle)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(DashboardTypography.label)
                         .foregroundStyle(.black)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
@@ -229,9 +233,9 @@ private struct MoodActivityColumn: View {
         VStack(alignment: .leading, spacing: 8) {
             if visits.isEmpty {
                 Text("—")
-                    .font(ContinuumTheme.kidCaptionFont)
+                    .font(DashboardTypography.body)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
+                    .frame(maxWidth: .infinity, minHeight: 52, alignment: .center)
             } else {
                 ForEach(visits, id: \.id) { visit in
                     MoodVisitEntry(visit: visit)
@@ -249,31 +253,31 @@ private struct MoodVisitEntry: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Text(MoodChoice.emoji(for: visit.mood ?? ""))
-                    .font(.title3)
+                    .font(.system(size: 28))
 
                 Text(visit.mood ?? "")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(DashboardTypography.bodyEmphasis)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
             }
 
             Text(visit.endedAt.formatted(date: .omitted, time: .shortened))
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(DashboardTypography.caption)
                 .foregroundStyle(.secondary)
 
             Text(soundLabel)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(DashboardTypography.bodyEmphasis)
                 .foregroundStyle(ContinuumTheme.tabPurple)
                 .lineLimit(2)
                 .minimumScaleFactor(0.85)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(8)
+        .padding(12)
         .background(ContinuumTheme.dashboardPurple.opacity(0.22))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(visit.activity?.subtitle ?? "Activity"), \(soundLabel), \(visit.mood ?? ""), \(visit.endedAt.formatted(date: .omitted, time: .shortened))")
     }
@@ -297,10 +301,10 @@ struct PracticeCalendarCard: View {
             VStack(alignment: .leading, spacing: 10) {
                 monthHeader
 
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 6) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
                     ForEach(weekdaySymbols, id: \.self) { symbol in
                         Text(symbol)
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .font(DashboardTypography.cardSubtitle.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
                     }
@@ -315,7 +319,7 @@ struct PracticeCalendarCard: View {
                             .buttonStyle(.plain)
                         } else {
                             Color.clear
-                                .frame(height: 36)
+                                .frame(height: 46)
                         }
                     }
                 }
@@ -326,7 +330,7 @@ struct PracticeCalendarCard: View {
                     legendItem(color: ContinuumTheme.tabPurple, label: "Practiced")
                     legendItem(color: .gray.opacity(0.25), label: "No practice")
                 }
-                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .font(DashboardTypography.cardSubtitle)
                 .foregroundStyle(.secondary)
             }
             .frame(maxHeight: .infinity, alignment: .top)
@@ -334,10 +338,10 @@ struct PracticeCalendarCard: View {
     }
 
     private func legendItem(color: Color, label: String) -> some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             Circle()
                 .fill(color)
-                .frame(width: 8, height: 8)
+                .frame(width: 10, height: 10)
             Text(label)
         }
     }
@@ -348,7 +352,7 @@ struct PracticeCalendarCard: View {
                 shiftMonth(by: -1)
             } label: {
                 Image(systemName: "chevron.left.circle.fill")
-                    .font(.title3)
+                    .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(ContinuumTheme.tabPurple)
             }
             .buttonStyle(.plain)
@@ -357,7 +361,7 @@ struct PracticeCalendarCard: View {
             Spacer()
 
             Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(.system(size: 24, weight: .bold, design: .rounded))
                 .foregroundStyle(.black)
 
             Spacer()
@@ -366,7 +370,7 @@ struct PracticeCalendarCard: View {
                 shiftMonth(by: 1)
             } label: {
                 Image(systemName: "chevron.right.circle.fill")
-                    .font(.title3)
+                    .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(ContinuumTheme.tabPurple)
             }
             .buttonStyle(.plain)
@@ -378,23 +382,23 @@ struct PracticeCalendarCard: View {
         let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         let isToday = calendar.isDateInToday(date)
 
-        return VStack(spacing: 3) {
+        return VStack(spacing: 4) {
             Text("\(item.day)")
-                .font(.system(size: 14, weight: isSelected ? .bold : .medium, design: .rounded))
+                .font(DashboardTypography.body.weight(isSelected ? .bold : .semibold))
                 .foregroundStyle(isSelected ? .white : .primary)
 
             Circle()
                 .fill(item.intensityColor)
-                .frame(width: 6, height: 6)
+                .frame(width: 8, height: 8)
         }
-        .frame(maxWidth: .infinity, minHeight: 36)
+        .frame(maxWidth: .infinity, minHeight: 46)
         .background(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(isSelected ? ContinuumTheme.tabPurple : .clear)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(isToday && !isSelected ? ContinuumTheme.tabPurple : .clear, lineWidth: 1.5)
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(isToday && !isSelected ? ContinuumTheme.tabPurple : .clear, lineWidth: 2)
         )
         .accessibilityLabel("\(date.formatted(date: .abbreviated, time: .omitted)), \(item.sessionCount) activities")
     }

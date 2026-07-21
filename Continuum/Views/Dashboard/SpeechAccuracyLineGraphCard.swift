@@ -41,7 +41,7 @@ struct SpeechAccuracyLineGraphCard: View {
 
                 if points.isEmpty {
                     Text("No Test attempts for this day and filter.")
-                        .font(ContinuumTheme.kidBodyFont)
+                        .font(DashboardTypography.body)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 } else {
@@ -94,7 +94,7 @@ struct SpeechAccuracyLineGraphCard: View {
                 AxisValueLabel {
                     if let intValue = value.as(Int.self) {
                         Text("\(intValue)%")
-                            .font(ContinuumTheme.kidCaptionFont)
+                            .font(DashboardTypography.cardSubtitle)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -106,7 +106,7 @@ struct SpeechAccuracyLineGraphCard: View {
                 AxisValueLabel {
                     if let intValue = value.as(Int.self) {
                         Text("\(intValue)")
-                            .font(ContinuumTheme.kidCaptionFont)
+                            .font(DashboardTypography.cardSubtitle)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -136,11 +136,11 @@ struct SpeechAccuracyLineGraphCard: View {
     private var chartSelectionCaption: some View {
         if let selectedPoint {
             Text("Attempt \(selectedPoint.attempt): \(formattedPercent(selectedPoint.percent)) accuracy")
-                .font(ContinuumTheme.kidCaptionFont.weight(.semibold))
+                .font(DashboardTypography.cardSubtitle.weight(.semibold))
                 .foregroundStyle(ContinuumTheme.tabPurple)
         } else {
             Text("Tap a data point to see exact accuracy.")
-                .font(ContinuumTheme.kidCaptionFont)
+                .font(DashboardTypography.cardSubtitle)
                 .foregroundStyle(.secondary)
         }
     }
@@ -174,7 +174,7 @@ struct SpeechAccuracyLineGraphCard: View {
                 .pickerStyle(.menu)
             }
         }
-        .font(ContinuumTheme.kidCaptionFont)
+        .font(DashboardTypography.cardSubtitle)
     }
 
     private var soundSelectionBinding: Binding<String?> {
@@ -193,15 +193,15 @@ private struct AccuracyPointCallout: View {
     var body: some View {
         VStack(spacing: 4) {
             Text(formattedPercent)
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(DashboardTypography.bodyEmphasis)
                 .foregroundStyle(.white)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
                 .background(ContinuumTheme.tabPurple)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
 
             Text("Attempt \(attempt)")
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .font(DashboardTypography.cardSubtitle.weight(.semibold))
                 .foregroundStyle(ContinuumTheme.tabPurple)
         }
         .shadow(color: .black.opacity(0.12), radius: 4, y: 2)

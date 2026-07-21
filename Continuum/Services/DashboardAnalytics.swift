@@ -58,7 +58,9 @@ struct PhonemePerformanceStat: Identifiable, Sendable {
 /// Weekly dashboard summary metrics.
 struct WeeklyDashboardSummary: Sendable {
     let streakDays: Int
-    let activitySummaryLine: String
+    let sandboxVisits: Int
+    let flashVisits: Int
+    let testAttempts: Int
     let moodTrendLine: String
     let todaysFocusLine: String
 }
@@ -93,7 +95,9 @@ enum DashboardAnalytics {
 
         return WeeklyDashboardSummary(
             streakDays: streakDays,
-            activitySummaryLine: "Sandbox: \(sandboxVisits) visits · Flash: \(flashVisits) visits · Test: \(testAttempts) attempts",
+            sandboxVisits: sandboxVisits,
+            flashVisits: flashVisits,
+            testAttempts: testAttempts,
             moodTrendLine: moodTrendLine(from: weekEngagements),
             todaysFocusLine: todaysFocusLine(from: sessions, endingOn: referenceDate)
         )
