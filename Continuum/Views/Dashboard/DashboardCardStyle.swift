@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Fixed heights for dashboard cards so the layout stays consistent.
 enum DashboardLayout {
-    static let thisWeekHeight: CGFloat = 348
+    static let thisWeekHeight: CGFloat = 286
     static let calendarHeight: CGFloat = 410
     static let statPairHeight: CGFloat = 320
     static let moodsHeight: CGFloat = 420
@@ -141,6 +141,45 @@ struct DashboardMiniBox: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
+        .background(ContinuumTheme.dashboardPurple.opacity(0.2))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(ContinuumTheme.tabPurple.opacity(0.1), lineWidth: 1)
+        )
+    }
+}
+
+/// Compact stat tile used for the three-across practice summary row.
+struct DashboardCompactStatBox: View {
+    let systemImage: String
+    let title: String
+    let valueLine: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.system(size: DashboardTypography.rowIconSize, weight: .semibold))
+                .foregroundStyle(ContinuumTheme.tabPurple)
+                .frame(width: 24)
+
+            Text(title)
+                .font(DashboardTypography.label)
+                .foregroundStyle(.black)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+
+            Spacer(minLength: 0)
+
+            Text(valueLine)
+                .font(DashboardTypography.bodyEmphasis)
+                .foregroundStyle(ContinuumTheme.tabPurple)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity, minHeight: DashboardLayout.miniBoxRowHeight)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 12)
         .background(ContinuumTheme.dashboardPurple.opacity(0.2))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(

@@ -43,6 +43,9 @@ enum ContinuumTheme {
     static let testPinkSoft = Color(red: 0.98, green: 0.91, blue: 0.94)
     static let subtitleGray = Color(red: 0.45, green: 0.47, blue: 0.52)
 
+    /// Shared left/right inset for main tab scroll content.
+    static let pageHorizontalPadding: CGFloat = 28
+
     /// Large rounded title for kid-readable navigation and section headers.
     static let kidNavigationTitleFont: Font = .system(size: 34, weight: .bold, design: .rounded)
     static let kidSectionHeaderFont: Font = .system(size: 30, weight: .bold, design: .rounded)

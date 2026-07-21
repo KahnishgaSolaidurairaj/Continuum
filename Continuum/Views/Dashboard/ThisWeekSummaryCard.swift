@@ -13,21 +13,50 @@ struct ThisWeekSummaryCard: View {
                     systemImage: "flame.fill",
                     text: "\(summary.streakDays) day streak"
                 )
-                DashboardMiniBox(
-                    systemImage: "chart.bar.fill",
-                    text: summary.activitySummaryLine
-                )
+
+                HStack(spacing: 10) {
+                    DashboardCompactStatBox(
+                        systemImage: PracticeActivity.sandbox.systemImage,
+                        title: "Sandbox",
+                        valueLine: "\(summary.sandboxVisits) visits"
+                    )
+                    DashboardCompactStatBox(
+                        systemImage: PracticeActivity.flash.systemImage,
+                        title: "Flash",
+                        valueLine: "\(summary.flashVisits) visits"
+                    )
+                    DashboardCompactStatBox(
+                        systemImage: PracticeActivity.test.systemImage,
+                        title: "Test",
+                        valueLine: "\(summary.testAttempts) attempts"
+                    )
+                }
+
                 DashboardMiniBox(
                     systemImage: "face.smiling",
                     text: summary.moodTrendLine
                 )
-                DashboardMiniBox(
-                    systemImage: "target",
-                    label: "Today's focus",
-                    text: summary.todaysFocusLine
-                )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+    }
+}
+
+/// Standalone card for the current practice focus recommendation.
+struct TodaysFocusCard: View {
+    let focusLine: String
+
+    var body: some View {
+        DashboardCard {
+            VStack(alignment: .leading, spacing: 12) {
+                DashboardCardHeader(title: "Today's focus", systemImage: "target")
+
+                Text(focusLine)
+                    .font(DashboardTypography.body)
+                    .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

@@ -46,6 +46,8 @@ struct DashboardView: View {
 
                     ThisWeekSummaryCard(summary: weeklySummary)
 
+                    TodaysFocusCard(focusLine: weeklySummary.todaysFocusLine)
+
                     PracticeCalendarCard(
                         engagements: engagements,
                         selectedDate: $selectedDate,
@@ -71,7 +73,7 @@ struct DashboardView: View {
                         needs: strengthsAndNeeds.needs
                     )
                 }
-                .padding(.horizontal, 14)
+                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
                 .padding(.vertical, 12)
                 .padding(.bottom, ContinuumTabBar.contentBottomPadding)
             }

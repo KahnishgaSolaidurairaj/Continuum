@@ -68,7 +68,7 @@ struct PhonemeSelectionView: View {
                 soundSection(title: "Consonants", sounds: PracticeSoundCatalog.consonants)
                 soundSection(title: "Vowel Teams", sounds: PracticeSoundCatalog.vowelTeams)
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
             .padding(.top, 20)
             .padding(.bottom, ContinuumTabBar.contentBottomPadding)
         }
@@ -136,7 +136,7 @@ struct ActivityCarouselView: View {
     }
 
     private var pageHorizontalPadding: CGFloat {
-        usesColumnLayout ? 32 : 32
+        ContinuumTheme.pageHorizontalPadding
     }
 
     private var activityIconContainerSize: CGFloat {
