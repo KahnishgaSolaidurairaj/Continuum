@@ -29,39 +29,44 @@ struct ActivityMoodSheet: View {
     let onComplete: (String?) -> Void
 
     var body: some View {
-        NavigationStack {
-            GeometryReader { geometry in
-                VStack(spacing: 14) {
-                    ForEach(MoodChoice.all) { mood in
-                        Button {
-                            onComplete(mood.label)
-                            dismiss()
-                        } label: {
-                            moodRow(label: mood.label, emoji: mood.emoji, isSelected: false)
-                        }
-                        .buttonStyle(.plain)
-                        .contentShape(Rectangle())
-                    }
+        ZStack {
+            ContinuumTheme.homeLavender
+                .ignoresSafeArea()
 
+            VStack(spacing: 14) {
+                Text("How did you feel?")
+                    .font(ContinuumTheme.kidSectionHeaderFont)
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 8)
+
+                ForEach(MoodChoice.all) { mood in
                     Button {
-                        onComplete(nil)
+                        onComplete(mood.label)
                         dismiss()
                     } label: {
-                        Text("Skip")
-                            .font(ContinuumTheme.kidButtonFont)
-                            .foregroundStyle(ContinuumTheme.stormBlue)
-                            .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                            .background(.white.opacity(0.9))
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                        moodRow(label: mood.label, emoji: mood.emoji, isSelected: false)
                     }
                     .buttonStyle(.plain)
-                    .padding(.top, 8)
+                    .contentShape(Rectangle())
                 }
-                .padding(24)
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+
+                Button {
+                    onComplete(nil)
+                    dismiss()
+                } label: {
+                    Text("Skip")
+                        .font(ContinuumTheme.kidButtonFont)
+                        .foregroundStyle(ContinuumTheme.stormBlue)
+                        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                        .background(.white.opacity(0.9))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 8)
             }
-            .background(ContinuumTheme.homeLavender)
-            .kidFriendlyNavigationTitle("How did you feel?")
+            .padding(24)
+            .continuumSheetInset()
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)

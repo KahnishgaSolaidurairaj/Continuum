@@ -98,6 +98,19 @@ extension View {
             )
     }
 
+    /// Applies warm-up-style outer inset and purple border for full-screen kid sheets.
+    func continuumSheetInset() -> some View {
+        padding(.horizontal, 28)
+            .padding(.vertical, 28)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay {
+                RoundedRectangle(cornerRadius: 36)
+                    .strokeBorder(ContinuumTheme.tabPurple.opacity(0.5), lineWidth: 5)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
+    }
+
     /// Applies styling for selectable list rows in sheets.
     func kidChoiceButtonStyle(isSelected: Bool) -> some View {
         self

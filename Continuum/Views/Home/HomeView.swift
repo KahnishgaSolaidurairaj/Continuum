@@ -11,6 +11,8 @@ struct HomeView: View {
     @State private var showGoalSheet = false
     @State private var showWarmUpSheet = false
     @State private var motivationMessage = BrocaMotivation.randomMessage()
+    @State private var brocaPoseName = BrocaBearCatalog.defaultPose
+    @State private var confettiTrigger = 0
     @State private var dailyGoalMinutes = PracticeProgressStore.dailyGoalMinutes
 
     private var latestMood: String? {
@@ -32,24 +34,24 @@ struct HomeView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                heroHeader
-                mainPanel
-                    .padding(.top, -20)
-            }
-            .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
-            .padding(.bottom, ContinuumTabBar.contentBottomPadding)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
+        ZStack(alignment: .top) {
             LinearGradient(
                 colors: [ContinuumTheme.homePink, ContinuumTheme.homeOffWhite],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
-        )
+
+            ScrollView {
+                VStack(spacing: 0) {
+                    heroHeader
+                    mainPanel
+                        .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
+                        .padding(.top, -20)
+                }
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
+            }
+        }
         .sheet(isPresented: $showGoalSheet) {
             DailyGoalSheet(goalMinutes: $dailyGoalMinutes)
         }
@@ -60,11 +62,11 @@ struct HomeView: View {
 
     /// Hills header with welcome copy and Broca mascot.
     private var heroHeader: some View {
-        GeometryReader { geometry in
-            let mascotSize = min(geometry.size.width * 0.44, 196)
+        ZStack(alignment: .bottom) {
+            HomeHillsBackground()
 
-            ZStack(alignment: .bottom) {
-                HomeHillsBackground()
+            GeometryReader { geometry in
+                let mascotSize = min(geometry.size.width * 0.38, 196)
 
                 HStack(alignment: .bottom, spacing: 6) {
                     VStack(alignment: .leading, spacing: 12) {
@@ -87,17 +89,20 @@ struct HomeView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Image("BrocaBear")
+                    Image(BrocaBearCatalog.defaultPose)
                         .resizable()
                         .scaledToFit()
                         .frame(width: mascotSize, height: mascotSize)
                         .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
                         .accessibilityLabel("Broca the Bear")
                 }
+                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
                 .padding(.bottom, 30)
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
             }
         }
         .frame(height: 270)
+        .frame(maxWidth: .infinity)
     }
 
     /// White rounded panel with actions, suggestions, motivation, and streak.
@@ -144,7 +149,7 @@ struct HomeView: View {
             Button {
                 onOpenPracticeTab()
             } label: {
-                Text("Practice \(suggestedTarget.symbol)")
+                Text("Practice Sounds")
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(ContinuumTheme.tabPurple)
                     .lineLimit(1)
@@ -204,17 +209,8 @@ struct HomeView: View {
                     title: "Today's goal",
                     description: "\(todayPracticeMinutes) of \(dailyGoalMinutes) minutes",
                     buttonTitle: "Change goal",
-                    tint: .green,
+                    tint: .blue,
                     action: { showGoalSheet = true }
-                )
-
-                HomeSuggestionCard(
-                    icon: "headphones",
-                    title: "Try Flash",
-                    description: "Flash cards for “\(suggestedTarget.symbol)”",
-                    buttonTitle: "Try Flash",
-                    tint: .purple,
-                    action: onOpenPracticeTab
                 )
             }
         }
@@ -222,45 +218,55 @@ struct HomeView: View {
 
     /// Quote row with mascot thumbnail and motivation refresh.
     private var motivationRow: some View {
-        HStack(spacing: 14) {
-            Image("BrocaBear")
+        HStack(alignment: .center, spacing: 16) {
+            Image(brocaPoseName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 54, height: 54)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(ContinuumTheme.tabPurple.opacity(0.35), lineWidth: 2))
+                .frame(width: 104, height: 104)
+                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+                .accessibilityLabel("Broca the Bear")
+                .animation(.spring(response: 0.35, dampingFraction: 0.72), value: brocaPoseName)
 
-            HStack(alignment: .top, spacing: 4) {
+            HStack(alignment: .top, spacing: 8) {
                 Text("“")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundStyle(ContinuumTheme.tabPurple.opacity(0.7))
-                    .offset(y: -6)
-                Text(motivationMessage)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.pencilLead)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.85)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+                    .offset(y: -10)
 
-            Button("Motivation") {
-                motivationMessage = BrocaMotivation.randomMessage()
+                Text(motivationMessage)
+                    .font(.system(size: 28, weight: .semibold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.pencilLead)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.85)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .font(.system(size: 15, weight: .bold, design: .rounded))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(
-                LinearGradient(
-                    colors: [ContinuumTheme.tabPurple, Color(red: 0.68, green: 0.52, blue: 0.92)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+            .frame(maxWidth: .infinity, alignment: .center)
+
+            Button(action: refreshMotivation) {
+                HStack(spacing: 10) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 20, weight: .bold))
+                    Text("Motivation!")
+                }
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .frame(minHeight: ContinuumTheme.kidMinTapHeight)
+                .background(
+                    LinearGradient(
+                        colors: [ContinuumTheme.tabPurple, Color(red: 0.68, green: 0.52, blue: 0.92)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
-            )
-            .clipShape(Capsule())
+                .clipShape(Capsule())
+                .shadow(color: ContinuumTheme.tabPurple.opacity(0.28), radius: 8, y: 4)
+            }
             .buttonStyle(.plain)
         }
-        .padding(16)
+        .padding(22)
         .background(
             LinearGradient(
                 colors: [ContinuumTheme.homeLavender.opacity(0.7), ContinuumTheme.homePink.opacity(0.45)],
@@ -268,7 +274,18 @@ struct HomeView: View {
                 endPoint: .trailing
             )
         )
-        .clipShape(RoundedRectangle(cornerRadius: 22))
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .overlay {
+            ConfettiBurstView(trigger: confettiTrigger)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+        }
+    }
+
+    /// Shuffles Broca's quote and pose, then triggers confetti.
+    private func refreshMotivation() {
+        motivationMessage = BrocaMotivation.randomMessage(excluding: motivationMessage)
+        brocaPoseName = BrocaBearCatalog.randomPose(excluding: brocaPoseName)
+        confettiTrigger += 1
     }
 
     /// Streak tracker with recent day checkmarks.
@@ -301,16 +318,20 @@ struct HomeView: View {
             Spacer()
 
             HStack(spacing: 8) {
-                ForEach(recentPracticeFlags, id: \.offset) { item in
+                ForEach(streakDayIndicators.indices, id: \.self) { index in
+                    let practiced = streakDayIndicators[index]
                     ZStack {
                         Circle()
-                            .fill(item.practiced ? ContinuumTheme.homeMint : Color.white)
+                            .fill(practiced ? ContinuumTheme.homeMint : Color.white)
                             .frame(width: 26, height: 26)
                             .overlay(
                                 Circle()
-                                    .stroke(item.practiced ? ContinuumTheme.homeMintText.opacity(0.5) : Color.gray.opacity(0.25), lineWidth: 1.5)
+                                    .stroke(
+                                        practiced ? ContinuumTheme.homeMintText.opacity(0.5) : Color.gray.opacity(0.25),
+                                        lineWidth: 1.5
+                                    )
                             )
-                        if item.practiced {
+                        if practiced {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundStyle(ContinuumTheme.homeMintText)
@@ -329,41 +350,34 @@ struct HomeView: View {
         .shadow(color: ContinuumTheme.homeMintText.opacity(0.12), radius: 6, y: 3)
     }
 
-    private var recentPracticeFlags: [(offset: Int, practiced: Bool)] {
-        let calendar = Calendar.current
-        let practicedDays = Set(PracticeProgressStore.practiceDates().map { calendar.startOfDay(for: $0) })
-        return (0..<5).map { offset in
-            let day = calendar.date(byAdding: .day, value: -(4 - offset), to: calendar.startOfDay(for: .now)) ?? .now
-            return (offset, practicedDays.contains(calendar.startOfDay(for: day)))
+    /// Five streak slots filled left-to-right based on the current streak count.
+    private var streakDayIndicators: [Bool] {
+        let filledCount = min(PracticeProgressStore.currentStreak, 5)
+        return (0..<5).map { index in
+            index < filledCount
         }
     }
 }
 
-/// Soft hills background for the home hero header.
+/// Soft hills layered on the home page gradient — no separate background fill.
 private struct HomeHillsBackground: View {
     var body: some View {
         ZStack(alignment: .bottom) {
-            LinearGradient(
-                colors: [
-                    Color(red: 1.0, green: 0.88, blue: 0.92),
-                    Color(red: 0.98, green: 0.84, blue: 0.80),
-                    Color(red: 0.94, green: 0.90, blue: 0.86)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            HomeHillShape()
+                .fill(Color(red: 0.95, green: 0.80, blue: 0.78).opacity(0.55))
+                .frame(maxWidth: .infinity)
+                .frame(height: 140)
+                .offset(y: 18)
 
             HomeHillShape()
-                .fill(Color(red: 0.95, green: 0.80, blue: 0.78).opacity(0.9))
-                .frame(height: 130)
-                .offset(y: 20)
-
-            HomeHillShape()
-                .fill(Color(red: 0.88, green: 0.72, blue: 0.70).opacity(0.65))
-                .frame(height: 100)
+                .fill(Color(red: 0.88, green: 0.72, blue: 0.70).opacity(0.38))
+                .frame(maxWidth: .infinity)
+                .frame(height: 110)
                 .scaleEffect(x: -1, y: 1)
-                .offset(x: -70, y: 30)
+                .offset(y: 32)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .clipped()
     }
 }
 
@@ -387,6 +401,7 @@ private struct HomeSuggestionCard: View {
     enum Tint {
         case purple
         case green
+        case blue
     }
 
     let icon: String
@@ -453,7 +468,14 @@ private struct HomeSuggestionCard: View {
     }
 
     private var accentColor: Color {
-        tint == .green ? ContinuumTheme.homeMintText : ContinuumTheme.tabPurple
+        switch tint {
+        case .green:
+            ContinuumTheme.homeMintText
+        case .purple:
+            ContinuumTheme.tabPurple
+        case .blue:
+            ContinuumTheme.stormBlue
+        }
     }
 }
 
@@ -465,49 +487,54 @@ struct DailyGoalSheet: View {
     private let goalOptions = [5, 10, 15, 20, 30]
 
     var body: some View {
-        NavigationStack {
-            GeometryReader { geometry in
-                VStack(spacing: 14) {
-                    Text("How many minutes do you want to practice today?")
-                        .font(ContinuumTheme.kidBodyFont)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.bottom, 4)
+        ZStack {
+            ContinuumTheme.homeLavender
+                .ignoresSafeArea()
 
-                    ForEach(goalOptions, id: \.self) { minutes in
-                        Button {
-                            goalMinutes = minutes
-                            PracticeProgressStore.dailyGoalMinutes = minutes
-                            dismiss()
-                        } label: {
-                            HStack {
-                                Text("\(minutes) minutes")
-                                    .font(ContinuumTheme.kidBodyFont.weight(.semibold))
-                                    .foregroundStyle(.primary)
+            VStack(spacing: 14) {
+                Text("Today's Goal")
+                    .font(ContinuumTheme.kidSectionHeaderFont)
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 8)
 
-                                Spacer()
+                Text("How many minutes do you want to practice today?")
+                    .font(ContinuumTheme.kidBodyFont)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 4)
 
-                                if goalMinutes == minutes {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.title2)
-                                        .foregroundStyle(ContinuumTheme.tabPurple)
-                                }
+                ForEach(goalOptions, id: \.self) { minutes in
+                    Button {
+                        goalMinutes = minutes
+                        PracticeProgressStore.dailyGoalMinutes = minutes
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("\(minutes) minutes")
+                                .font(ContinuumTheme.kidBodyFont.weight(.semibold))
+                                .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            if goalMinutes == minutes {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(ContinuumTheme.tabPurple)
                             }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                            .kidChoiceButtonStyle(isSelected: goalMinutes == minutes)
                         }
-                        .buttonStyle(.plain)
-                        .contentShape(Rectangle())
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        .kidChoiceButtonStyle(isSelected: goalMinutes == minutes)
                     }
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
                 }
-                .padding(24)
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
-            .background(ContinuumTheme.homeLavender)
-            .kidFriendlyNavigationTitle("Today's Goal")
+            .padding(24)
+            .continuumSheetInset()
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)

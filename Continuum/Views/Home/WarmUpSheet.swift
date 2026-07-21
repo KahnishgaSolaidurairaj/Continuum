@@ -28,15 +28,7 @@ struct WarmUpSheet: View {
                 completedButton
                     .padding(.bottom, 8)
             }
-            .padding(.horizontal, 28)
-            .padding(.vertical, 28)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay {
-                RoundedRectangle(cornerRadius: 36)
-                    .strokeBorder(ContinuumTheme.tabPurple.opacity(0.5), lineWidth: 5)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 20)
+            .continuumSheetInset()
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
