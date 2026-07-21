@@ -4,6 +4,7 @@ import SwiftData
 /// Home screen with mascot hero, suggestions grid, motivation, and practice prompts.
 struct HomeView: View {
     let onOpenPracticeTab: () -> Void
+    let onOpenPracticeWithPriorityFocus: () -> Void
 
     @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse)
     private var engagements: [ActivityEngagementRecord]
@@ -14,18 +15,6 @@ struct HomeView: View {
     @State private var brocaPoseName = BrocaBearCatalog.defaultPose
     @State private var confettiTrigger = 0
     @State private var dailyGoalMinutes = PracticeProgressStore.dailyGoalMinutes
-
-    private var latestMood: String? {
-        ActivityEngagementAnalytics.latestMoodToday(records: engagements)
-    }
-
-    private var suggestedTarget: PracticeTarget {
-        if let lastID = PracticeProgressStore.lastPracticeTargetID,
-           let match = PracticeTarget.allPhonemes.first(where: { $0.id == lastID }) {
-            return match
-        }
-        return PracticeTarget.allPhonemes[0]
-    }
 
     private var todayPracticeMinutes: Int {
         let seconds = ActivityEngagementAnalytics.engagements(on: .now, records: engagements)
@@ -117,11 +106,14 @@ struct HomeView: View {
         .padding(.top, 20)
         .padding(.bottom, 24)
         .frame(maxWidth: .infinity, alignment: .top)
-        .background(
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .fill(Color.white.opacity(0.98))
-                .shadow(color: ContinuumTheme.tabPurple.opacity(0.12), radius: 16, y: -6)
-        )
+        .background(homePanelBackground(shadowY: -6))
+    }
+
+    /// Shared rounded white background used for the home page panel.
+    private func homePanelBackground(shadowY: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 34, style: .continuous)
+            .fill(Color.white.opacity(0.98))
+            .shadow(color: ContinuumTheme.tabPurple.opacity(0.12), radius: 16, y: shadowY)
     }
 
     /// Warm up and practice call-to-action buttons from the mockup.
@@ -187,21 +179,12 @@ struct HomeView: View {
                 spacing: 12
             ) {
                 HomeSuggestionCard(
-                    icon: "face.smiling",
-                    title: "Warm up more",
-                    description: latestMood.map { "Latest mood: \($0)" } ?? "Get your voice ready",
-                    buttonTitle: "Warm up",
-                    tint: .green,
-                    action: { showWarmUpSheet = true }
-                )
-
-                HomeSuggestionCard(
                     icon: "target",
                     title: "Practice focus",
-                    description: "Keep working on “\(suggestedTarget.symbol)”",
+                    description: "Jump to your priority sounds",
                     buttonTitle: "Continue",
                     tint: .purple,
-                    action: onOpenPracticeTab
+                    action: onOpenPracticeWithPriorityFocus
                 )
 
                 HomeSuggestionCard(
@@ -290,7 +273,7 @@ struct HomeView: View {
 
     /// Streak tracker with recent day checkmarks.
     private var streakRow: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 20) {
             ZStack {
                 Circle()
                     .fill(
@@ -300,54 +283,58 @@ struct HomeView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 50, height: 50)
+                    .frame(width: 78, height: 78)
                 Image(systemName: "flame.fill")
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(size: 34, weight: .bold))
                     .foregroundStyle(ContinuumTheme.homeMintText)
             }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text("\(PracticeProgressStore.currentStreak) day streak")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(ContinuumTheme.pencilLead)
                 Text("Keep it up! You're doing great.")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
             }
 
-            Spacer()
+            Spacer(minLength: 12)
 
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 ForEach(streakDayIndicators.indices, id: \.self) { index in
                     let practiced = streakDayIndicators[index]
                     ZStack {
                         Circle()
                             .fill(practiced ? ContinuumTheme.homeMint : Color.white)
-                            .frame(width: 26, height: 26)
+                            .frame(width: 38, height: 38)
                             .overlay(
                                 Circle()
                                     .stroke(
                                         practiced ? ContinuumTheme.homeMintText.opacity(0.5) : Color.gray.opacity(0.25),
-                                        lineWidth: 1.5
+                                        lineWidth: 2
                                     )
                             )
                         if practiced {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.system(size: 16, weight: .bold))
                                 .foregroundStyle(ContinuumTheme.homeMintText)
                         }
                     }
                 }
             }
         }
-        .padding(16)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(ContinuumTheme.homeMint.opacity(0.8), lineWidth: 2)
+        .padding(.horizontal, 22)
+        .padding(.vertical, 24)
+        .frame(maxWidth: .infinity, minHeight: 120)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(ContinuumTheme.sandboxMintSoft.opacity(0.55))
         )
-        .shadow(color: ContinuumTheme.homeMintText.opacity(0.12), radius: 6, y: 3)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(ContinuumTheme.homeMint.opacity(0.85), lineWidth: 2.5)
+        )
+        .shadow(color: ContinuumTheme.homeMintText.opacity(0.14), radius: 8, y: 4)
     }
 
     /// Five streak slots filled left-to-right based on the current streak count.
@@ -423,14 +410,14 @@ private struct HomeSuggestionCard: View {
                         .foregroundStyle(accentColor)
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     Text(title)
-                        .font(.system(size: 21, weight: .bold, design: .rounded))
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(ContinuumTheme.pencilLead)
                         .lineLimit(2)
                         .minimumScaleFactor(0.85)
                     Text(description)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .font(.system(size: 20, weight: .semibold, design: .rounded))
                         .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.75))
                         .lineLimit(4)
                         .minimumScaleFactor(0.85)
@@ -451,7 +438,7 @@ private struct HomeSuggestionCard: View {
                 .buttonStyle(.plain)
         }
         .padding(18)
-        .frame(maxWidth: .infinity, minHeight: 168, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: 180, maxHeight: .infinity, alignment: .topLeading)
         .background(
             LinearGradient(
                 colors: [accentColor.opacity(0.16), accentColor.opacity(0.08)],

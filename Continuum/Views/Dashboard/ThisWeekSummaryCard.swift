@@ -5,9 +5,25 @@ struct ThisWeekSummaryCard: View {
     let summary: WeeklyDashboardSummary
 
     var body: some View {
-        DashboardCard(height: DashboardLayout.thisWeekHeight) {
+        DashboardCard {
             VStack(alignment: .leading, spacing: DashboardLayout.miniBoxSpacing) {
-                DashboardCardHeader(title: "This week", systemImage: "calendar")
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: DashboardTypography.headerIconSize, weight: .semibold))
+                        .foregroundStyle(ContinuumTheme.tabPurple)
+
+                    Text("This week")
+                        .font(DashboardTypography.cardTitle)
+                        .foregroundStyle(.black)
+
+                    Text(summary.weekDateRangeLabel)
+                        .font(DashboardTypography.cardSubtitle)
+                        .foregroundStyle(ContinuumTheme.tabPurple.opacity(0.85))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+
+                    Spacer(minLength: 0)
+                }
 
                 DashboardMiniBox(
                     systemImage: "flame.fill",
@@ -46,6 +62,14 @@ struct ThisWeekSummaryCard: View {
 struct TodaysFocusCard: View {
     let focusLine: String
 
+    @State private var focusTextHeight: CGFloat = 0
+
+    private static let singleLineTextHeight: CGFloat = 29
+
+    private var isMultiline: Bool {
+        focusTextHeight > Self.singleLineTextHeight
+    }
+
     var body: some View {
         DashboardCard {
             VStack(alignment: .leading, spacing: 12) {
@@ -55,8 +79,20 @@ struct TodaysFocusCard: View {
                     .font(DashboardTypography.body)
                     .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.9))
                     .fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, isMultiline ? 6 : 0)
+                    .background {
+                        GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: DashboardTextHeightKey.self,
+                                value: geometry.size.height
+                            )
+                        }
+                    }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .onPreferenceChange(DashboardTextHeightKey.self) { height in
+                focusTextHeight = height
+            }
         }
     }
 }

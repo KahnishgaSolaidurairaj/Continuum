@@ -17,7 +17,7 @@ struct DashboardView: View {
         DashboardAnalytics.weeklySummary(
             engagements: engagements,
             sessions: sessions,
-            streakDays: PracticeProgressStore.currentStreak
+            referenceDate: selectedDate
         )
     }
 
@@ -38,11 +38,12 @@ struct DashboardView: View {
                 VStack(spacing: DashboardLayout.sectionSpacing) {
                     DashboardScrollOffsetReader()
 
-                    Text("Dashboard")
-                        .font(ContinuumTheme.kidSectionHeaderFont)
-                        .foregroundStyle(.black)
+                    Text("Progress Report")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(ContinuumTheme.pencilLead)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 8)
+                        .padding(.top, 12)
+                        .padding(.bottom, 4)
 
                     ThisWeekSummaryCard(summary: weeklySummary)
 
