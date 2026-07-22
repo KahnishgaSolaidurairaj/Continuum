@@ -13,7 +13,8 @@ struct MainTabView: View {
     @State private var practiceRootID = UUID()
     @State private var shouldPulsePrioritySection = false
     @State private var tabBarVisibility = TabBarVisibility()
-    @State private var showAppTour = !AppTourStore.hasCompletedAppTour
+    @State private var showEducationalDisclaimer = !EducationalDisclaimerStore.hasAcknowledgedDisclaimer
+    @State private var showAppTour = false
     @State private var appTourStepIndex = 0
     @State private var tourHighlightFrames: [AppTourAnchor: CGRect] = [:]
 
@@ -79,6 +80,27 @@ struct MainTabView: View {
         .environment(tabBarVisibility)
         .animation(.easeInOut(duration: 0.25), value: tabBarVisibility.isHidden)
         .animation(.easeInOut(duration: 0.25), value: showAppTour)
+        .onAppear(perform: presentFirstLaunchFlowIfNeeded)
+        .alert("Important Notice", isPresented: $showEducationalDisclaimer) {
+            Button("I Understand") {
+                acknowledgeEducationalDisclaimer()
+            }
+        } message: {
+            Text("This is an educational app and is not intended to replace professional speech therapists.")
+        }
+    }
+
+    /// Shows the preview tour after the disclaimer when both are still pending.
+    private func presentFirstLaunchFlowIfNeeded() {
+        guard EducationalDisclaimerStore.hasAcknowledgedDisclaimer else { return }
+        showAppTour = !AppTourStore.hasCompletedAppTour
+    }
+
+    /// Saves disclaimer acceptance and continues into the first-launch tour when needed.
+    private func acknowledgeEducationalDisclaimer() {
+        EducationalDisclaimerStore.markAcknowledged()
+        showEducationalDisclaimer = false
+        showAppTour = !AppTourStore.hasCompletedAppTour
     }
 
     /// Opens the practice tab at phoneme selection every time.

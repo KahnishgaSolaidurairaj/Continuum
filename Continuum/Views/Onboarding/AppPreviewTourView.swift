@@ -117,6 +117,12 @@ struct AppPreviewTourView: View {
         stepIndex >= AppTourStep.steps.count - 1
     }
 
+    private var tourCardBottomPadding: CGFloat {
+        currentStep.showsActivityPreview
+            ? ContinuumTabBar.layoutHeight + 96
+            : ContinuumTabBar.layoutHeight + 12
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             AppTourSpotlightOverlay(
@@ -125,22 +131,11 @@ struct AppPreviewTourView: View {
             )
 
             VStack(spacing: 0) {
-                skipButton
-                    .padding(.horizontal, 24)
-                    .padding(.top, 12)
-
                 Spacer()
 
-                stepCard
-                    .padding(.horizontal, 24)
-
-                pageIndicator
-                    .padding(.top, 16)
-
-                nextButton
-                    .padding(.horizontal, 24)
-                    .padding(.top, 20)
-                    .padding(.bottom, ContinuumTabBar.layoutHeight + 28)
+                tourCard
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, tourCardBottomPadding)
             }
         }
         .onAppear {
@@ -151,106 +146,88 @@ struct AppPreviewTourView: View {
         }
     }
 
-    private var skipButton: some View {
-        HStack {
-            Spacer()
-            Button(action: onSkip) {
-                Text("Skip")
-                    .font(ContinuumTheme.kidButtonFont)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 22)
-                    .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.18))
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.35), lineWidth: 1.5)
-                    )
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Skip app tour")
-        }
-    }
-
-    private var stepCard: some View {
-        VStack(spacing: 18) {
-            ZStack {
-                Circle()
-                    .fill(currentStep.accent.opacity(0.14))
-                    .frame(width: 88, height: 88)
-
-                Image(systemName: currentStep.systemImage)
-                    .font(.system(size: 38, weight: .semibold))
-                    .foregroundStyle(currentStep.accent)
-            }
-
+    private var tourCard: some View {
+        VStack(spacing: 10) {
             Text(currentStep.title)
-                .font(ContinuumTheme.kidSectionHeaderFont)
-                .foregroundStyle(ContinuumTheme.tabPurple)
+                .font(ContinuumTheme.kidSubheadFont.weight(.bold))
+                .foregroundStyle(ContinuumTheme.testMagenta)
                 .multilineTextAlignment(.center)
 
             Text(currentStep.message)
-                .font(ContinuumTheme.kidBodyFont)
+                .font(ContinuumTheme.kidCaptionFont)
                 .foregroundStyle(ContinuumTheme.pencilLead)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: "hand.tap.fill")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(currentStep.accent)
-                    .padding(.top, 2)
+            Text(currentStep.actionHint)
+                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .foregroundStyle(ContinuumTheme.subtitleGray)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Look for the pulsing outline")
-                        .font(ContinuumTheme.kidCaptionFont.weight(.bold))
-                        .foregroundStyle(currentStep.accent)
+            pageIndicator
+                .padding(.top, 2)
 
-                    Text(currentStep.actionHint)
-                        .font(ContinuumTheme.kidSubheadFont)
-                        .foregroundStyle(ContinuumTheme.subtitleGray)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
-            .background(currentStep.accent.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            tourActionButtons
         }
-        .padding(24)
-        .frame(maxWidth: .infinity)
-        .background(Color.white.opacity(0.97))
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(ContinuumTheme.tabPurple.opacity(0.2), lineWidth: 2)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .frame(maxWidth: 420)
+        .background(
+            LinearGradient(
+                colors: [ContinuumTheme.homePink, ContinuumTheme.testPinkSoft],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         )
-        .shadow(color: ContinuumTheme.navBarShadow, radius: 12, y: 6)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(ContinuumTheme.testMagenta.opacity(0.35), lineWidth: 2)
+        )
+        .shadow(color: ContinuumTheme.testMagenta.opacity(0.18), radius: 12, y: 6)
     }
 
     private var pageIndicator: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             ForEach(AppTourStep.steps) { step in
                 Circle()
-                    .fill(step.id == stepIndex ? Color.white : Color.white.opacity(0.45))
-                    .frame(width: step.id == stepIndex ? 10 : 8, height: step.id == stepIndex ? 10 : 8)
+                    .fill(step.id == stepIndex ? ContinuumTheme.testMagenta : ContinuumTheme.testMagenta.opacity(0.28))
+                    .frame(width: step.id == stepIndex ? 8 : 6, height: step.id == stepIndex ? 8 : 6)
             }
         }
         .accessibilityLabel("Step \(stepIndex + 1) of \(AppTourStep.steps.count)")
     }
 
-    private var nextButton: some View {
-        Button(action: advanceStep) {
-            Text(isFinalStep ? "Get Started" : "Next")
-                .font(ContinuumTheme.kidButtonFont)
-                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                .foregroundStyle(.white)
-                .background(ContinuumTheme.tabPurple)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .shadow(color: ContinuumTheme.tabPurple.opacity(0.3), radius: 8, y: 4)
+    private var tourActionButtons: some View {
+        HStack(spacing: 10) {
+            Button(action: onSkip) {
+                Text("Skip")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .frame(maxWidth: .infinity, minHeight: 46)
+                    .foregroundStyle(ContinuumTheme.testMagenta)
+                    .background(Color.white.opacity(0.92))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(ContinuumTheme.testMagenta.opacity(0.45), lineWidth: 2)
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Skip app tour")
+
+            Button(action: advanceStep) {
+                Text(isFinalStep ? "Get Started" : "Next")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .frame(maxWidth: .infinity, minHeight: 46)
+                    .foregroundStyle(.white)
+                    .background(ContinuumTheme.testMagenta)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .shadow(color: ContinuumTheme.testMagenta.opacity(0.35), radius: 8, y: 4)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isFinalStep ? "Get started" : "Next step")
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(isFinalStep ? "Get started" : "Next step")
     }
 
     /// Switches the visible tab to match the active tour step.

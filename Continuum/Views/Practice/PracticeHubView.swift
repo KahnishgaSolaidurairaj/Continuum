@@ -21,7 +21,8 @@ struct PracticeHubView: View {
                     ActivityCarouselView(
                         target: previewTarget,
                         onSelectActivity: { _ in },
-                        onBack: {}
+                        onBack: {},
+                        appTourStepIndex: appTourStepIndex
                     )
                     .allowsHitTesting(false)
                 } else if let target = selectedTarget {
@@ -169,9 +170,9 @@ struct PhonemeSelectionView: View {
                         .padding(.vertical, 10)
                         .background(ContinuumTheme.tabPurple)
                         .clipShape(Capsule())
-                        .appTourHighlight(.practiceManageButton)
                 }
                 .buttonStyle(.plain)
+                .appTourHighlight(.practiceManageButton)
 
                 if isManagingPriority {
                     Button {
@@ -593,9 +594,12 @@ private struct AddPrioritySoundSheet: View {
 
 /// Wireframe step 2: activity picker for the selected target.
 struct ActivityCarouselView: View {
+    static let activitiesSectionScrollID = "practiceActivitiesSection"
+
     let target: PracticeTarget
     let onSelectActivity: (PracticeActivity) -> Void
     let onBack: () -> Void
+    var appTourStepIndex: Int? = nil
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -628,36 +632,58 @@ struct ActivityCarouselView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: usesColumnLayout ? 24 : 24) {
-                headerSection
+        ScrollViewReader { scrollProxy in
+            ScrollView {
+                VStack(spacing: usesColumnLayout ? 24 : 24) {
+                    headerSection
 
-                if usesColumnLayout {
-                    VStack(spacing: activityCardsSpacing) {
-                        ForEach(PracticeActivity.allCases) { activity in
-                            activityCard(for: activity)
+                    if usesColumnLayout {
+                        VStack(spacing: activityCardsSpacing) {
+                            ForEach(PracticeActivity.allCases) { activity in
+                                activityCard(for: activity)
+                            }
                         }
+                        .padding(.vertical, 8)
+                        .id(Self.activitiesSectionScrollID)
+                        .appTourHighlight(.practiceActivities)
+                    } else {
+                        let activities = PracticeActivity.allCases
+                        VStack(spacing: 16) {
+                            HStack(spacing: 16) {
+                                activityCard(for: activities[0])
+                                activityCard(for: activities[1])
+                            }
+                            HStack(spacing: 16) {
+                                activityCard(for: activities[2])
+                                activityCard(for: activities[3])
+                            }
+                        }
+                        .id(Self.activitiesSectionScrollID)
+                        .appTourHighlight(.practiceActivities)
                     }
-                    .padding(.vertical, 8)
-                    .appTourHighlight(.practiceActivities)
-                } else {
-                    let activities = PracticeActivity.allCases
-                    VStack(spacing: 16) {
-                        HStack(spacing: 16) {
-                            activityCard(for: activities[0])
-                            activityCard(for: activities[1])
-                        }
-                        HStack(spacing: 16) {
-                            activityCard(for: activities[2])
-                            activityCard(for: activities[3])
-                        }
-                    }
-                    .appTourHighlight(.practiceActivities)
                 }
+                .padding(.horizontal, pageHorizontalPadding)
+                .padding(.top, usesColumnLayout ? 16 : 12)
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
             }
-            .padding(.horizontal, pageHorizontalPadding)
-            .padding(.top, usesColumnLayout ? 16 : 12)
-            .padding(.bottom, ContinuumTabBar.contentBottomPadding)
+            .onAppear {
+                scrollToActivitiesForTour(using: scrollProxy)
+            }
+            .onChange(of: appTourStepIndex) { _, stepIndex in
+                guard stepIndex == 5 else { return }
+                scrollToActivitiesForTour(using: scrollProxy)
+            }
+        }
+    }
+
+    /// Scrolls the activity picker so all four practice cards are visible during the tour.
+    private func scrollToActivitiesForTour(using scrollProxy: ScrollViewProxy) {
+        guard appTourStepIndex == 5 else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            withAnimation(.easeInOut(duration: 0.45)) {
+                scrollProxy.scrollTo(Self.activitiesSectionScrollID, anchor: .center)
+            }
         }
     }
 
