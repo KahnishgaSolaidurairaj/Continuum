@@ -135,6 +135,7 @@ struct HomeView: View {
                     )
                     .clipShape(Capsule())
                     .shadow(color: ContinuumTheme.homeMintText.opacity(0.22), radius: 8, y: 4)
+                    .appTourHighlight(.homeWarmUp)
             }
             .buttonStyle(.plain)
 
@@ -156,6 +157,7 @@ struct HomeView: View {
                     )
                     .clipShape(Capsule())
                     .shadow(color: ContinuumTheme.tabPurple.opacity(0.2), radius: 8, y: 4)
+                    .appTourHighlight(.homePracticeSounds)
             }
             .buttonStyle(.plain)
         }

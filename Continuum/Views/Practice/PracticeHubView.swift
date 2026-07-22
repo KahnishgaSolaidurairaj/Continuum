@@ -5,6 +5,9 @@ import SwiftData
 struct PracticeHubView: View {
     var shouldPulsePrioritySection = false
     var onPriorityPulseComplete: (() -> Void)? = nil
+    var tourPreviewTarget: PracticeTarget? = nil
+    var tourEmphasizePriorityManage = false
+    var appTourStepIndex: Int? = nil
 
     @Environment(TabBarVisibility.self) private var tabBarVisibility
 
@@ -14,7 +17,14 @@ struct PracticeHubView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if let target = selectedTarget {
+                if let previewTarget = tourPreviewTarget {
+                    ActivityCarouselView(
+                        target: previewTarget,
+                        onSelectActivity: { _ in },
+                        onBack: {}
+                    )
+                    .allowsHitTesting(false)
+                } else if let target = selectedTarget {
                     ActivityCarouselView(
                         target: target,
                         onSelectActivity: { activity in
@@ -31,7 +41,9 @@ struct PracticeHubView: View {
                             selectedTarget = target
                         },
                         shouldPulsePrioritySection: shouldPulsePrioritySection,
-                        onPriorityPulseComplete: onPriorityPulseComplete
+                        onPriorityPulseComplete: onPriorityPulseComplete,
+                        tourEmphasizePriorityManage: tourEmphasizePriorityManage,
+                        appTourStepIndex: appTourStepIndex
                     )
                 }
             }
@@ -68,6 +80,8 @@ struct PhonemeSelectionView: View {
     let onSelect: (PracticeTarget) -> Void
     var shouldPulsePrioritySection = false
     var onPriorityPulseComplete: (() -> Void)? = nil
+    var tourEmphasizePriorityManage = false
+    var appTourStepIndex: Int? = nil
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -112,6 +126,18 @@ struct PhonemeSelectionView: View {
                 reloadPrioritySounds()
                 beginPrioritySectionEmphasisIfNeeded(scrollProxy: scrollProxy)
             }
+            .onChange(of: tourEmphasizePriorityManage) { _, shouldEmphasize in
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                    isManagingPriority = shouldEmphasize
+                }
+                if shouldEmphasize {
+                    scrollToPrioritySection(using: scrollProxy)
+                }
+            }
+            .onChange(of: appTourStepIndex) { _, stepIndex in
+                guard let stepIndex, (2...4).contains(stepIndex) else { return }
+                scrollToPrioritySection(using: scrollProxy)
+            }
         }
         .sheet(isPresented: $showPriorityPicker, onDismiss: reloadPrioritySounds) {
             AddPrioritySoundSheet(existingSoundIDs: prioritySoundIDs) { sound in
@@ -143,6 +169,7 @@ struct PhonemeSelectionView: View {
                         .padding(.vertical, 10)
                         .background(ContinuumTheme.tabPurple)
                         .clipShape(Capsule())
+                        .appTourHighlight(.practiceManageButton)
                 }
                 .buttonStyle(.plain)
 
@@ -237,6 +264,16 @@ struct PhonemeSelectionView: View {
             radius: 18,
             y: 0
         )
+        .appTourHighlight(.practicePrioritySection)
+    }
+
+    /// Scrolls the practice list so Priority Sounds is visible during the app tour.
+    private func scrollToPrioritySection(using scrollProxy: ScrollViewProxy) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            withAnimation(.easeInOut(duration: 0.45)) {
+                scrollProxy.scrollTo(Self.prioritySectionScrollID, anchor: .top)
+            }
+        }
     }
 
     /// Scrolls to and pulses the priority section when opened from Home practice focus.
@@ -602,6 +639,7 @@ struct ActivityCarouselView: View {
                         }
                     }
                     .padding(.vertical, 8)
+                    .appTourHighlight(.practiceActivities)
                 } else {
                     let activities = PracticeActivity.allCases
                     VStack(spacing: 16) {
@@ -614,6 +652,7 @@ struct ActivityCarouselView: View {
                             activityCard(for: activities[3])
                         }
                     }
+                    .appTourHighlight(.practiceActivities)
                 }
             }
             .padding(.horizontal, pageHorizontalPadding)

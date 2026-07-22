@@ -13,6 +13,19 @@ struct MainTabView: View {
     @State private var practiceRootID = UUID()
     @State private var shouldPulsePrioritySection = false
     @State private var tabBarVisibility = TabBarVisibility()
+    @State private var showAppTour = !AppTourStore.hasCompletedAppTour
+    @State private var appTourStepIndex = 0
+    @State private var tourHighlightFrames: [AppTourAnchor: CGRect] = [:]
+
+    private var currentTourStep: AppTourStep? {
+        guard showAppTour, AppTourStep.steps.indices.contains(appTourStepIndex) else { return nil }
+        return AppTourStep.steps[appTourStepIndex]
+    }
+
+    private var tourPreviewTarget: PracticeTarget? {
+        guard currentTourStep?.showsActivityPreview == true else { return nil }
+        return PracticeTarget.allPhonemes.first
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -28,7 +41,10 @@ struct MainTabView: View {
                         shouldPulsePrioritySection: shouldPulsePrioritySection,
                         onPriorityPulseComplete: {
                             shouldPulsePrioritySection = false
-                        }
+                        },
+                        tourPreviewTarget: tourPreviewTarget,
+                        tourEmphasizePriorityManage: currentTourStep?.emphasizePriorityManage ?? false,
+                        appTourStepIndex: showAppTour ? appTourStepIndex : nil
                     )
                     .id(practiceRootID)
                 case .dashboard:
@@ -43,9 +59,26 @@ struct MainTabView: View {
                     .padding(.bottom, 10)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
+
+            if showAppTour, !tabBarVisibility.isHidden {
+                AppPreviewTourView(
+                    stepIndex: $appTourStepIndex,
+                    highlightFrames: tourHighlightFrames,
+                    onSelectTab: selectTab,
+                    onFinish: completeAppTour,
+                    onSkip: completeAppTour
+                )
+                .transition(.opacity)
+                .zIndex(10)
+            }
+        }
+        .coordinateSpace(name: "AppTourSpace")
+        .onPreferenceChange(AppTourHighlightFramePreferenceKey.self) { frames in
+            tourHighlightFrames = frames
         }
         .environment(tabBarVisibility)
         .animation(.easeInOut(duration: 0.25), value: tabBarVisibility.isHidden)
+        .animation(.easeInOut(duration: 0.25), value: showAppTour)
     }
 
     /// Opens the practice tab at phoneme selection every time.
@@ -72,6 +105,15 @@ struct MainTabView: View {
             tabBarVisibility.isHidden = false
         }
         selectedTab = tab
+    }
+
+    /// Marks the first-launch tour complete and dismisses the overlay.
+    private func completeAppTour() {
+        AppTourStore.markCompleted()
+        showAppTour = false
+        appTourStepIndex = 0
+        selectedTab = .home
+        practiceRootID = UUID()
     }
 }
 
@@ -143,10 +185,20 @@ struct ContinuumTabBar: View {
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
             }
             .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.62))
+            .padding(.vertical, 6)
+            .appTourHighlight(tabHighlight(for: tab))
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func tabHighlight(for tab: AppTab) -> AppTourAnchor {
+        switch tab {
+        case .home: return .tabHome
+        case .practice: return .tabPractice
+        case .dashboard: return .tabDashboard
+        }
     }
 }
