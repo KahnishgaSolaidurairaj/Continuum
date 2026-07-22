@@ -23,41 +23,36 @@ struct FlashActivityView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 20) {
-                Text("Flashcards ⚡")
-                    .font(ContinuumTheme.kidSectionHeaderFont)
-                    .foregroundStyle(ContinuumTheme.stormBlueDeep)
+        PracticeActivityScrollLayout {
+            flashInstructions
 
-                levelPicker
+            levelPicker
+                .padding(.horizontal, 28)
+                .padding(.vertical, 28)
+                .practiceActivityCardStyle()
 
-                flashcard(cardHeight: geometry.size.height * 0.52)
+            flashcard
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 360)
 
-                if selectedLevel != .sound && levelWords.count > 1 {
-                    nextWordButton
+            if selectedLevel != .sound && levelWords.count > 1 {
+                PracticeSecondaryButton(title: "Next word", systemImage: "arrow.right.circle.fill") {
+                    wordIndex = (wordIndex + 1) % levelWords.count
                 }
-
-                if !hasWordsForSelectedLevel && selectedLevel != .sound {
-                    Text("More words coming soon for this level.")
-                        .font(ContinuumTheme.kidCaptionFont)
-                        .foregroundStyle(ContinuumTheme.stormBlue)
-                        .multilineTextAlignment(.center)
-                }
-
-                hearItButton
-                    .disabled(!hasWordsForSelectedLevel && selectedLevel != .sound)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                LinearGradient(
-                    colors: [ContinuumTheme.stormSky, ContinuumTheme.lightningGlow.opacity(0.55)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
+
+            if !hasWordsForSelectedLevel && selectedLevel != .sound {
+                Text("More words coming soon for this level.")
+                    .font(ContinuumTheme.kidCaptionFont)
+                    .foregroundStyle(ContinuumTheme.subtitleGray)
+                    .multilineTextAlignment(.center)
+            }
+
+            hearItButton
+                .disabled(!hasWordsForSelectedLevel && selectedLevel != .sound)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(PracticeActivityChrome.background(for: .flash))
         .onChange(of: selectedLevel) { _, _ in
             wordIndex = 0
         }
@@ -66,168 +61,151 @@ struct FlashActivityView: View {
         }
     }
 
+    /// Top instructions shown directly on the page background.
+    private var flashInstructions: some View {
+        VStack(spacing: 8) {
+            Text("Listen to the sound")
+                .font(ContinuumTheme.kidSectionHeaderFont)
+                .foregroundStyle(ContinuumTheme.pencilLead)
+                .multilineTextAlignment(.center)
+
+            Text("Practice \(target.displayLabel)")
+                .font(ContinuumTheme.kidBodyFont)
+                .foregroundStyle(ContinuumTheme.subtitleGray)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     /// Three large level buttons for sound, short words, and long words.
     private var levelPicker: some View {
-        HStack(spacing: 12) {
-            ForEach(FlashLevel.allCases) { level in
-                Button {
-                    selectedLevel = level
-                } label: {
-                    VStack(spacing: 6) {
-                        Text(level.label)
-                            .font(ContinuumTheme.kidButtonFont)
-                        Text(level.subtitle)
-                            .font(ContinuumTheme.kidCaptionFont)
-                            .multilineTextAlignment(.center)
+        VStack(spacing: 16) {
+            Text("Level")
+                .font(ContinuumTheme.kidSectionHeaderFont)
+                .foregroundStyle(ContinuumTheme.tabPurple)
+
+            HStack(spacing: 12) {
+                ForEach(FlashLevel.allCases) { level in
+                    Button {
+                        selectedLevel = level
+                    } label: {
+                        VStack(spacing: 6) {
+                            Text(level.label)
+                                .font(ContinuumTheme.kidButtonFont)
+                            Text(level.subtitle)
+                                .font(ContinuumTheme.kidCaptionFont)
+                                .multilineTextAlignment(.center)
+                        }
+                        .foregroundStyle(
+                            selectedLevel == level ? .white : ContinuumTheme.sandboxMint
+                        )
+                        .frame(maxWidth: .infinity, minHeight: 72)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(
+                                    selectedLevel == level
+                                        ? ContinuumTheme.tabPurple
+                                        : ContinuumTheme.sandboxMintSoft
+                                )
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(
+                                    selectedLevel == level
+                                        ? ContinuumTheme.tabPurple
+                                        : ContinuumTheme.sandboxMint.opacity(0.45),
+                                    lineWidth: 1.5
+                                )
+                        )
                     }
-                    .foregroundStyle(
-                        selectedLevel == level ? ContinuumTheme.stormBlueDeep : ContinuumTheme.stormBlue
-                    )
-                    .frame(maxWidth: .infinity, minHeight: 72)
-                    .padding(.vertical, 8)
-                    .background(
-                        selectedLevel == level
-                            ? ContinuumTheme.lightningYellow
-                            : ContinuumTheme.lightningGlow.opacity(0.85)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                selectedLevel == level
-                                    ? ContinuumTheme.stormBlueDeep
-                                    : ContinuumTheme.stormBlue.opacity(0.45),
-                                lineWidth: selectedLevel == level ? 3 : 2
-                            )
-                    )
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("\(level.label), \(level.subtitle)")
+                    .accessibilityAddTraits(selectedLevel == level ? .isSelected : [])
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("\(level.label), \(level.subtitle)")
             }
         }
     }
 
-    /// Large lightning-themed card showing the phoneme or word for the active level.
-    private func flashcard(cardHeight: CGFloat) -> some View {
-        let resolvedHeight = max(cardHeight, 320)
-
-        return ZStack {
-            RoundedRectangle(cornerRadius: 28)
-                .fill(
-                    LinearGradient(
-                        colors: [ContinuumTheme.lightningGlow, ContinuumTheme.lightningYellow],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 28)
-                        .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 3)
-                )
-                .shadow(color: ContinuumTheme.stormBlue.opacity(0.25), radius: 10, y: 6)
+    /// Large card showing the phoneme or word for the active level.
+    private var flashcard: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(Color.white.opacity(0.97))
 
             LightningCornerDecoration()
 
-            VStack(spacing: 18) {
+            VStack(spacing: 24) {
                 if selectedLevel != .sound {
                     practiceBadge
                 }
 
                 if selectedLevel == .sound {
                     Text(target.displayLabel)
-                        .font(.system(size: resolvedHeight * 0.22, weight: .bold, design: .rounded))
-                        .foregroundStyle(ContinuumTheme.stormBlueDeep)
+                        .font(.system(size: 96, weight: .bold, design: .rounded))
+                        .foregroundStyle(ContinuumTheme.tabPurple)
                         .minimumScaleFactor(0.5)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
                 } else if hasWordsForSelectedLevel {
                     highlightedWordView(
                         word: currentWord,
-                        font: .system(size: wordFontSize(for: currentWord, cardHeight: resolvedHeight), weight: .bold, design: .rounded)
+                        font: .system(size: wordFontSize(for: currentWord, cardHeight: 360), weight: .bold, design: .rounded)
                     )
                     .minimumScaleFactor(0.45)
                     .lineLimit(2)
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, 12)
                 } else {
                     Text("No words yet")
                         .font(ContinuumTheme.kidSectionHeaderFont)
-                        .foregroundStyle(ContinuumTheme.stormBlue)
+                        .foregroundStyle(ContinuumTheme.subtitleGray)
                 }
             }
             .padding(.vertical, 32)
             .padding(.horizontal, 24)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: resolvedHeight)
+        .practiceActivityCardStyle()
     }
 
     /// Shows which sound the child is practicing on word levels.
     private var practiceBadge: some View {
         Text("Practice: \(target.displayLabel)")
-            .font(ContinuumTheme.kidSubheadFont.weight(.bold))
-            .foregroundStyle(ContinuumTheme.stormBlueDeep)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .background(ContinuumTheme.stormSky.opacity(0.85))
+            .font(.system(size: 28, weight: .bold, design: .rounded))
+            .foregroundStyle(ContinuumTheme.sandboxMint)
+            .padding(.horizontal, 28)
+            .padding(.vertical, 16)
+            .background(ContinuumTheme.sandboxMintSoft)
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .stroke(ContinuumTheme.stormBlue.opacity(0.5), lineWidth: 1.5)
+                    .stroke(ContinuumTheme.sandboxMint.opacity(0.45), lineWidth: 1.5)
             )
-    }
-
-    /// Cycles to the next word within the current level.
-    private var nextWordButton: some View {
-        Button {
-            wordIndex = (wordIndex + 1) % levelWords.count
-        } label: {
-            Label("Next word", systemImage: "arrow.right.circle.fill")
-                .font(ContinuumTheme.kidButtonFont)
-                .foregroundStyle(ContinuumTheme.stormBlueDeep)
-                .padding(.horizontal, 20)
-                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                .background(ContinuumTheme.lightningGlow)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(ContinuumTheme.stormBlue, lineWidth: 2)
-                )
-        }
-        .buttonStyle(.plain)
     }
 
     /// Plays audio for the phoneme example or the active word.
     private var hearItButton: some View {
-        Button {
+        PracticePrimaryButton(
+            title: "Hear it",
+            systemImage: "speaker.wave.2.fill",
+            accent: ContinuumTheme.sandboxMint
+        ) {
             if selectedLevel == .sound {
                 referencePlayback.playReference(for: target.id)
             } else {
                 speechService.speakWord(currentWord)
             }
-        } label: {
-            Label("Hear it", systemImage: "speaker.wave.2.fill")
-                .font(ContinuumTheme.kidButtonFont)
-                .padding()
-                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                .background(ContinuumTheme.stormBlue)
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 2)
-                )
         }
-        .buttonStyle(.plain)
     }
 
     /// Scales word text down slightly for longer words so it stays readable.
     private func wordFontSize(for word: String, cardHeight: CGFloat) -> CGFloat {
-        let baseSize = cardHeight * 0.2
+        let baseSize = cardHeight * 0.28
         switch word.count {
         case ...4: return baseSize
-        case 5...6: return baseSize * 0.82
-        case 7...8: return baseSize * 0.68
-        default: return baseSize * 0.56
+        case 5...6: return baseSize * 0.88
+        case 7...8: return baseSize * 0.78
+        default: return baseSize * 0.64
         }
     }
 
@@ -237,8 +215,8 @@ struct FlashActivityView: View {
             word: word,
             highlights: FlashWordBank.highlights(for: target, word: word),
             font: font,
-            baseColor: ContinuumTheme.stormBlueDeep,
-            highlightColor: ContinuumTheme.stormBlue
+            baseColor: ContinuumTheme.pencilLead,
+            highlightColor: ContinuumTheme.sandboxMint
         )
     }
 }
@@ -259,10 +237,10 @@ private struct LightningCornerDecoration: View {
 
     private func lightningBolt(size: CGFloat, rotation: Double) -> some View {
         LightningBoltShape()
-            .fill(ContinuumTheme.stormBlue.opacity(0.55))
+            .fill(ContinuumTheme.sandboxMint.opacity(0.4))
             .frame(width: size, height: size * 1.2)
             .rotationEffect(.degrees(rotation))
-            .shadow(color: ContinuumTheme.lightningYellow.opacity(0.8), radius: 2)
+            .shadow(color: ContinuumTheme.tabPurple.opacity(0.2), radius: 2)
     }
 }
 

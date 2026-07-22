@@ -752,19 +752,19 @@ private struct ActivityTileTheme {
         switch activity {
         case .sandbox:
             return ActivityTileTheme(
-                cardBackground: ContinuumTheme.sandboxMintSoft,
-                accent: ContinuumTheme.sandboxMint,
+                cardBackground: ContinuumTheme.homeLavender,
+                accent: ContinuumTheme.tabPurple,
                 iconBackground: Color.white.opacity(0.75),
-                buttonBackground: ContinuumTheme.sandboxMint,
+                buttonBackground: ContinuumTheme.tabPurple,
                 buttonForeground: .white,
                 usesOutlinedButton: false
             )
         case .flash:
             return ActivityTileTheme(
-                cardBackground: ContinuumTheme.flashLavenderSoft,
-                accent: ContinuumTheme.tabPurple,
+                cardBackground: ContinuumTheme.sandboxMintSoft,
+                accent: ContinuumTheme.sandboxMint,
                 iconBackground: Color.white.opacity(0.75),
-                buttonBackground: ContinuumTheme.tabPurple,
+                buttonBackground: ContinuumTheme.sandboxMint,
                 buttonForeground: .white,
                 usesOutlinedButton: false
             )
