@@ -13,10 +13,12 @@ struct MainTabView: View {
     @State private var practiceRootID = UUID()
     @State private var shouldPulsePrioritySection = false
     @State private var tabBarVisibility = TabBarVisibility()
+    @State private var parentMode = ParentModeController()
     @State private var showEducationalDisclaimer = !EducationalDisclaimerStore.hasAcknowledgedDisclaimer
     @State private var showAppTour = false
     @State private var appTourStepIndex = 0
     @State private var tourHighlightFrames: [AppTourAnchor: CGRect] = [:]
+    @State private var showPostTourPINSetup = false
 
     private var currentTourStep: AppTourStep? {
         guard showAppTour, AppTourStep.steps.indices.contains(appTourStepIndex) else { return nil }
@@ -45,7 +47,8 @@ struct MainTabView: View {
                         },
                         tourPreviewTarget: tourPreviewTarget,
                         tourEmphasizePriorityManage: currentTourStep?.emphasizePriorityManage ?? false,
-                        appTourStepIndex: showAppTour ? appTourStepIndex : nil
+                        appTourStepIndex: showAppTour ? appTourStepIndex : nil,
+                        isChildMode: parentMode.isChildMode
                     )
                     .id(practiceRootID)
                 case .dashboard:
@@ -55,7 +58,11 @@ struct MainTabView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             if !tabBarVisibility.isHidden {
-                ContinuumTabBar(selectedTab: $selectedTab, onTabSelected: selectTab)
+                ContinuumTabBar(
+                    selectedTab: $selectedTab,
+                    onTabSelected: selectTab,
+                    showsDashboardTab: !parentMode.isChildMode
+                )
                     .padding(.horizontal, 28)
                     .padding(.bottom, 10)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -78,8 +85,15 @@ struct MainTabView: View {
             tourHighlightFrames = frames
         }
         .environment(tabBarVisibility)
+        .environment(parentMode)
         .animation(.easeInOut(duration: 0.25), value: tabBarVisibility.isHidden)
         .animation(.easeInOut(duration: 0.25), value: showAppTour)
+        .onChange(of: parentMode.isChildMode) { _, isChildMode in
+            practiceRootID = UUID()
+            if isChildMode, selectedTab == .dashboard {
+                selectedTab = .home
+            }
+        }
         .onAppear(perform: presentFirstLaunchFlowIfNeeded)
         .alert("Important Notice", isPresented: $showEducationalDisclaimer) {
             Button("I Understand") {
@@ -87,6 +101,9 @@ struct MainTabView: View {
             }
         } message: {
             Text("This is an educational app and is not intended to replace professional speech therapists.")
+        }
+        .sheet(isPresented: $showPostTourPINSetup) {
+            ParentPINSetupSheet()
         }
     }
 
@@ -136,6 +153,10 @@ struct MainTabView: View {
         appTourStepIndex = 0
         selectedTab = .home
         practiceRootID = UUID()
+        parentMode.switchToParentModeWithoutPIN()
+        if !ParentModeStore.hasPINConfigured {
+            showPostTourPINSetup = true
+        }
     }
 }
 
@@ -143,6 +164,7 @@ struct MainTabView: View {
 struct ContinuumTabBar: View {
     @Binding var selectedTab: AppTab
     let onTabSelected: (AppTab) -> Void
+    var showsDashboardTab = true
 
     /// Approximate layout height used to keep tab content from crowding the bar.
     static let layoutHeight: CGFloat = 76
@@ -164,12 +186,14 @@ struct ContinuumTabBar: View {
                 systemImage: "text.bubble",
                 selectedSystemImage: "text.bubble.fill"
             )
-            tabButton(
-                tab: .dashboard,
-                title: "Dashboard",
-                systemImage: "chart.bar",
-                selectedSystemImage: "chart.bar.fill"
-            )
+            if showsDashboardTab {
+                tabButton(
+                    tab: .dashboard,
+                    title: "Dashboard",
+                    systemImage: "chart.bar",
+                    selectedSystemImage: "chart.bar.fill"
+                )
+            }
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 12)
@@ -210,6 +234,7 @@ struct ContinuumTabBar: View {
             .padding(.vertical, 6)
             .appTourHighlight(tabHighlight(for: tab))
             .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)

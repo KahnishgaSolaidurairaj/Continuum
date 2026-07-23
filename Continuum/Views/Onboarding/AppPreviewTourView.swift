@@ -97,6 +97,18 @@ struct AppTourStep: Identifiable {
             highlightAnchors: [.tabDashboard],
             showsActivityPreview: false,
             emphasizePriorityManage: false
+        ),
+        AppTourStep(
+            id: 7,
+            tab: .home,
+            title: "Set a parent PIN",
+            message: "Create a 4-digit PIN to protect parent settings.",
+            actionHint: "Use Set PIN in Parent Lock, then switch to child mode when ready.",
+            systemImage: "lock.shield.fill",
+            accent: ContinuumTheme.testMagenta,
+            highlightAnchors: [.tabHome, .homeParentLock],
+            showsActivityPreview: false,
+            emphasizePriorityManage: false
         )
     ]
 }
@@ -212,18 +224,20 @@ struct AppPreviewTourView: View {
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
                             .stroke(ContinuumTheme.testMagenta.opacity(0.45), lineWidth: 2)
                     )
+                    .fullRoundedHitTarget(cornerRadius: 14)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Skip app tour")
 
             Button(action: advanceStep) {
-                Text(isFinalStep ? "Get Started" : "Next")
+                Text(isFinalStep ? (currentStep.id == 7 ? "Set PIN" : "Get Started") : "Next")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .frame(maxWidth: .infinity, minHeight: 46)
                     .foregroundStyle(.white)
                     .background(ContinuumTheme.testMagenta)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .shadow(color: ContinuumTheme.testMagenta.opacity(0.35), radius: 8, y: 4)
+                    .fullRoundedHitTarget(cornerRadius: 14)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(isFinalStep ? "Get started" : "Next step")

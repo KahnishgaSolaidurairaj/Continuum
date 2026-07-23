@@ -8,6 +8,7 @@ struct PracticeHubView: View {
     var tourPreviewTarget: PracticeTarget? = nil
     var tourEmphasizePriorityManage = false
     var appTourStepIndex: Int? = nil
+    var isChildMode = false
 
     @Environment(TabBarVisibility.self) private var tabBarVisibility
 
@@ -44,7 +45,8 @@ struct PracticeHubView: View {
                         shouldPulsePrioritySection: shouldPulsePrioritySection,
                         onPriorityPulseComplete: onPriorityPulseComplete,
                         tourEmphasizePriorityManage: tourEmphasizePriorityManage,
-                        appTourStepIndex: appTourStepIndex
+                        appTourStepIndex: appTourStepIndex,
+                        isChildMode: isChildMode
                     )
                 }
             }
@@ -83,6 +85,7 @@ struct PhonemeSelectionView: View {
     var onPriorityPulseComplete: (() -> Void)? = nil
     var tourEmphasizePriorityManage = false
     var appTourStepIndex: Int? = nil
+    var isChildMode = false
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -93,9 +96,15 @@ struct PhonemeSelectionView: View {
     @State private var priorityPulseScale: CGFloat = 1
     @State private var priorityPulseRingOpacity = 0.0
     @State private var priorityPulseShadowOpacity = 0.0
+    @State private var childBrocaPoseName = BrocaBearCatalog.defaultPose
+    @State private var childMotivationMessage = BrocaMotivation.randomMessage()
 
     private var columnCount: Int {
         horizontalSizeClass == .compact ? 2 : 4
+    }
+
+    private var priorityColumnCount: Int {
+        isChildMode ? 2 : columnCount
     }
 
     private var prioritySounds: [PracticeSound] {
@@ -106,7 +115,7 @@ struct PhonemeSelectionView: View {
         ScrollViewReader { scrollProxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
-                    Text("Which sound?")
+                    Text(isChildMode ? "Your focus sounds" : "Which sound?")
                         .font(.system(size: 36, weight: .bold, design: .rounded))
                         .foregroundStyle(ContinuumTheme.pencilLead)
                         .frame(maxWidth: .infinity)
@@ -114,9 +123,15 @@ struct PhonemeSelectionView: View {
                     prioritySoundsSection
                         .id(Self.prioritySectionScrollID)
 
-                    collapsibleSoundSection(title: "Vowels", sounds: PracticeSoundCatalog.vowels)
-                    collapsibleSoundSection(title: "Consonants", sounds: PracticeSoundCatalog.consonants)
-                    collapsibleSoundSection(title: "Vowel Teams", sounds: PracticeSoundCatalog.vowelTeams)
+                    if isChildMode {
+                        childPracticeBrocaSection
+                    }
+
+                    if !isChildMode {
+                        collapsibleSoundSection(title: "Vowels", sounds: PracticeSoundCatalog.vowels)
+                        collapsibleSoundSection(title: "Consonants", sounds: PracticeSoundCatalog.consonants)
+                        collapsibleSoundSection(title: "Vowel Teams", sounds: PracticeSoundCatalog.vowelTeams)
+                    }
                 }
                 .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
                 .padding(.top, 20)
@@ -139,6 +154,11 @@ struct PhonemeSelectionView: View {
                 guard let stepIndex, (2...4).contains(stepIndex) else { return }
                 scrollToPrioritySection(using: scrollProxy)
             }
+            .onChange(of: isChildMode) { _, childMode in
+                if childMode {
+                    isManagingPriority = false
+                }
+            }
         }
         .sheet(isPresented: $showPriorityPicker, onDismiss: reloadPrioritySounds) {
             AddPrioritySoundSheet(existingSoundIDs: prioritySoundIDs) { sound in
@@ -153,56 +173,76 @@ struct PhonemeSelectionView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 10) {
                 Label("Priority Sounds", systemImage: "folder.fill")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .font(.system(size: isChildMode ? 32 : 26, weight: .bold, design: .rounded))
                     .foregroundStyle(ContinuumTheme.tabPurple)
 
                 Spacer()
 
-                Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
-                        isManagingPriority.toggle()
-                    }
-                } label: {
-                    Text(isManagingPriority ? "Done" : "Manage")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 10)
-                        .background(ContinuumTheme.tabPurple)
-                        .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-                .appTourHighlight(.practiceManageButton)
-
-                if isManagingPriority {
+                if !isChildMode {
                     Button {
-                        showPriorityPicker = true
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 14, weight: .bold))
-                            Text("Add")
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                            isManagingPriority.toggle()
                         }
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundStyle(ContinuumTheme.tabPurple)
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 10)
-                        .background(Color.white.opacity(0.95))
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(ContinuumTheme.tabPurple.opacity(0.35), lineWidth: 2)
-                        )
+                    } label: {
+                        Text(isManagingPriority ? "Done" : "Manage")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 10)
+                            .background(ContinuumTheme.tabPurple)
+                            .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
+                    .appTourHighlight(.practiceManageButton)
+
+                    if isManagingPriority {
+                        Button {
+                            showPriorityPicker = true
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 14, weight: .bold))
+                                Text("Add")
+                            }
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(ContinuumTheme.tabPurple)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 10)
+                            .background(Color.white.opacity(0.95))
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(ContinuumTheme.tabPurple.opacity(0.35), lineWidth: 2)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
 
             if prioritySounds.isEmpty {
-                Button {
-                    isManagingPriority = true
-                    showPriorityPicker = true
-                } label: {
+                if isChildMode {
+                    HStack(spacing: 12) {
+                        Image(systemName: "star.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(ContinuumTheme.tabPurple)
+
+                        Text("Ask a parent to add focus sounds here.")
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundStyle(ContinuumTheme.subtitleGray)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .padding(18)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(Color.white.opacity(0.82))
+                    )
+                } else {
+                    Button {
+                        isManagingPriority = true
+                        showPriorityPicker = true
+                    } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "star.circle.fill")
                             .font(.system(size: 28))
@@ -232,15 +272,16 @@ struct PhonemeSelectionView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                }
             } else {
-                soundGrid(
+                prioritySoundGrid(
                     sounds: prioritySounds,
-                    showsRemoveButton: isManagingPriority,
+                    showsRemoveButton: isManagingPriority && !isChildMode,
                     onRemove: removePrioritySound
                 )
             }
         }
-        .padding(18)
+        .padding(isChildMode ? 24 : 18)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(
@@ -266,6 +307,67 @@ struct PhonemeSelectionView: View {
             y: 0
         )
         .appTourHighlight(.practicePrioritySection)
+    }
+
+    /// Motivational Broca panel shown below priority sounds in child mode.
+    private var childPracticeBrocaSection: some View {
+        VStack(spacing: 18) {
+            Image(childBrocaPoseName)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 280, maxHeight: 280)
+                .shadow(color: .black.opacity(0.12), radius: 12, y: 6)
+                .accessibilityLabel("Broca the Bear")
+
+            Text("“\(childMotivationMessage)”")
+                .font(.system(size: 26, weight: .semibold, design: .rounded))
+                .foregroundStyle(ContinuumTheme.pencilLead)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 8)
+
+            Text("Tap a focus sound above to start practicing!")
+                .font(.system(size: 20, weight: .medium, design: .rounded))
+                .foregroundStyle(ContinuumTheme.subtitleGray)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 28)
+        .frame(maxWidth: .infinity)
+        .background(
+            LinearGradient(
+                colors: [ContinuumTheme.homeLavender.opacity(0.75), ContinuumTheme.homePink.opacity(0.55)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(ContinuumTheme.tabPurple.opacity(0.18), lineWidth: 2)
+        )
+    }
+
+    /// Priority sound grid with larger tiles in child mode.
+    private func prioritySoundGrid(
+        sounds: [PracticeSound],
+        showsRemoveButton: Bool,
+        onRemove: ((PracticeSound) -> Void)? = nil
+    ) -> some View {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: isChildMode ? 18 : 14), count: priorityColumnCount),
+            spacing: isChildMode ? 18 : 14
+        ) {
+            ForEach(sounds) { sound in
+                PracticeSoundTile(
+                    sound: sound,
+                    showsRemoveButton: showsRemoveButton,
+                    usesLargeStyle: isChildMode,
+                    onSelect: { onSelect(PracticeTarget(id: sound.id, practiceSound: sound)) },
+                    onRemove: { onRemove?(sound) }
+                )
+            }
+        }
     }
 
     /// Scrolls the practice list so Priority Sounds is visible during the app tour.
@@ -380,6 +482,7 @@ struct PhonemeSelectionView: View {
                 PracticeSoundTile(
                     sound: sound,
                     showsRemoveButton: showsRemoveButton,
+                    usesLargeStyle: false,
                     onSelect: { onSelect(PracticeTarget(id: sound.id, practiceSound: sound)) },
                     onRemove: { onRemove?(sound) }
                 )
@@ -412,15 +515,16 @@ struct PhonemeSelectionView: View {
 private struct PracticeSoundTile: View {
     let sound: PracticeSound
     let showsRemoveButton: Bool
+    var usesLargeStyle = false
     let onSelect: () -> Void
     let onRemove: () -> Void
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Button(action: onSelect) {
-                VStack(spacing: 10) {
+                VStack(spacing: usesLargeStyle ? 14 : 10) {
                     Text(sound.displayName)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: usesLargeStyle ? 28 : 20, weight: .bold, design: .rounded))
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
@@ -428,14 +532,14 @@ private struct PracticeSoundTile: View {
                     HighlightedWordText(
                         word: sound.level1Example.word,
                         highlights: sound.level1Example.highlights,
-                        font: .system(size: 22, weight: .semibold, design: .rounded),
+                        font: .system(size: usesLargeStyle ? 30 : 22, weight: .semibold, design: .rounded),
                         baseColor: ContinuumTheme.pencilLead,
                         highlightColor: ContinuumTheme.tabPurple
                     )
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 16)
-                .frame(maxWidth: .infinity, minHeight: 104)
+                .padding(.horizontal, usesLargeStyle ? 16 : 10)
+                .padding(.vertical, usesLargeStyle ? 22 : 16)
+                .frame(maxWidth: .infinity, minHeight: usesLargeStyle ? 148 : 104)
                 .background(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .fill(.white)
