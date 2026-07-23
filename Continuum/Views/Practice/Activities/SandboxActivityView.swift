@@ -4,7 +4,8 @@ import SwiftUI
 struct SandboxActivityView: View {
     let target: PracticeTarget
 
-    @State private var tracedPoints: [CGPoint] = []
+    @State private var tracedStrokes: [[CGPoint]] = []
+    @State private var isDrawingStroke = false
     @State private var selectedPenThickness: PenThickness = .medium
 
     var body: some View {
@@ -12,6 +13,7 @@ struct SandboxActivityView: View {
             VStack(spacing: 20) {
                 Text("Trace with your finger")
                     .font(ContinuumTheme.kidSectionHeaderFont)
+                    .foregroundStyle(ContinuumTheme.tabPurple)
                     .multilineTextAlignment(.center)
 
                 tracingBox(availableHeight: geometry.size.height * 0.68)
@@ -23,7 +25,7 @@ struct SandboxActivityView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
                 LinearGradient(
-                    colors: [ContinuumTheme.beachCoral, ContinuumTheme.beachSunYellow],
+                    colors: [ContinuumTheme.homePink, ContinuumTheme.homeLavender],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -32,7 +34,8 @@ struct SandboxActivityView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    tracedPoints.removeAll()
+                    tracedStrokes.removeAll()
+                    isDrawingStroke = false
                 } label: {
                     Text("Clear")
                         .font(ContinuumTheme.kidButtonFont)
@@ -73,7 +76,7 @@ struct SandboxActivityView: View {
 
         return ZStack {
             RoundedRectangle(cornerRadius: 24)
-                .fill(ContinuumTheme.sandYellow)
+                .fill(ContinuumTheme.testPinkSoft)
                 .overlay {
                     SandTextureBackground()
                         .clipShape(RoundedRectangle(cornerRadius: 24))
@@ -82,19 +85,27 @@ struct SandboxActivityView: View {
 
             Text(target.traceCharacter.uppercased())
                 .font(.system(size: letterSize, weight: .bold, design: .rounded))
-                .foregroundStyle(.black.opacity(0.14))
+                .foregroundStyle(ContinuumTheme.tabPurple.opacity(0.24))
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
                 .padding(letterSize * 0.12)
 
-            GrainyTracedPath(points: tracedPoints, lineWidth: selectedPenThickness.lineWidth)
+            GrainyTracedPath(strokes: tracedStrokes, lineWidth: selectedPenThickness.lineWidth)
         }
         .frame(width: size.width, height: size.height)
         .contentShape(RoundedRectangle(cornerRadius: 24))
         .gesture(
             DragGesture(minimumDistance: 0, coordinateSpace: .local)
                 .onChanged { value in
-                    tracedPoints.append(value.location)
+                    if !isDrawingStroke {
+                        isDrawingStroke = true
+                        tracedStrokes.append([value.location])
+                    } else {
+                        tracedStrokes[tracedStrokes.count - 1].append(value.location)
+                    }
+                }
+                .onEnded { _ in
+                    isDrawingStroke = false
                 }
         )
     }
@@ -104,6 +115,7 @@ struct SandboxActivityView: View {
         VStack(spacing: 10) {
             Text("Pen size")
                 .font(ContinuumTheme.kidSectionHeaderFont)
+                .foregroundStyle(ContinuumTheme.tabPurple)
 
             HStack(spacing: 16) {
                 ForEach(PenThickness.allCases) { thickness in
@@ -112,7 +124,7 @@ struct SandboxActivityView: View {
                     } label: {
                         VStack(spacing: 8) {
                             Circle()
-                                .fill(ContinuumTheme.beachCoralPen)
+                                .fill(ContinuumTheme.tabPurple)
                                 .frame(width: thickness.displaySize, height: thickness.displaySize)
 
                             Text(thickness.label)
@@ -199,7 +211,7 @@ private struct SandTextureBackground: View {
                     let offsetY = CGFloat((seed * 3) % 5)
                     let grainSize = CGFloat(1 + seed % 3)
                     let opacity = 0.1 + Double(seed % 10) / 100.0
-                    let tint = seed % 2 == 0 ? ContinuumTheme.sandGrain : Color.orange.opacity(0.45)
+                    let tint = seed % 2 == 0 ? ContinuumTheme.homeLavender : ContinuumTheme.tabPurple.opacity(0.45)
 
                     let rect = CGRect(
                         x: CGFloat(column) * 5 + offsetX,
@@ -219,65 +231,72 @@ private struct SandTextureBackground: View {
 
 /// Draws traced paths with layered, speckled strokes that resemble pencil on sand.
 private struct GrainyTracedPath: View {
-    let points: [CGPoint]
+    let strokes: [[CGPoint]]
     let lineWidth: CGFloat
 
     var body: some View {
         Canvas { context, _ in
-            guard !points.isEmpty else { return }
-
-            if points.count == 1, let point = points.first {
-                let dotRect = CGRect(
-                    x: point.x - lineWidth / 2,
-                    y: point.y - lineWidth / 2,
-                    width: lineWidth,
-                    height: lineWidth
-                )
-                context.fill(Path(ellipseIn: dotRect), with: .color(ContinuumTheme.beachCoralPen))
-                return
-            }
-
-            var path = Path()
-            path.addLines(points)
-
-            let offsets: [(CGFloat, CGFloat, Double)] = [
-                (0, 0, 0.95),
-                (-1.1, 0.7, 0.35),
-                (0.9, -0.6, 0.3),
-                (-0.5, -0.9, 0.25),
-                (0.6, 0.8, 0.22)
-            ]
-
-            for (offsetX, offsetY, opacity) in offsets {
-                var strokeContext = context
-                strokeContext.translateBy(x: offsetX, y: offsetY)
-                strokeContext.stroke(
-                    path,
-                    with: .color(ContinuumTheme.beachCoralPen.opacity(opacity)),
-                    style: StrokeStyle(
-                        lineWidth: lineWidth * (offsetX == 0 ? 1 : 0.45),
-                        lineCap: .round,
-                        lineJoin: .round
-                    )
-                )
-            }
-
-            for (index, point) in points.enumerated() where index % 3 == 0 {
-                let speckleSeed = (index * 17) % 11
-                let speckleSize = CGFloat(1 + speckleSeed % 2)
-                let rect = CGRect(
-                    x: point.x - speckleSize,
-                    y: point.y - speckleSize,
-                    width: speckleSize * 2,
-                    height: speckleSize * 2
-                )
-                context.fill(
-                    Path(ellipseIn: rect),
-                    with: .color(ContinuumTheme.beachCoralPen.opacity(0.18 + Double(speckleSeed) / 30.0))
-                )
+            for points in strokes {
+                drawStroke(points, in: &context)
             }
         }
         .allowsHitTesting(false)
+    }
+
+    /// Renders one pen stroke without connecting it to other strokes.
+    private func drawStroke(_ points: [CGPoint], in context: inout GraphicsContext) {
+        guard !points.isEmpty else { return }
+
+        if points.count == 1, let point = points.first {
+            let dotRect = CGRect(
+                x: point.x - lineWidth / 2,
+                y: point.y - lineWidth / 2,
+                width: lineWidth,
+                height: lineWidth
+            )
+            context.fill(Path(ellipseIn: dotRect), with: .color(ContinuumTheme.tabPurple))
+            return
+        }
+
+        var path = Path()
+        path.addLines(points)
+
+        let offsets: [(CGFloat, CGFloat, Double)] = [
+            (0, 0, 0.95),
+            (-1.1, 0.7, 0.35),
+            (0.9, -0.6, 0.3),
+            (-0.5, -0.9, 0.25),
+            (0.6, 0.8, 0.22)
+        ]
+
+        for (offsetX, offsetY, opacity) in offsets {
+            var strokeContext = context
+            strokeContext.translateBy(x: offsetX, y: offsetY)
+            strokeContext.stroke(
+                path,
+                with: .color(ContinuumTheme.tabPurple.opacity(opacity)),
+                style: StrokeStyle(
+                    lineWidth: lineWidth * (offsetX == 0 ? 1 : 0.45),
+                    lineCap: .round,
+                    lineJoin: .round
+                )
+            )
+        }
+
+        for (index, point) in points.enumerated() where index % 3 == 0 {
+            let speckleSeed = (index * 17) % 11
+            let speckleSize = CGFloat(1 + speckleSeed % 2)
+            let rect = CGRect(
+                x: point.x - speckleSize,
+                y: point.y - speckleSize,
+                width: speckleSize * 2,
+                height: speckleSize * 2
+            )
+            context.fill(
+                Path(ellipseIn: rect),
+                with: .color(ContinuumTheme.tabPurple.opacity(0.18 + Double(speckleSeed) / 30.0))
+            )
+        }
     }
 }
 
@@ -364,14 +383,14 @@ private struct SeashellSandboxBorder: View {
         SeashellShape()
             .fill(
                 LinearGradient(
-                    colors: [ContinuumTheme.shellCream, ContinuumTheme.shellPink],
+                    colors: [ContinuumTheme.homePink, ContinuumTheme.homeLavender],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
             .overlay {
                 SeashellShape()
-                    .stroke(ContinuumTheme.sandGrain.opacity(0.45), lineWidth: 1.5)
+                    .stroke(ContinuumTheme.tabPurple.opacity(0.25), lineWidth: 1.5)
             }
             .frame(width: size, height: size * 0.82)
             .rotationEffect(.degrees(rotation))

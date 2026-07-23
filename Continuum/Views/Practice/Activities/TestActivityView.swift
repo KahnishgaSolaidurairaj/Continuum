@@ -8,6 +8,10 @@ struct TestActivityView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = WordTestViewModel()
 
+    private var testCardBorder: Color {
+        ContinuumTheme.testMagenta.opacity(0.22)
+    }
+
     var body: some View {
         ZStack {
             AudioDemoBackgroundView(
@@ -15,59 +19,22 @@ struct TestActivityView: View {
                 audioLevel: viewModel.liveAudioLevel
             )
 
-            VStack {
+            PracticeActivityScrollLayout {
                 header
-                    .padding(.top, 8)
 
-                Spacer()
+                wordPromptCard
 
-                VStack(spacing: 12) {
-                    wordPromptCard
+                feedbackSection
 
-                    if viewModel.isPreparingSpeech {
-                        statusCard(
-                            title: "Preparing speech recognition…",
-                            subtitle: "This may take a moment on first launch."
-                        )
-                    } else if viewModel.isAnalyzing {
-                        statusCard(
-                            title: "Checking…",
-                            subtitle: "Listening for \(viewModel.currentWord)."
-                        )
-                    } else if viewModel.isRecording {
-                        recordingProgressCard
-                        Text("Say **\(viewModel.currentWord)** clearly for the full bar.")
-                            .font(.caption)
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(.secondary)
-                    } else if let score = viewModel.lastScore {
-                        overallScoreCard(score: score)
-                        CoachingMessagesView(messages: score.messages)
-                        if let heard = viewModel.heardTranscript,
-                           score.correctness < 70,
-                           !heard.isEmpty {
-                            Text("Heard: \"\(heard)\"")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    } else {
-                        Text("Say this word clearly.")
-                            .font(.subheadline)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
+                recordButton
 
-                    recordButton
+                postScoreActions
 
-                    if !viewModel.testWords.isEmpty {
-                        Text(viewModel.wordPositionLabel)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
+                if !viewModel.testWords.isEmpty {
+                    Text(viewModel.wordPositionLabel)
+                        .font(ContinuumTheme.kidCaptionFont)
+                        .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.75))
                 }
-                .padding()
             }
         }
         .task {
@@ -81,131 +48,196 @@ struct TestActivityView: View {
         }
     }
 
-    private var header: some View {
-        VStack(spacing: 8) {
-            Text("Try it yourself")
-                .font(ContinuumTheme.kidSectionHeaderFont)
-            Text("Practice \(target.displayLabel)")
-                .font(ContinuumTheme.kidSubheadFont)
+    @ViewBuilder
+    private var feedbackSection: some View {
+        if viewModel.isPreparingSpeech {
+            statusCard(
+                title: "Preparing speech recognition…",
+                subtitle: "This may take a moment on first launch."
+            )
+        } else if viewModel.isAnalyzing {
+            statusCard(
+                title: "Checking…",
+                subtitle: "Listening for \(viewModel.currentWord)."
+            )
+        } else if viewModel.isRecording {
+            recordingProgressCard
+            instructionCard("Say **\(viewModel.currentWord)** clearly for the full bar.")
+        } else if let score = viewModel.lastScore {
+            overallScoreCard(score: score)
+            CoachingMessagesView(messages: score.messages)
+            if let heard = viewModel.heardTranscript,
+               score.correctness < 70,
+               !heard.isEmpty {
+                instructionCard("Heard: \"\(heard)\"")
+            }
+        } else {
+            instructionCard("Say this word clearly into the microphone.")
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var header: some View {
+        PracticeActivityHeader(
+            title: "Try it yourself",
+            subtitle: "Say the word out loud",
+            detail: "Practice \(target.displayLabel)",
+            borderColor: testCardBorder
+        )
     }
 
     private var wordPromptCard: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Text("Say this word")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(ContinuumTheme.kidSubheadFont)
+                .foregroundStyle(ContinuumTheme.tabPurple)
 
             HighlightedWordText(
                 word: viewModel.currentWord,
                 highlights: FlashWordBank.highlights(for: target, word: viewModel.currentWord),
-                font: .system(size: 42, weight: .bold, design: .rounded),
-                baseColor: .primary,
-                highlightColor: .orange
+                font: .system(size: 44, weight: .bold, design: .rounded),
+                baseColor: ContinuumTheme.pencilLead,
+                highlightColor: ContinuumTheme.testMagenta
             )
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
+            .padding(.vertical, 10)
         }
-        .padding(12)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(PracticeActivityChrome.cardInnerPadding)
+        .frame(maxWidth: .infinity)
+        .practiceActivityCardStyle(borderColor: testCardBorder)
+    }
+
+    private func instructionCard(_ text: String) -> some View {
+        Text(.init(text))
+            .font(ContinuumTheme.kidBodyFont)
+            .foregroundStyle(ContinuumTheme.pencilLead)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(PracticeActivityChrome.cardInnerPadding)
+            .practiceActivityCardStyle(borderColor: testCardBorder)
     }
 
     private func statusCard(title: String, subtitle: String) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             ProgressView()
+                .tint(ContinuumTheme.tabPurple)
+
             Text(title)
-                .font(.subheadline.weight(.semibold))
+                .font(ContinuumTheme.kidSubheadFont)
+                .foregroundStyle(ContinuumTheme.pencilLead)
+                .multilineTextAlignment(.center)
+
             Text(subtitle)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(ContinuumTheme.kidBodyFont)
+                .foregroundStyle(ContinuumTheme.subtitleGray)
                 .multilineTextAlignment(.center)
         }
-        .padding(12)
+        .padding(PracticeActivityChrome.cardInnerPadding)
         .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .practiceActivityCardStyle(borderColor: testCardBorder)
     }
 
     private var recordingProgressCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Recording")
-                    .font(.caption)
+                Label("Recording", systemImage: "mic.fill")
+                    .font(ContinuumTheme.kidSubheadFont)
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+
                 Spacer()
+
                 Text(String(
                     format: "%.1f / %.1fs",
                     viewModel.liveDuration,
                     viewModel.targetRecordingDuration
                 ))
-                .font(.caption.monospacedDigit())
+                .font(ContinuumTheme.kidCaptionFont.monospacedDigit())
+                .foregroundStyle(ContinuumTheme.pencilLead)
             }
+
             ProgressView(value: viewModel.recordingProgress)
-                .tint(.orange)
+                .tint(ContinuumTheme.testMagenta)
         }
-        .padding(12)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(PracticeActivityChrome.cardInnerPadding)
+        .frame(maxWidth: .infinity)
+        .practiceActivityCardStyle(borderColor: testCardBorder)
     }
 
     private func overallScoreCard(score: PronunciationScore) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Text("Your Score")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(ContinuumTheme.kidSubheadFont)
+                .foregroundStyle(ContinuumTheme.tabPurple)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Text("\(score.correctness)%")
                 .font(.system(size: 56, weight: .bold, design: .rounded))
+                .foregroundStyle(ContinuumTheme.pencilLead)
                 .frame(maxWidth: .infinity, alignment: .center)
 
             Text(score.scoringMethodLabel)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                .font(ContinuumTheme.kidCaptionFont)
+                .foregroundStyle(ContinuumTheme.subtitleGray)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(12)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(PracticeActivityChrome.cardInnerPadding)
+        .frame(maxWidth: .infinity)
+        .practiceActivityCardStyle(borderColor: testCardBorder)
     }
 
     private var recordButton: some View {
-        VStack(spacing: 10) {
-            Button {
-                if viewModel.isRecording {
-                    viewModel.cancelRecording()
-                } else {
-                    viewModel.startRecording(
-                        modelContext: modelContext,
-                        practiceTargetID: target.id
-                    )
-                }
-            } label: {
-                Label(
-                    viewModel.isRecording ? "Cancel" : "Start Recording",
-                    systemImage: viewModel.isRecording ? "xmark.circle.fill" : "mic.circle.fill"
-                )
-                .font(ContinuumTheme.kidButtonFont)
-                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                .padding()
-                .background(viewModel.isRecording ? Color.orange : Color.blue)
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            }
-            .disabled(!viewModel.microphoneAuthorized || !viewModel.speechRecognitionReady || viewModel.isAnalyzing)
+        Group {
+            if viewModel.lastScore == nil {
+                VStack(spacing: 10) {
+                    PracticePrimaryButton(
+                        title: viewModel.isRecording ? "Cancel" : "Start Recording",
+                        systemImage: viewModel.isRecording ? "xmark.circle.fill" : "mic.circle.fill",
+                        accent: viewModel.isRecording ? ContinuumTheme.tabPurple : ContinuumTheme.testMagenta
+                    ) {
+                        if viewModel.isRecording {
+                            viewModel.cancelRecording()
+                        } else {
+                            viewModel.startRecording(
+                                modelContext: modelContext,
+                                practiceTargetID: target.id
+                            )
+                        }
+                    }
+                    .disabled(!viewModel.microphoneAuthorized || !viewModel.speechRecognitionReady || viewModel.isAnalyzing)
 
-            if !viewModel.isRecording {
-                Text(String(
-                    format: "Recording length adjusts to the word (%.1fs for %@).",
-                    viewModel.targetRecordingDuration,
-                    viewModel.currentWord
-                ))
-                .font(.caption2)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                    if !viewModel.isRecording {
+                        Text(String(
+                            format: "Recording length adjusts to the word (%.1fs for %@).",
+                            viewModel.targetRecordingDuration,
+                            viewModel.currentWord
+                        ))
+                        .font(ContinuumTheme.kidCaptionFont)
+                        .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var postScoreActions: some View {
+        if viewModel.lastScore != nil, !viewModel.isRecording, !viewModel.isAnalyzing {
+            VStack(spacing: 12) {
+                PracticePrimaryButton(
+                    title: "Try same word again",
+                    systemImage: "arrow.counterclockwise.circle.fill",
+                    accent: ContinuumTheme.testMagenta
+                ) {
+                    viewModel.prepareForRetry()
+                }
+
+                PracticeSecondaryButton(
+                    title: "Next word",
+                    systemImage: "arrow.right.circle.fill",
+                    accent: ContinuumTheme.tabPurple
+                ) {
+                    viewModel.moveToNextWord()
+                }
             }
         }
     }

@@ -57,12 +57,19 @@ struct PhonemePerformanceStat: Identifiable, Sendable {
 
 /// Weekly dashboard summary metrics.
 struct WeeklyDashboardSummary: Sendable {
+    let weekStartDate: Date
+    let weekEndDate: Date
     let streakDays: Int
     let sandboxVisits: Int
     let flashVisits: Int
     let testAttempts: Int
     let moodTrendLine: String
     let todaysFocusLine: String
+
+    /// Human-readable week range shown beside the This week title.
+    var weekDateRangeLabel: String {
+        DashboardAnalytics.formattedWeekRange(start: weekStartDate, end: weekEndDate)
+    }
 }
 
 /// Aggregates practice records for dashboard charts and summaries.
@@ -73,34 +80,61 @@ enum DashboardAnalytics {
     private static let maxStrengthCount = 3
     private static let maxNeedCount = 3
 
-    /// Builds the weekly summary card content.
+    /// Builds the weekly summary card content for the calendar week containing the reference date.
     /// - Parameters:
     ///   - engagements: Stored activity engagement records.
     ///   - sessions: Stored Test session records.
-    ///   - streakDays: Current practice streak.
-    ///   - referenceDate: Date used to determine the current calendar week.
+    ///   - referenceDate: Selected dashboard day used to determine the displayed week.
     /// - Returns: Summary metrics for the This week card.
     static func weeklySummary(
         engagements: [ActivityEngagementRecord],
         sessions: [PracticeSessionRecord],
-        streakDays: Int,
         referenceDate: Date = .now
     ) -> WeeklyDashboardSummary {
-        let weekEngagements = engagementsInCurrentWeek(from: engagements, referenceDate: referenceDate)
-        let weekSessions = sessionsInRollingDays(from: sessions, days: 7, endingOn: referenceDate)
+        let calendar = Calendar.current
+        let weekBounds = weekBounds(containing: referenceDate)
+        let weekEngagements = engagements.filter { engagement in
+            weekBounds.contains(engagement.endedAt)
+        }
+        let weekSessions = sessions.filter { session in
+            weekBounds.contains(session.timestamp)
+        }
+
+        let practicedDays = practicedDays(from: engagements)
+        let streakReference = min(calendar.startOfDay(for: referenceDate), calendar.startOfDay(for: .now))
 
         let sandboxVisits = visitCount(for: .sandbox, in: weekEngagements)
         let flashVisits = visitCount(for: .flash, in: weekEngagements)
         let testAttempts = weekSessions.count
 
         return WeeklyDashboardSummary(
-            streakDays: streakDays,
+            weekStartDate: weekBounds.start,
+            weekEndDate: weekBounds.end,
+            streakDays: streakDays(endingOn: streakReference, practicedDays: practicedDays),
             sandboxVisits: sandboxVisits,
             flashVisits: flashVisits,
             testAttempts: testAttempts,
             moodTrendLine: moodTrendLine(from: weekEngagements),
             todaysFocusLine: todaysFocusLine(from: sessions, endingOn: referenceDate)
         )
+    }
+
+    /// Formats a week range such as "Jul 20 – Jul 26".
+    /// - Parameters:
+    ///   - start: First day in the week.
+    ///   - end: Last day in the week.
+    /// - Returns: A compact date range label.
+    static func formattedWeekRange(start: Date, end: Date) -> String {
+        let calendar = Calendar.current
+        let startLabel = start.formatted(.dateTime.month(.abbreviated).day())
+        let endLabel = end.formatted(.dateTime.month(.abbreviated).day())
+        if calendar.component(.year, from: start) != calendar.component(.year, from: end) {
+            return "\(start.formatted(.dateTime.month(.abbreviated).day().year())) – \(end.formatted(.dateTime.month(.abbreviated).day().year()))"
+        }
+        if calendar.component(.month, from: start) != calendar.component(.month, from: end) {
+            return "\(startLabel) – \(end.formatted(.dateTime.month(.abbreviated).day().year()))"
+        }
+        return "\(startLabel) – \(endLabel)"
     }
 
     /// Returns Test sessions on a day that match the selected group and sound filters.
@@ -271,24 +305,60 @@ enum DashboardAnalytics {
         PracticeSoundCatalog.sound(withID: soundID)?.displayName ?? soundID
     }
 
+    private struct WeekBounds: Sendable {
+        let start: Date
+        let end: Date
+
+        /// Returns whether the given instant falls inside this week.
+        func contains(_ date: Date) -> Bool {
+            date >= start && date < endExclusive
+        }
+
+        private var endExclusive: Date {
+            Calendar.current.date(byAdding: .day, value: 1, to: end) ?? end
+        }
+    }
+
+    private static func weekBounds(containing referenceDate: Date) -> WeekBounds {
+        let calendar = Calendar.current
+        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: referenceDate) else {
+            let day = calendar.startOfDay(for: referenceDate)
+            return WeekBounds(start: day, end: day)
+        }
+
+        let start = calendar.startOfDay(for: weekInterval.start)
+        let end = calendar.date(byAdding: .day, value: -1, to: calendar.startOfDay(for: weekInterval.end)) ?? start
+        return WeekBounds(start: start, end: end)
+    }
+
+    private static func practicedDays(from engagements: [ActivityEngagementRecord]) -> Set<Date> {
+        let calendar = Calendar.current
+        let engagementDays = Set(engagements.map { calendar.startOfDay(for: $0.endedAt) })
+        let storedDays = Set(PracticeProgressStore.practiceDates().map { calendar.startOfDay(for: $0) })
+        return engagementDays.union(storedDays)
+    }
+
+    private static func streakDays(endingOn referenceDate: Date, practicedDays: Set<Date>) -> Int {
+        let calendar = Calendar.current
+        guard !practicedDays.isEmpty else { return 0 }
+
+        var streak = 0
+        var cursor = calendar.startOfDay(for: referenceDate)
+
+        while practicedDays.contains(cursor) {
+            streak += 1
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else { break }
+            cursor = previous
+        }
+
+        return streak
+    }
+
     private static func visitCount(
         for activity: PracticeActivity,
         in engagements: [ActivityEngagementRecord]
     ) -> Int {
         engagements.filter { $0.activityRawValue == activity.rawValue }.count
-    }
-
-    private static func engagementsInCurrentWeek(
-        from engagements: [ActivityEngagementRecord],
-        referenceDate: Date
-    ) -> [ActivityEngagementRecord] {
-        let calendar = Calendar.current
-        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: referenceDate) else {
-            return []
-        }
-        return engagements.filter { engagement in
-            weekInterval.contains(engagement.endedAt)
-        }
     }
 
     private static func sessionsInRollingDays(

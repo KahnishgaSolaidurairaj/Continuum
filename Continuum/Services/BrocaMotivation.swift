@@ -16,7 +16,8 @@ enum BrocaMotivation {
     ]
 
     /// Returns a random motivational line from Broca.
-    static func randomMessage() -> String {
-        messages.randomElement() ?? messages[0]
+    static func randomMessage(excluding current: String? = nil) -> String {
+        let options = messages.filter { $0 != current }
+        return options.randomElement() ?? messages[0]
     }
 }

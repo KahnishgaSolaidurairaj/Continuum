@@ -4,6 +4,8 @@ import SwiftUI
 enum ContinuumTheme {
     static let homePink = Color(red: 0.98, green: 0.86, blue: 0.89)
     static let homeLavender = Color(red: 0.88, green: 0.84, blue: 0.95)
+    static let homePracticePurple = Color(red: 0.38, green: 0.28, blue: 0.62)
+    static let homePracticePurpleDeep = Color(red: 0.30, green: 0.22, blue: 0.52)
     static let tabPurple = Color(red: 0.58, green: 0.48, blue: 0.78)
     static let dashboardPurple = Color(red: 0.78, green: 0.73, blue: 0.92)
     static let practiceCream = Color(red: 0.98, green: 0.96, blue: 0.88)
@@ -57,6 +59,25 @@ enum ContinuumTheme {
 }
 
 extension View {
+    /// Applies the theme purple capsule styling used for home practice buttons.
+    func homePracticeCapsuleStyle() -> some View {
+        font(.system(size: 24, weight: .bold, design: .rounded))
+            .foregroundStyle(.white)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .frame(maxWidth: .infinity, minHeight: 64)
+            .background(
+                LinearGradient(
+                    colors: [ContinuumTheme.tabPurple, Color(red: 0.68, green: 0.52, blue: 0.92)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(Capsule())
+            .shadow(color: ContinuumTheme.tabPurple.opacity(0.28), radius: 8, y: 4)
+            .fullCapsuleHitTarget()
+    }
+
     /// Applies a large, centered navigation title that is easy for kids to read.
     func kidFriendlyNavigationTitle(_ title: String) -> some View {
         navigationTitle(title)
@@ -98,6 +119,19 @@ extension View {
             )
     }
 
+    /// Applies warm-up-style outer inset and purple border for full-screen kid sheets.
+    func continuumSheetInset() -> some View {
+        padding(.horizontal, 28)
+            .padding(.vertical, 28)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay {
+                RoundedRectangle(cornerRadius: 36)
+                    .strokeBorder(ContinuumTheme.tabPurple.opacity(0.5), lineWidth: 5)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
+    }
+
     /// Applies styling for selectable list rows in sheets.
     func kidChoiceButtonStyle(isSelected: Bool) -> some View {
         self
@@ -111,5 +145,15 @@ extension View {
                     )
             )
             .contentShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    /// Ensures taps register across an entire capsule-shaped button label.
+    func fullCapsuleHitTarget() -> some View {
+        contentShape(Capsule())
+    }
+
+    /// Ensures taps register across an entire rounded-rectangle button label.
+    func fullRoundedHitTarget(cornerRadius: CGFloat) -> some View {
+        contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 }

@@ -143,7 +143,7 @@ final class WordTestViewModel {
         recordingStartedAt = nil
     }
 
-    /// Ends capture, runs speech recognition, scores the attempt, and advances the word.
+    /// Ends capture, runs speech recognition, and scores the attempt.
     /// - Parameter modelContext: SwiftData context for session storage.
     func stopRecording(modelContext: ModelContext) {
         guard isRecording else { return }
@@ -188,7 +188,6 @@ final class WordTestViewModel {
                     )
                 )
                 lastScore = score
-                advanceWord()
                 persistAttempt(
                     modelContext: modelContext,
                     audio: audio,
@@ -199,6 +198,21 @@ final class WordTestViewModel {
                 errorMessage = "Speech recognition failed: \(error.localizedDescription)"
             }
         }
+    }
+
+    /// Clears the last attempt so the learner can record the current word again.
+    /// - Returns: Nothing; resets score UI state for another attempt on the same word.
+    func prepareForRetry() {
+        lastScore = nil
+        heardTranscript = nil
+        errorMessage = nil
+    }
+
+    /// Advances to the next practice word and clears the previous score.
+    /// - Returns: Nothing; updates `currentWord` and hides the prior score until the next attempt.
+    func moveToNextWord() {
+        advanceWord()
+        prepareForRetry()
     }
 
     private func advanceWord() {

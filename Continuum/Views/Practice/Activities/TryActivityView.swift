@@ -15,29 +15,21 @@ struct TryActivityView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("See an example")
-                .font(ContinuumTheme.kidSectionHeaderFont)
-                .foregroundStyle(ContinuumTheme.stormBlueDeep)
-
-            Text("Watch how to say \(target.displayLabel)")
-                .font(ContinuumTheme.kidSubheadFont)
-                .foregroundStyle(ContinuumTheme.stormBlueDeep)
-                .multilineTextAlignment(.center)
+        PracticeActivityScrollLayout {
+            PracticeActivityHeader(
+                title: "Watch Demo",
+                subtitle: "See an example",
+                detail: "Watch how to say \(target.displayLabel)"
+            )
 
             videoSection
+                .padding(12)
+                .practiceActivityCardStyle(borderColor: ContinuumTheme.stormBlueDeep.opacity(0.25))
 
             actionButtons
         }
-        .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            LinearGradient(
-                colors: [ContinuumTheme.homeLavender, ContinuumTheme.stormBlue],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        .background(PracticeActivityChrome.background(for: .tryDemo))
         .alert("Watch the full video?", isPresented: $showFullVideoPrompt) {
             Button("Open YouTube") {
                 openFullVideo()
@@ -66,23 +58,32 @@ struct TryActivityView: View {
                 if playbackError {
                     playbackErrorOverlay
                 } else if !playerReady {
-                    ProgressView("Loading video…")
-                        .tint(ContinuumTheme.stormBlueDeep)
-                        .foregroundStyle(ContinuumTheme.stormBlueDeep)
+                    videoLoadingOverlay
                 } else if playbackToken == 0 {
                     playOverlay
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 300)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 2)
-            )
+            .frame(minHeight: 360)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         } else {
             missingClipCard
         }
+    }
+
+    private var videoLoadingOverlay: some View {
+        VStack(spacing: 20) {
+            ProgressView()
+                .scaleEffect(2.4)
+                .tint(ContinuumTheme.stormBlueDeep)
+
+            Text("Loading video…")
+                .font(ContinuumTheme.kidSectionHeaderFont)
+                .foregroundStyle(ContinuumTheme.pencilLead)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black.opacity(0.85))
     }
 
     private var playOverlay: some View {
@@ -91,7 +92,7 @@ struct TryActivityView: View {
             playbackToken += 1
         } label: {
             Image(systemName: "play.circle.fill")
-                .font(.system(size: 72))
+                .font(.system(size: 96))
                 .foregroundStyle(.white)
                 .shadow(color: ContinuumTheme.stormBlueDeep.opacity(0.45), radius: 8)
         }
@@ -100,13 +101,13 @@ struct TryActivityView: View {
     }
 
     private var playbackErrorOverlay: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 36))
-                .foregroundStyle(.yellow)
+                .font(.system(size: 52))
+                .foregroundStyle(ContinuumTheme.stormBlueDeep)
 
             Text("Couldn't play inside the app")
-                .font(ContinuumTheme.kidSubheadFont)
+                .font(ContinuumTheme.kidSectionHeaderFont)
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
 
@@ -136,94 +137,64 @@ struct TryActivityView: View {
 
             Text("Video clip coming soon")
                 .font(ContinuumTheme.kidSubheadFont)
-                .foregroundStyle(ContinuumTheme.stormBlueDeep)
+                .foregroundStyle(ContinuumTheme.pencilLead)
 
             Text("We still need the timestamp for \(target.displayLabel) from the pronunciation guide.")
                 .font(ContinuumTheme.kidCaptionFont)
-                .foregroundStyle(ContinuumTheme.stormBlueDeep.opacity(0.85))
+                .foregroundStyle(ContinuumTheme.subtitleGray)
                 .multilineTextAlignment(.center)
         }
         .padding(24)
         .frame(maxWidth: .infinity)
-        .frame(height: 300)
-        .background(.white.opacity(0.85))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 2)
-        )
+        .frame(minHeight: 360)
     }
 
     @ViewBuilder
     private var actionButtons: some View {
         if clip != nil, segmentFinished {
             VStack(spacing: 12) {
-                Button {
+                PracticeSecondaryButton(
+                    title: "Replay clip",
+                    systemImage: "arrow.counterclockwise.circle.fill",
+                    accent: ContinuumTheme.tabPurple
+                ) {
                     segmentFinished = false
                     playbackToken += 1
-                } label: {
-                    Label("Replay clip", systemImage: "arrow.counterclockwise.circle.fill")
-                        .font(ContinuumTheme.kidButtonFont)
-                        .foregroundStyle(ContinuumTheme.stormBlueDeep)
-                        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                        .background(ContinuumTheme.lightningGlow)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(ContinuumTheme.stormBlueDeep, lineWidth: 2)
-                        )
                 }
-                .buttonStyle(.plain)
 
-                Button {
+                PracticePrimaryButton(
+                    title: "Watch full video",
+                    systemImage: "arrow.up.right.square",
+                    accent: ContinuumTheme.stormBlueDeep
+                ) {
                     showFullVideoPrompt = true
-                } label: {
-                    Label("Watch full video", systemImage: "arrow.up.right.square")
-                        .font(ContinuumTheme.kidButtonFont)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                        .background(ContinuumTheme.stormBlueDeep)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-                .buttonStyle(.plain)
             }
         } else if clip != nil, (playerReady || playbackError), playbackToken == 0, !playbackError {
-            Button {
+            PracticePrimaryButton(
+                title: "Play clip",
+                systemImage: "play.fill",
+                accent: ContinuumTheme.stormBlueDeep
+            ) {
                 segmentFinished = false
                 playbackToken += 1
-            } label: {
-                Label("Play clip", systemImage: "play.fill")
-                    .font(ContinuumTheme.kidButtonFont)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                    .background(ContinuumTheme.stormBlueDeep)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .buttonStyle(.plain)
         } else if clip != nil, playbackError {
-            Button {
+            PracticePrimaryButton(
+                title: "Open in YouTube",
+                systemImage: "arrow.up.right.square",
+                accent: ContinuumTheme.stormBlueDeep
+            ) {
                 showFullVideoPrompt = true
-            } label: {
-                Label("Open in YouTube", systemImage: "arrow.up.right.square")
-                    .font(ContinuumTheme.kidButtonFont)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                    .background(ContinuumTheme.stormBlueDeep)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .buttonStyle(.plain)
         } else if clip == nil {
-            Button {
+            PracticePrimaryButton(
+                title: "Open pronunciation guide",
+                systemImage: "arrow.up.right.square",
+                accent: ContinuumTheme.stormBlueDeep
+            ) {
                 showFullVideoPrompt = true
-            } label: {
-                Label("Open pronunciation guide", systemImage: "arrow.up.right.square")
-                    .font(ContinuumTheme.kidButtonFont)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
-                    .background(ContinuumTheme.stormBlueDeep)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .buttonStyle(.plain)
         }
     }
 

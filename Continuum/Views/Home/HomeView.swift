@@ -1,29 +1,24 @@
 import SwiftUI
 import SwiftData
 
-/// Home screen with mascot hero, suggestions grid, motivation, and practice prompts.
+/// Home screen router with parent and child experiences plus a mode toggle.
 struct HomeView: View {
     let onOpenPracticeTab: () -> Void
+    let onOpenPracticeWithPriorityFocus: () -> Void
+
+    @Environment(ParentModeController.self) private var parentMode
 
     @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse)
     private var engagements: [ActivityEngagementRecord]
 
     @State private var showGoalSheet = false
     @State private var showWarmUpSheet = false
-    @State private var motivationMessage = BrocaMotivation.randomMessage()
+    @State private var showPINSetupSheet = false
+    @State private var showPINUnlockSheet = false
+    @State private var pinDisplayContent: ParentPINDisplayContent?
+    @State private var hasParentPINConfigured = ParentModeStore.hasPINConfigured
     @State private var dailyGoalMinutes = PracticeProgressStore.dailyGoalMinutes
-
-    private var latestMood: String? {
-        ActivityEngagementAnalytics.latestMoodToday(records: engagements)
-    }
-
-    private var suggestedTarget: PracticeTarget {
-        if let lastID = PracticeProgressStore.lastPracticeTargetID,
-           let match = PracticeTarget.allPhonemes.first(where: { $0.id == lastID }) {
-            return match
-        }
-        return PracticeTarget.allPhonemes[0]
-    }
+    @State private var parentLockCardHeight: CGFloat = 0
 
     private var todayPracticeMinutes: Int {
         let seconds = ActivityEngagementAnalytics.engagements(on: .now, records: engagements)
@@ -32,91 +27,159 @@ struct HomeView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                heroHeader
-                mainPanel
-                    .padding(.top, -20)
-            }
-            .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
-            .padding(.bottom, ContinuumTabBar.contentBottomPadding)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
+        ZStack(alignment: .top) {
             LinearGradient(
                 colors: [ContinuumTheme.homePink, ContinuumTheme.homeOffWhite],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
-        )
+
+            ScrollView {
+                VStack(spacing: 0) {
+                    heroHeader
+                    mainPanel
+                        .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
+                        .padding(.top, -22)
+                }
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
+            }
+        }
         .sheet(isPresented: $showGoalSheet) {
             DailyGoalSheet(goalMinutes: $dailyGoalMinutes)
         }
         .sheet(isPresented: $showWarmUpSheet) {
             WarmUpSheet()
         }
+        .sheet(isPresented: $showPINSetupSheet, onDismiss: refreshParentPINState) {
+            ParentPINSetupSheet()
+        }
+        .sheet(item: $pinDisplayContent) { content in
+            ParentPINDisplaySheet(
+                pinText: content.pinText,
+                isUnavailableMessage: content.isUnavailableMessage
+            )
+        }
+        .fullScreenCover(isPresented: $showPINUnlockSheet) {
+            ParentPINUnlockSheet {
+                parentMode.switchToParentModeWithoutPIN()
+            }
+        }
+        .onChange(of: parentMode.isChildMode) { _, isChildMode in
+            if !isChildMode {
+                presentParentPINUpdateIfNeeded()
+            }
+        }
+        .onAppear {
+            refreshParentPINState()
+            presentParentPINUpdateIfNeeded()
+        }
+    }
+
+    /// Syncs local PIN state after setup or when returning to the parent home.
+    private func refreshParentPINState() {
+        hasParentPINConfigured = ParentModeStore.hasPINConfigured
+    }
+
+    /// Opens PIN setup when the parent returned using a temporary recovery code.
+    private func presentParentPINUpdateIfNeeded() {
+        guard !parentMode.isChildMode, ParentModeStore.needsParentPINUpdate else { return }
+        showPINSetupSheet = true
     }
 
     /// Hills header with welcome copy and Broca mascot.
     private var heroHeader: some View {
-        GeometryReader { geometry in
-            let mascotSize = min(geometry.size.width * 0.44, 196)
+        ZStack(alignment: .bottom) {
+            HomeHillsBackground()
 
-            ZStack(alignment: .bottom) {
-                HomeHillsBackground()
+            GeometryReader { geometry in
+                let mascotSize = min(geometry.size.width * 0.57, 294)
+                let mascotLeftOffset = mascotSize * 0.12
+                let taglineLineHeight = UIFont.systemFont(ofSize: 26, weight: .medium).lineHeight
 
-                HStack(alignment: .bottom, spacing: 6) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Welcome to")
-                            .font(.system(size: 36, weight: .semibold, design: .rounded))
-                            .foregroundStyle(ContinuumTheme.pencilLead)
+                ZStack(alignment: .bottom) {
+                    HStack(alignment: .bottom, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(parentMode.isChildMode ? "Let's practice!" : "Welcome to")
+                                .font(.system(size: 36, weight: .semibold, design: .rounded))
+                                .foregroundStyle(ContinuumTheme.pencilLead)
 
-                        Text("Continuum")
-                            .font(.system(size: 68, weight: .bold, design: .rounded))
-                            .foregroundStyle(ContinuumTheme.pencilLead)
-                            .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
-                            .minimumScaleFactor(0.8)
-                            .lineLimit(1)
+                            Text("Continuum")
+                                .font(.system(size: 68, weight: .bold, design: .rounded))
+                                .foregroundStyle(ContinuumTheme.pencilLead)
+                                .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
+                                .minimumScaleFactor(0.8)
+                                .lineLimit(1)
 
-                        Text("Continue therapy at home")
-                            .font(.system(size: 26, weight: .medium, design: .rounded))
-                            .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.bottom, 20)
+                            Text(parentMode.isChildMode ? "Your practice space" : "Continue therapy at home")
+                                .font(.system(size: 26, weight: .medium, design: .rounded))
+                                .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Color.clear
+                            .frame(width: mascotSize, height: mascotSize)
+                            .accessibilityHidden(true)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
+                    .padding(.bottom, 26)
+                    .offset(y: -taglineLineHeight)
 
-                    Image("BrocaBear")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: mascotSize, height: mascotSize)
-                        .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
-                        .accessibilityLabel("Broca the Bear")
+                    HStack {
+                        Spacer()
+
+                        Image(BrocaBearCatalog.headerPose)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: mascotSize, height: mascotSize)
+                            .clipped()
+                            .offset(x: -mascotLeftOffset * 1.5)
+                            .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
+                            .accessibilityLabel("Broca the Bear")
+                    }
+                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
                 }
-                .padding(.bottom, 30)
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
             }
         }
-        .frame(height: 270)
+        .frame(height: 310)
+        .frame(maxWidth: .infinity)
     }
 
-    /// White rounded panel with actions, suggestions, motivation, and streak.
+    /// White rounded panel with parent or child content.
     private var mainPanel: some View {
         VStack(spacing: 14) {
-            primaryActionRow
-            suggestionsSection
-            motivationRow
-            streakRow
+            if parentMode.isChildMode {
+                ChildHomeView(
+                    onOpenPracticeWithPriorityFocus: onOpenPracticeWithPriorityFocus,
+                    onDone: handleChildDone
+                )
+            } else {
+                parentHomeContent
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 20)
         .padding(.bottom, 24)
         .frame(maxWidth: .infinity, alignment: .top)
-        .background(
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .fill(Color.white.opacity(0.98))
-                .shadow(color: ContinuumTheme.tabPurple.opacity(0.12), radius: 16, y: -6)
-        )
+        .background(homePanelBackground(shadowY: -6))
+    }
+
+    /// Full parent home content with setup tools and quick actions.
+    private var parentHomeContent: some View {
+        VStack(spacing: 14) {
+            primaryActionRow
+            suggestionsSection
+            parentPinSettingsSection
+        }
+    }
+
+    /// Shared rounded white background used for the home page panel.
+    private func homePanelBackground(shadowY: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 34, style: .continuous)
+            .fill(Color.white.opacity(0.98))
+            .shadow(color: ContinuumTheme.tabPurple.opacity(0.12), radius: 16, y: shadowY)
     }
 
     /// Warm up and practice call-to-action buttons from the mockup.
@@ -138,27 +201,17 @@ struct HomeView: View {
                     )
                     .clipShape(Capsule())
                     .shadow(color: ContinuumTheme.homeMintText.opacity(0.22), radius: 8, y: 4)
+                    .fullCapsuleHitTarget()
+                    .appTourHighlight(.homeWarmUp)
             }
             .buttonStyle(.plain)
 
             Button {
                 onOpenPracticeTab()
             } label: {
-                Text("Practice \(suggestedTarget.symbol)")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.tabPurple)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .frame(maxWidth: .infinity, minHeight: 64)
-                    .background(
-                        LinearGradient(
-                            colors: [ContinuumTheme.homeLavender, Color(red: 0.80, green: 0.72, blue: 0.98)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .clipShape(Capsule())
-                    .shadow(color: ContinuumTheme.tabPurple.opacity(0.2), radius: 8, y: 4)
+                Text("Practice Sounds")
+                    .homePracticeCapsuleStyle()
+                    .appTourHighlight(.homePracticeSounds)
             }
             .buttonStyle(.plain)
         }
@@ -182,21 +235,12 @@ struct HomeView: View {
                 spacing: 12
             ) {
                 HomeSuggestionCard(
-                    icon: "face.smiling",
-                    title: "Warm up more",
-                    description: latestMood.map { "Latest mood: \($0)" } ?? "Get your voice ready",
-                    buttonTitle: "Warm up",
-                    tint: .green,
-                    action: { showWarmUpSheet = true }
-                )
-
-                HomeSuggestionCard(
                     icon: "target",
                     title: "Practice focus",
-                    description: "Keep working on “\(suggestedTarget.symbol)”",
+                    description: "Jump to your priority sounds",
                     buttonTitle: "Continue",
                     tint: .purple,
-                    action: onOpenPracticeTab
+                    action: onOpenPracticeWithPriorityFocus
                 )
 
                 HomeSuggestionCard(
@@ -204,166 +248,181 @@ struct HomeView: View {
                     title: "Today's goal",
                     description: "\(todayPracticeMinutes) of \(dailyGoalMinutes) minutes",
                     buttonTitle: "Change goal",
-                    tint: .green,
+                    tint: .blue,
                     action: { showGoalSheet = true }
                 )
-
-                HomeSuggestionCard(
-                    icon: "headphones",
-                    title: "Try Flash",
-                    description: "Flash cards for “\(suggestedTarget.symbol)”",
-                    buttonTitle: "Try Flash",
-                    tint: .purple,
-                    action: onOpenPracticeTab
-                )
             }
         }
     }
 
-    /// Quote row with mascot thumbnail and motivation refresh.
-    private var motivationRow: some View {
-        HStack(spacing: 14) {
-            Image("BrocaBear")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 54, height: 54)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(ContinuumTheme.tabPurple.opacity(0.35), lineWidth: 2))
-
-            HStack(alignment: .top, spacing: 4) {
-                Text("“")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.tabPurple.opacity(0.7))
-                    .offset(y: -6)
-                Text(motivationMessage)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.pencilLead)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.85)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Button("Motivation") {
-                motivationMessage = BrocaMotivation.randomMessage()
-            }
-            .font(.system(size: 15, weight: .bold, design: .rounded))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(
-                LinearGradient(
-                    colors: [ContinuumTheme.tabPurple, Color(red: 0.68, green: 0.52, blue: 0.92)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .clipShape(Capsule())
-            .buttonStyle(.plain)
-        }
-        .padding(16)
-        .background(
-            LinearGradient(
-                colors: [ContinuumTheme.homeLavender.opacity(0.7), ContinuumTheme.homePink.opacity(0.45)],
-                startPoint: .leading,
-                endPoint: .trailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 22))
-    }
-
-    /// Streak tracker with recent day checkmarks.
-    private var streakRow: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(red: 0.78, green: 0.96, blue: 0.82), ContinuumTheme.homeMint],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 50, height: 50)
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(ContinuumTheme.homeMintText)
-            }
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text("\(PracticeProgressStore.currentStreak) day streak")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.pencilLead)
-                Text("Keep it up! You're doing great.")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            HStack(spacing: 8) {
-                ForEach(recentPracticeFlags, id: \.offset) { item in
-                    ZStack {
-                        Circle()
-                            .fill(item.practiced ? ContinuumTheme.homeMint : Color.white)
-                            .frame(width: 26, height: 26)
-                            .overlay(
-                                Circle()
-                                    .stroke(item.practiced ? ContinuumTheme.homeMintText.opacity(0.5) : Color.gray.opacity(0.25), lineWidth: 1.5)
-                            )
-                        if item.practiced {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(ContinuumTheme.homeMintText)
-                        }
+    /// Parent-only controls for PIN setup beside the mode toggle card.
+    private var parentPinSettingsSection: some View {
+        HStack(alignment: .top, spacing: 12) {
+            parentLockCard
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                parentLockCardHeight = geometry.size.height
+                            }
+                            .onChange(of: geometry.size.height) { _, newHeight in
+                                parentLockCardHeight = newHeight
+                            }
                     }
                 }
-            }
+
+            parentModeToggleCard
+                .frame(width: 118, height: max(parentLockCardHeight, 1))
         }
-        .padding(16)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(ContinuumTheme.homeMint.opacity(0.8), lineWidth: 2)
-        )
-        .shadow(color: ContinuumTheme.homeMintText.opacity(0.12), radius: 6, y: 3)
     }
 
-    private var recentPracticeFlags: [(offset: Int, practiced: Bool)] {
-        let calendar = Calendar.current
-        let practicedDays = Set(PracticeProgressStore.practiceDates().map { calendar.startOfDay(for: $0) })
-        return (0..<5).map { offset in
-            let day = calendar.date(byAdding: .day, value: -(4 - offset), to: calendar.startOfDay(for: .now)) ?? .now
-            return (offset, practicedDays.contains(calendar.startOfDay(for: day)))
+    /// PIN setup card shown on the left side of the parent lock row.
+    private var parentLockCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Parent Lock", systemImage: "lock.shield.fill")
+                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .foregroundStyle(ContinuumTheme.testMagenta)
+
+            Text(
+                hasParentPINConfigured
+                    ? "A 4-digit PIN protects parent settings. Switch to child mode when your child is ready to practice."
+                    : "Add a 4-digit PIN before switching to child mode."
+            )
+            .font(.system(size: 20, weight: .medium, design: .rounded))
+            .foregroundStyle(ContinuumTheme.pencilLead)
+            .fixedSize(horizontal: false, vertical: true)
+
+            if hasParentPINConfigured {
+                parentPINButton(title: "View PIN", action: presentStoredPIN)
+            } else {
+                parentPINButton(title: "Set PIN") {
+                    showPINSetupSheet = true
+                }
+            }
+
+            /*
+            if let backupPhone = ParentModeStore.backupPhoneNumber, !backupPhone.isEmpty {
+                Text("Backup phone: \(formattedPhone(backupPhone))")
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.8))
+            }
+            */
         }
+        .padding(18)
+        .background(parentSettingsCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(parentSettingsCardBorder)
+        .appTourHighlight(.homeParentLock)
+    }
+
+    /// Mode toggle card shown on the right side of the parent lock row.
+    private var parentModeToggleCard: some View {
+        VStack {
+            HomeModeToggle(
+                isChildMode: parentMode.isChildMode,
+                onSelectParent: handleSelectParentMode,
+                onSelectChild: { parentMode.switchToChildMode() },
+                usesVerticalLayout: true,
+                fillsAvailableHeight: true
+            )
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(parentSettingsCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(parentSettingsCardBorder)
+        .appTourHighlight(.homeChildModeToggle)
+    }
+
+    /// Builds a full-width parent PIN action button with a large tap target.
+    private func parentPINButton(title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(ContinuumTheme.testMagenta)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .fullRoundedHitTarget(cornerRadius: 14)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var parentSettingsCardBackground: some View {
+        LinearGradient(
+            colors: [ContinuumTheme.homePink.opacity(0.65), ContinuumTheme.testPinkSoft.opacity(0.8)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var parentSettingsCardBorder: some View {
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+            .stroke(ContinuumTheme.testMagenta.opacity(0.25), lineWidth: 2)
+    }
+
+    /// Shows the saved parent PIN in the themed in-app sheet.
+    private func presentStoredPIN() {
+        if let pin = ParentModeStore.storedPIN(), !pin.isEmpty {
+            pinDisplayContent = ParentPINDisplayContent(
+                pinText: pin,
+                isUnavailableMessage: false
+            )
+        } else {
+            pinDisplayContent = ParentPINDisplayContent(
+                pinText: "PIN unavailable. Set a new PIN to store it on this device.",
+                isUnavailableMessage: true
+            )
+        }
+    }
+
+    /// Routes parent-mode selection through PIN unlock when one is configured.
+    private func handleSelectParentMode() {
+        guard parentMode.isChildMode else { return }
+
+        if parentMode.requiresPINToUnlockParentMode {
+            showPINUnlockSheet = true
+        } else {
+            parentMode.switchToParentModeWithoutPIN()
+        }
+    }
+
+    /// Returns to parent mode from child home via PIN when configured.
+    private func handleChildDone() {
+        handleSelectParentMode()
+    }
+
+    /// Formats a stored phone number for display.
+    private func formattedPhone(_ digits: String) -> String {
+        guard digits.count == 10 else { return digits }
+        let area = digits.prefix(3)
+        let middle = digits.dropFirst(3).prefix(3)
+        let last = digits.suffix(4)
+        return "(\(area)) \(middle)-\(last)"
     }
 }
 
-/// Soft hills background for the home hero header.
+/// Soft hills layered on the home page gradient — no separate background fill.
 private struct HomeHillsBackground: View {
     var body: some View {
         ZStack(alignment: .bottom) {
-            LinearGradient(
-                colors: [
-                    Color(red: 1.0, green: 0.88, blue: 0.92),
-                    Color(red: 0.98, green: 0.84, blue: 0.80),
-                    Color(red: 0.94, green: 0.90, blue: 0.86)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            HomeHillShape()
+                .fill(Color(red: 0.95, green: 0.80, blue: 0.78).opacity(0.55))
+                .frame(maxWidth: .infinity)
+                .frame(height: 140)
+                .offset(y: 18)
 
             HomeHillShape()
-                .fill(Color(red: 0.95, green: 0.80, blue: 0.78).opacity(0.9))
-                .frame(height: 130)
-                .offset(y: 20)
-
-            HomeHillShape()
-                .fill(Color(red: 0.88, green: 0.72, blue: 0.70).opacity(0.65))
-                .frame(height: 100)
+                .fill(Color(red: 0.88, green: 0.72, blue: 0.70).opacity(0.38))
+                .frame(maxWidth: .infinity)
+                .frame(height: 110)
                 .scaleEffect(x: -1, y: 1)
-                .offset(x: -70, y: 30)
+                .offset(y: 32)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .clipped()
     }
 }
 
@@ -382,81 +441,6 @@ private struct HomeHillShape: Shape {
     }
 }
 
-/// One suggestion tile in the home 2x2 grid.
-private struct HomeSuggestionCard: View {
-    enum Tint {
-        case purple
-        case green
-    }
-
-    let icon: String
-    let title: String
-    let description: String
-    let buttonTitle: String
-    let tint: Tint
-    let action: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(accentColor.opacity(0.22))
-                        .frame(width: 54, height: 54)
-                    Image(systemName: icon)
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(accentColor)
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(title)
-                        .font(.system(size: 21, weight: .bold, design: .rounded))
-                        .foregroundStyle(ContinuumTheme.pencilLead)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.85)
-                    Text(description)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.75))
-                        .lineLimit(4)
-                        .minimumScaleFactor(0.85)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-
-            Spacer(minLength: 8)
-
-            Button(buttonTitle, action: action)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
-                .background(accentColor)
-                .clipShape(Capsule())
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .buttonStyle(.plain)
-        }
-        .padding(18)
-        .frame(maxWidth: .infinity, minHeight: 168, maxHeight: .infinity, alignment: .topLeading)
-        .background(
-            LinearGradient(
-                colors: [accentColor.opacity(0.16), accentColor.opacity(0.08)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(accentColor.opacity(0.28), lineWidth: 2)
-        )
-        .shadow(color: accentColor.opacity(0.14), radius: 6, y: 3)
-    }
-
-    private var accentColor: Color {
-        tint == .green ? ContinuumTheme.homeMintText : ContinuumTheme.tabPurple
-    }
-}
-
 /// Sheet for setting the daily practice goal in minutes.
 struct DailyGoalSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -465,49 +449,54 @@ struct DailyGoalSheet: View {
     private let goalOptions = [5, 10, 15, 20, 30]
 
     var body: some View {
-        NavigationStack {
-            GeometryReader { geometry in
-                VStack(spacing: 14) {
-                    Text("How many minutes do you want to practice today?")
-                        .font(ContinuumTheme.kidBodyFont)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.bottom, 4)
+        ZStack {
+            ContinuumTheme.homeLavender
+                .ignoresSafeArea()
 
-                    ForEach(goalOptions, id: \.self) { minutes in
-                        Button {
-                            goalMinutes = minutes
-                            PracticeProgressStore.dailyGoalMinutes = minutes
-                            dismiss()
-                        } label: {
-                            HStack {
-                                Text("\(minutes) minutes")
-                                    .font(ContinuumTheme.kidBodyFont.weight(.semibold))
-                                    .foregroundStyle(.primary)
+            VStack(spacing: 14) {
+                Text("Today's Goal")
+                    .font(ContinuumTheme.kidSectionHeaderFont)
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 8)
 
-                                Spacer()
+                Text("How many minutes do you want to practice today?")
+                    .font(ContinuumTheme.kidBodyFont)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 4)
 
-                                if goalMinutes == minutes {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.title2)
-                                        .foregroundStyle(ContinuumTheme.tabPurple)
-                                }
+                ForEach(goalOptions, id: \.self) { minutes in
+                    Button {
+                        goalMinutes = minutes
+                        PracticeProgressStore.dailyGoalMinutes = minutes
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("\(minutes) minutes")
+                                .font(ContinuumTheme.kidBodyFont.weight(.semibold))
+                                .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            if goalMinutes == minutes {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(ContinuumTheme.tabPurple)
                             }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                            .kidChoiceButtonStyle(isSelected: goalMinutes == minutes)
                         }
-                        .buttonStyle(.plain)
-                        .contentShape(Rectangle())
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        .kidChoiceButtonStyle(isSelected: goalMinutes == minutes)
                     }
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
                 }
-                .padding(24)
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
-            .background(ContinuumTheme.homeLavender)
-            .kidFriendlyNavigationTitle("Today's Goal")
+            .padding(24)
+            .continuumSheetInset()
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)

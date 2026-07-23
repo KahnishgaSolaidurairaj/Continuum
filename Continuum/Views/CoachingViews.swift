@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Background visual for the audio-only demo.
+/// Soft practice-page background for the Test (try it yourself) activity.
 struct AudioDemoBackgroundView: View {
     let isRecording: Bool
     let audioLevel: Float
@@ -8,41 +8,47 @@ struct AudioDemoBackgroundView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [Color(red: 0.08, green: 0.1, blue: 0.18), Color(red: 0.04, green: 0.06, blue: 0.12)],
+                colors: [
+                    ContinuumTheme.homePink,
+                    ContinuumTheme.testPinkSoft,
+                    ContinuumTheme.homeLavender
+                ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
-            VStack(spacing: 24) {
-                Image(systemName: isRecording ? "waveform.circle.fill" : "mic.circle")
-                    .font(.system(size: 96))
-                    .foregroundStyle(isRecording ? .blue : .white.opacity(0.6))
-                    .symbolEffect(.pulse, isActive: isRecording)
-
-                if isRecording {
-                    HStack(spacing: 4) {
-                        ForEach(0..<12, id: \.self) { index in
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(.blue.opacity(0.8))
-                                .frame(width: 6, height: barHeight(for: index))
-                        }
-                    }
-                    .frame(height: 60)
-                    .animation(.easeInOut(duration: 0.15), value: audioLevel)
+            if isRecording {
+                VStack {
+                    Spacer()
+                    recordingWaveform
+                        .padding(.bottom, 120)
                 }
-
-                Text(isRecording ? "Listening…" : "Audio Demo Mode")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.85))
             }
         }
         .ignoresSafeArea()
     }
 
+    private var recordingWaveform: some View {
+        HStack(spacing: 5) {
+            ForEach(0..<12, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 3, style: .continuous)
+                    .fill(
+                        index.isMultiple(of: 2)
+                            ? ContinuumTheme.testMagenta.opacity(0.75)
+                            : ContinuumTheme.tabPurple.opacity(0.75)
+                    )
+                    .frame(width: 7, height: barHeight(for: index))
+            }
+        }
+        .frame(height: 56)
+        .animation(.easeInOut(duration: 0.15), value: audioLevel)
+        .accessibilityHidden(true)
+    }
+
     private func barHeight(for index: Int) -> CGFloat {
-        let base = CGFloat(8 + index % 4 * 6)
-        let boost = CGFloat(audioLevel) * 40 * (index.isMultiple(of: 2) ? 1.2 : 0.8)
-        return min(56, base + boost)
+        let base = CGFloat(10 + index % 4 * 6)
+        let boost = CGFloat(audioLevel) * 36 * (index.isMultiple(of: 2) ? 1.2 : 0.8)
+        return min(52, base + boost)
     }
 }
 
@@ -51,21 +57,34 @@ struct CoachingMessagesView: View {
     let messages: [CoachingMessage]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Feedback")
+                .font(ContinuumTheme.kidSubheadFont)
+                .foregroundStyle(ContinuumTheme.tabPurple)
+
             ForEach(messages.prefix(4)) { message in
-                HStack(alignment: .top, spacing: 8) {
+                HStack(alignment: .top, spacing: 12) {
                     Image(systemName: iconName(for: message.severity))
+                        .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(color(for: message.severity))
+                        .frame(width: 28)
+
                     Text(message.text)
-                        .font(.subheadline)
+                        .font(ContinuumTheme.kidBodyFont)
+                        .foregroundStyle(ContinuumTheme.pencilLead)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
-        .padding(12)
+        .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .background(Color.white.opacity(0.97))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(ContinuumTheme.testMagenta.opacity(0.22), lineWidth: 2)
+        )
+        .shadow(color: ContinuumTheme.navBarShadow, radius: 8, y: 4)
     }
 
     private func iconName(for severity: CoachingSeverity) -> String {
@@ -78,9 +97,9 @@ struct CoachingMessagesView: View {
 
     private func color(for severity: CoachingSeverity) -> Color {
         switch severity {
-        case .good: return .green
-        case .warning: return .yellow
-        case .critical: return .red
+        case .good: return ContinuumTheme.homeMintText
+        case .warning: return Color.orange
+        case .critical: return Color.red
         }
     }
 }

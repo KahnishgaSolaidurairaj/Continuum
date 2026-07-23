@@ -11,30 +11,125 @@ enum AppTab: Hashable {
 struct MainTabView: View {
     @State private var selectedTab: AppTab = .home
     @State private var practiceRootID = UUID()
+    @State private var shouldPulsePrioritySection = false
+    @State private var tabBarVisibility = TabBarVisibility()
+    @State private var parentMode = ParentModeController()
+    @State private var showEducationalDisclaimer = !EducationalDisclaimerStore.hasAcknowledgedDisclaimer
+    @State private var showAppTour = false
+    @State private var appTourStepIndex = 0
+    @State private var tourHighlightFrames: [AppTourAnchor: CGRect] = [:]
+    @State private var showPostTourPINSetup = false
+
+    private var currentTourStep: AppTourStep? {
+        guard showAppTour, AppTourStep.steps.indices.contains(appTourStepIndex) else { return nil }
+        return AppTourStep.steps[appTourStepIndex]
+    }
+
+    private var tourPreviewTarget: PracticeTarget? {
+        guard currentTourStep?.showsActivityPreview == true else { return nil }
+        return PracticeTarget.allPhonemes.first
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             Group {
                 switch selectedTab {
                 case .home:
-                    HomeView(onOpenPracticeTab: openPracticeHub)
+                    HomeView(
+                        onOpenPracticeTab: openPracticeHub,
+                        onOpenPracticeWithPriorityFocus: openPracticeHubWithPriorityFocus
+                    )
                 case .practice:
-                    PracticeHubView()
-                        .id(practiceRootID)
+                    PracticeHubView(
+                        shouldPulsePrioritySection: shouldPulsePrioritySection,
+                        onPriorityPulseComplete: {
+                            shouldPulsePrioritySection = false
+                        },
+                        tourPreviewTarget: tourPreviewTarget,
+                        tourEmphasizePriorityManage: currentTourStep?.emphasizePriorityManage ?? false,
+                        appTourStepIndex: showAppTour ? appTourStepIndex : nil,
+                        isChildMode: parentMode.isChildMode
+                    )
+                    .id(practiceRootID)
                 case .dashboard:
                     DashboardView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            ContinuumTabBar(selectedTab: $selectedTab, onTabSelected: selectTab)
-                .padding(.horizontal, 28)
-                .padding(.bottom, 10)
+            if !tabBarVisibility.isHidden {
+                ContinuumTabBar(
+                    selectedTab: $selectedTab,
+                    onTabSelected: selectTab,
+                    showsDashboardTab: !parentMode.isChildMode
+                )
+                    .padding(.horizontal, 28)
+                    .padding(.bottom, 10)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+
+            if showAppTour, !tabBarVisibility.isHidden {
+                AppPreviewTourView(
+                    stepIndex: $appTourStepIndex,
+                    highlightFrames: tourHighlightFrames,
+                    onSelectTab: selectTab,
+                    onFinish: completeAppTour,
+                    onSkip: completeAppTour
+                )
+                .transition(.opacity)
+                .zIndex(10)
+            }
         }
+        .coordinateSpace(name: "AppTourSpace")
+        .onPreferenceChange(AppTourHighlightFramePreferenceKey.self) { frames in
+            tourHighlightFrames = frames
+        }
+        .environment(tabBarVisibility)
+        .environment(parentMode)
+        .animation(.easeInOut(duration: 0.25), value: tabBarVisibility.isHidden)
+        .animation(.easeInOut(duration: 0.25), value: showAppTour)
+        .onChange(of: parentMode.isChildMode) { _, isChildMode in
+            practiceRootID = UUID()
+            if isChildMode, selectedTab == .dashboard {
+                selectedTab = .home
+            }
+        }
+        .onAppear(perform: presentFirstLaunchFlowIfNeeded)
+        .alert("Important Notice", isPresented: $showEducationalDisclaimer) {
+            Button("I Understand") {
+                acknowledgeEducationalDisclaimer()
+            }
+        } message: {
+            Text("This is an educational app and is not intended to replace professional speech therapists.")
+        }
+        .sheet(isPresented: $showPostTourPINSetup) {
+            ParentPINSetupSheet()
+        }
+    }
+
+    /// Shows the preview tour after the disclaimer when both are still pending.
+    private func presentFirstLaunchFlowIfNeeded() {
+        guard EducationalDisclaimerStore.hasAcknowledgedDisclaimer else { return }
+        showAppTour = !AppTourStore.hasCompletedAppTour
+    }
+
+    /// Saves disclaimer acceptance and continues into the first-launch tour when needed.
+    private func acknowledgeEducationalDisclaimer() {
+        EducationalDisclaimerStore.markAcknowledged()
+        showEducationalDisclaimer = false
+        showAppTour = !AppTourStore.hasCompletedAppTour
     }
 
     /// Opens the practice tab at phoneme selection every time.
     private func openPracticeHub() {
+        shouldPulsePrioritySection = false
+        practiceRootID = UUID()
+        selectedTab = .practice
+    }
+
+    /// Opens the practice tab and pulses the priority sounds section.
+    private func openPracticeHubWithPriorityFocus() {
+        shouldPulsePrioritySection = true
         practiceRootID = UUID()
         selectedTab = .practice
     }
@@ -43,9 +138,25 @@ struct MainTabView: View {
     /// - Parameter tab: Destination tab.
     private func selectTab(_ tab: AppTab) {
         if tab == .practice {
+            shouldPulsePrioritySection = false
             practiceRootID = UUID()
+        } else {
+            tabBarVisibility.isHidden = false
         }
         selectedTab = tab
+    }
+
+    /// Marks the first-launch tour complete and dismisses the overlay.
+    private func completeAppTour() {
+        AppTourStore.markCompleted()
+        showAppTour = false
+        appTourStepIndex = 0
+        selectedTab = .home
+        practiceRootID = UUID()
+        parentMode.switchToParentModeWithoutPIN()
+        if !ParentModeStore.hasPINConfigured {
+            showPostTourPINSetup = true
+        }
     }
 }
 
@@ -53,6 +164,7 @@ struct MainTabView: View {
 struct ContinuumTabBar: View {
     @Binding var selectedTab: AppTab
     let onTabSelected: (AppTab) -> Void
+    var showsDashboardTab = true
 
     /// Approximate layout height used to keep tab content from crowding the bar.
     static let layoutHeight: CGFloat = 76
@@ -74,19 +186,30 @@ struct ContinuumTabBar: View {
                 systemImage: "text.bubble",
                 selectedSystemImage: "text.bubble.fill"
             )
-            tabButton(
-                tab: .dashboard,
-                title: "Progress",
-                systemImage: "chart.bar",
-                selectedSystemImage: "chart.bar.fill"
-            )
+            if showsDashboardTab {
+                tabButton(
+                    tab: .dashboard,
+                    title: "Dashboard",
+                    systemImage: "chart.bar",
+                    selectedSystemImage: "chart.bar.fill"
+                )
+            }
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(.white)
-                .shadow(color: ContinuumTheme.navBarShadow, radius: 16, y: 6)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            ContinuumTheme.tabPurple,
+                            Color(red: 0.52, green: 0.42, blue: 0.72)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: ContinuumTheme.tabPurple.opacity(0.35), radius: 16, y: 6)
         )
     }
 
@@ -107,11 +230,22 @@ struct ContinuumTabBar: View {
                 Text(title)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
             }
-            .foregroundStyle(isSelected ? ContinuumTheme.tabPurple : ContinuumTheme.navInactive)
+            .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.62))
+            .padding(.vertical, 6)
+            .appTourHighlight(tabHighlight(for: tab))
             .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func tabHighlight(for tab: AppTab) -> AppTourAnchor {
+        switch tab {
+        case .home: return .tabHome
+        case .practice: return .tabPractice
+        case .dashboard: return .tabDashboard
+        }
     }
 }

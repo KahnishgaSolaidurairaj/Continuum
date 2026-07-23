@@ -31,6 +31,15 @@ enum DashboardTypography {
     static let rowIconSize: CGFloat = 22
 }
 
+/// Reports measured dashboard text height for adaptive padding.
+struct DashboardTextHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 /// Shared white card styling for dashboard sections.
 struct DashboardCard<Content: View>: View {
     var height: CGFloat?
@@ -106,6 +115,18 @@ struct DashboardMiniBox: View {
     var trailingText: String?
     var minHeight: CGFloat = DashboardLayout.miniBoxRowHeight
 
+    @State private var textBlockHeight: CGFloat = 0
+
+    private static let singleLineTextHeight: CGFloat = 29
+
+    private var isMultiline: Bool {
+        textBlockHeight > Self.singleLineTextHeight
+    }
+
+    private var verticalPadding: CGFloat {
+        isMultiline ? 16 : 12
+    }
+
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             Image(systemName: systemImage)
@@ -124,9 +145,17 @@ struct DashboardMiniBox: View {
                 Text(text)
                     .font(DashboardTypography.body)
                     .foregroundStyle(.primary.opacity(0.9))
-                    .lineLimit(label == nil ? 2 : 4)
+                    .lineLimit(label == nil ? 3 : 4)
                     .minimumScaleFactor(0.85)
                     .fixedSize(horizontal: false, vertical: true)
+                    .background {
+                        GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: DashboardTextHeightKey.self,
+                                value: geometry.size.height
+                            )
+                        }
+                    }
             }
 
             if let trailingText {
@@ -139,14 +168,21 @@ struct DashboardMiniBox: View {
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
+        .padding(.vertical, verticalPadding)
+        .frame(
+            maxWidth: .infinity,
+            minHeight: isMultiline ? minHeight + 10 : minHeight,
+            alignment: .leading
+        )
         .background(ContinuumTheme.dashboardPurple.opacity(0.2))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(ContinuumTheme.tabPurple.opacity(0.1), lineWidth: 1)
         )
+        .onPreferenceChange(DashboardTextHeightKey.self) { height in
+            textBlockHeight = height
+        }
     }
 }
 
