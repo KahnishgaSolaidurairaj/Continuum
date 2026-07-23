@@ -168,25 +168,15 @@ struct ParentPINSetupSheet: View {
                 */
 
                 HStack(spacing: 12) {
-                    Button("Cancel") { dismiss() }
-                        .font(ContinuumTheme.kidSubheadFont.weight(.bold))
-                        .foregroundStyle(ContinuumTheme.testMagenta)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .background(Color.white.opacity(0.92))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    pinSheetActionButton(title: "Cancel", action: { dismiss() })
 
                     if step == .confirmPIN {
-                        Button("Back") {
+                        pinSheetActionButton(title: "Back") {
                             confirmPIN = ""
                             pin = ""
                             step = .enterPIN
                             errorMessage = nil
                         }
-                        .font(ContinuumTheme.kidSubheadFont.weight(.bold))
-                        .foregroundStyle(ContinuumTheme.testMagenta)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .background(Color.white.opacity(0.92))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                 }
             }
@@ -220,6 +210,20 @@ struct ParentPINSetupSheet: View {
         // ParentModeStore.backupPhoneNumber = normalizedPhone
         ParentModeStore.needsParentPINUpdate = false
         dismiss()
+    }
+
+    /// Builds a secondary sheet action button with a full-width tap target.
+    private func pinSheetActionButton(title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(ContinuumTheme.kidSubheadFont.weight(.bold))
+                .foregroundStyle(ContinuumTheme.testMagenta)
+                .frame(maxWidth: .infinity, minHeight: 48)
+                .background(Color.white.opacity(0.92))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .fullRoundedHitTarget(cornerRadius: 14)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -315,6 +319,7 @@ struct ParentPINResetSheet: View {
                     .frame(maxWidth: .infinity, minHeight: 48)
                     .background(Color.white.opacity(0.92))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .fullRoundedHitTarget(cornerRadius: 14)
                     .buttonStyle(.plain)
             }
             .padding(24)
@@ -435,14 +440,18 @@ struct ParentPINUnlockSheet: View {
 
                 Spacer()
 
-                Button("Cancel") { dismiss() }
-                    .font(ContinuumTheme.kidSubheadFont.weight(.bold))
-                    .foregroundStyle(ContinuumTheme.testMagenta)
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(Color.white.opacity(0.92))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .fullRoundedHitTarget(cornerRadius: 16)
-                    .buttonStyle(.plain)
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Cancel")
+                        .font(ContinuumTheme.kidSubheadFont.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .background(ContinuumTheme.testMagenta)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .fullRoundedHitTarget(cornerRadius: 16)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 28)
             .padding(.vertical, 32)
@@ -521,5 +530,74 @@ struct ParentPINUnlockSheet: View {
             errorMessage = "Incorrect PIN. Try again."
             pin = ""
         }
+    }
+}
+
+/// Payload used to present the saved parent PIN sheet with fresh content each time.
+struct ParentPINDisplayContent: Identifiable {
+    let id = UUID()
+    let pinText: String
+    let isUnavailableMessage: Bool
+}
+
+/// Themed sheet that displays the saved parent PIN for reference.
+struct ParentPINDisplaySheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let pinText: String
+    var isUnavailableMessage = false
+
+    var body: some View {
+        ZStack {
+            ContinuumTheme.homePink.ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Text("Your Parent PIN")
+                    .font(ContinuumTheme.kidSectionHeaderFont)
+                    .foregroundStyle(ContinuumTheme.testMagenta)
+                    .frame(maxWidth: .infinity)
+
+                Group {
+                    if isUnavailableMessage {
+                        Text(pinText)
+                            .font(ContinuumTheme.kidBodyFont.weight(.semibold))
+                            .foregroundStyle(ContinuumTheme.pencilLead)
+                            .multilineTextAlignment(.center)
+                    } else {
+                        Text(pinText)
+                            .font(.system(size: 56, weight: .bold, design: .rounded))
+                            .foregroundStyle(ContinuumTheme.pencilLead)
+                            .multilineTextAlignment(.center)
+                            .tracking(6)
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: 72, alignment: .center)
+                .layoutPriority(1)
+
+                Button {
+                    dismiss()
+                } label: {
+                    Text("OK")
+                        .font(ContinuumTheme.kidSubheadFont.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .background(ContinuumTheme.testMagenta)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .fullRoundedHitTarget(cornerRadius: 14)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 28)
+            .padding(.vertical, 28)
+            .frame(maxWidth: .infinity)
+            .overlay {
+                RoundedRectangle(cornerRadius: 36, style: .continuous)
+                    .strokeBorder(ContinuumTheme.tabPurple.opacity(0.5), lineWidth: 5)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
+        }
+        .presentationDetents([.height(380)])
+        .presentationDragIndicator(.visible)
     }
 }

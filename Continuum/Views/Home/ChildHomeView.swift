@@ -84,7 +84,7 @@ struct ChildHomeView: View {
 
     private var brocaGoalProgressRow: some View {
         HStack(alignment: .center, spacing: 12) {
-            Image(BrocaBearCatalog.defaultPose)
+            Image(BrocaBearCatalog.goalProgressPose)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 80, height: 80)
@@ -100,9 +100,7 @@ struct ChildHomeView: View {
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundStyle(ContinuumTheme.subtitleGray)
 
-                ProgressView(value: goalProgress)
-                    .tint(ContinuumTheme.testMagenta)
-                    .scaleEffect(x: 1, y: 1.8, anchor: .center)
+                goalProgressBar
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -132,6 +130,23 @@ struct ChildHomeView: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(ContinuumTheme.testMagenta.opacity(0.25), lineWidth: 2)
         )
+    }
+
+    /// Thick capsule progress bar for today's practice goal.
+    private var goalProgressBar: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.white.opacity(0.65))
+
+                Capsule()
+                    .fill(ContinuumTheme.testMagenta)
+                    .frame(width: max(geometry.size.width * goalProgress, goalProgress > 0 ? 12 : 0))
+            }
+        }
+        .frame(height: 16)
+        .accessibilityLabel("Today's goal progress")
+        .accessibilityValue("\(Int(goalProgress * 100)) percent")
     }
 
     /// Shuffles Broca's quote and pose, then triggers confetti.

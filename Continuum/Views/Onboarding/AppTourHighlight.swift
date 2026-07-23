@@ -8,6 +8,7 @@ enum AppTourAnchor: Hashable {
     case homeWarmUp
     case homePracticeSounds
     case homeParentLock
+    case homeChildModeToggle
     case practicePrioritySection
     case practiceManageButton
     case practiceActivities
@@ -15,7 +16,7 @@ enum AppTourAnchor: Hashable {
     /// Accent color for the pulsing outline on this anchor.
     var pulseAccent: Color {
         switch self {
-        case .homeWarmUp, .homePracticeSounds, .practiceManageButton, .homeParentLock:
+        case .homeWarmUp, .homePracticeSounds, .practiceManageButton, .homeParentLock, .homeChildModeToggle:
             return ContinuumTheme.testMagenta
         default:
             return ContinuumTheme.tabPurple
@@ -29,7 +30,7 @@ enum AppTourAnchor: Hashable {
             return .capsule
         case .tabHome, .tabPractice, .tabDashboard:
             return .rounded(16)
-        case .practicePrioritySection, .practiceActivities, .homeParentLock:
+        case .practicePrioritySection, .practiceActivities, .homeParentLock, .homeChildModeToggle:
             return .rounded(22)
         }
     }

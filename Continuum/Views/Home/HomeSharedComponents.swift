@@ -194,15 +194,15 @@ struct HomeSuggestionCard: View {
 
             Button(action: action) {
                 Text(buttonTitle)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .font(.system(size: 21, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 13)
                     .background(accentColor)
                     .clipShape(Capsule())
                     .fullCapsuleHitTarget()
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
             .buttonStyle(.plain)
         }
         .padding(18)

@@ -109,6 +109,18 @@ struct AppTourStep: Identifiable {
             highlightAnchors: [.tabHome, .homeParentLock],
             showsActivityPreview: false,
             emphasizePriorityManage: false
+        ),
+        AppTourStep(
+            id: 8,
+            tab: .home,
+            title: "Return to parent mode",
+            message: "In child mode, your child sees a simplified home screen.",
+            actionHint: "Tap Done on Today's goal, then enter your parent PIN to switch back.",
+            systemImage: "arrow.uturn.backward.circle.fill",
+            accent: ContinuumTheme.testMagenta,
+            highlightAnchors: [.tabHome, .homeParentLock, .homeChildModeToggle],
+            showsActivityPreview: false,
+            emphasizePriorityManage: false
         )
     ]
 }
@@ -230,7 +242,7 @@ struct AppPreviewTourView: View {
             .accessibilityLabel("Skip app tour")
 
             Button(action: advanceStep) {
-                Text(isFinalStep ? (currentStep.id == 7 ? "Set PIN" : "Get Started") : "Next")
+                Text(isFinalStep ? (currentStep.id == 8 ? "Set PIN" : "Get Started") : "Next")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .frame(maxWidth: .infinity, minHeight: 46)
                     .foregroundStyle(.white)

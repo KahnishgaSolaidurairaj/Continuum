@@ -15,9 +15,10 @@ struct HomeView: View {
     @State private var showWarmUpSheet = false
     @State private var showPINSetupSheet = false
     @State private var showPINUnlockSheet = false
-    @State private var showViewPINAlert = false
-    @State private var viewedPIN = ""
+    @State private var pinDisplayContent: ParentPINDisplayContent?
+    @State private var hasParentPINConfigured = ParentModeStore.hasPINConfigured
     @State private var dailyGoalMinutes = PracticeProgressStore.dailyGoalMinutes
+    @State private var parentLockCardHeight: CGFloat = 0
 
     private var todayPracticeMinutes: Int {
         let seconds = ActivityEngagementAnalytics.engagements(on: .now, records: engagements)
@@ -39,7 +40,7 @@ struct HomeView: View {
                     heroHeader
                     mainPanel
                         .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
-                        .padding(.top, -20)
+                        .padding(.top, -22)
                 }
                 .padding(.bottom, ContinuumTabBar.contentBottomPadding)
             }
@@ -50,8 +51,14 @@ struct HomeView: View {
         .sheet(isPresented: $showWarmUpSheet) {
             WarmUpSheet()
         }
-        .sheet(isPresented: $showPINSetupSheet) {
+        .sheet(isPresented: $showPINSetupSheet, onDismiss: refreshParentPINState) {
             ParentPINSetupSheet()
+        }
+        .sheet(item: $pinDisplayContent) { content in
+            ParentPINDisplaySheet(
+                pinText: content.pinText,
+                isUnavailableMessage: content.isUnavailableMessage
+            )
         }
         .fullScreenCover(isPresented: $showPINUnlockSheet) {
             ParentPINUnlockSheet {
@@ -64,13 +71,14 @@ struct HomeView: View {
             }
         }
         .onAppear {
+            refreshParentPINState()
             presentParentPINUpdateIfNeeded()
         }
-        .alert("Your Parent PIN", isPresented: $showViewPINAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(viewedPIN)
-        }
+    }
+
+    /// Syncs local PIN state after setup or when returning to the parent home.
+    private func refreshParentPINState() {
+        hasParentPINConfigured = ParentModeStore.hasPINConfigured
     }
 
     /// Opens PIN setup when the parent returned using a temporary recovery code.
@@ -85,42 +93,57 @@ struct HomeView: View {
             HomeHillsBackground()
 
             GeometryReader { geometry in
-                let mascotSize = min(geometry.size.width * 0.38, 196)
+                let mascotSize = min(geometry.size.width * 0.57, 294)
+                let mascotLeftOffset = mascotSize * 0.12
+                let taglineLineHeight = UIFont.systemFont(ofSize: 26, weight: .medium).lineHeight
 
-                HStack(alignment: .bottom, spacing: 6) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(parentMode.isChildMode ? "Let's practice!" : "Welcome to")
-                            .font(.system(size: 36, weight: .semibold, design: .rounded))
-                            .foregroundStyle(ContinuumTheme.pencilLead)
+                ZStack(alignment: .bottom) {
+                    HStack(alignment: .bottom, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(parentMode.isChildMode ? "Let's practice!" : "Welcome to")
+                                .font(.system(size: 36, weight: .semibold, design: .rounded))
+                                .foregroundStyle(ContinuumTheme.pencilLead)
 
-                        Text("Continuum")
-                            .font(.system(size: 68, weight: .bold, design: .rounded))
-                            .foregroundStyle(ContinuumTheme.pencilLead)
-                            .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
-                            .minimumScaleFactor(0.8)
-                            .lineLimit(1)
+                            Text("Continuum")
+                                .font(.system(size: 68, weight: .bold, design: .rounded))
+                                .foregroundStyle(ContinuumTheme.pencilLead)
+                                .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
+                                .minimumScaleFactor(0.8)
+                                .lineLimit(1)
 
-                        Text(parentMode.isChildMode ? "Your practice space" : "Continue therapy at home")
-                            .font(.system(size: 26, weight: .medium, design: .rounded))
-                            .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.bottom, 20)
+                            Text(parentMode.isChildMode ? "Your practice space" : "Continue therapy at home")
+                                .font(.system(size: 26, weight: .medium, design: .rounded))
+                                .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Color.clear
+                            .frame(width: mascotSize, height: mascotSize)
+                            .accessibilityHidden(true)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
+                    .padding(.bottom, 26)
+                    .offset(y: -taglineLineHeight)
 
-                    Image(BrocaBearCatalog.defaultPose)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: mascotSize, height: mascotSize)
-                        .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
-                        .accessibilityLabel("Broca the Bear")
+                    HStack {
+                        Spacer()
+
+                        Image(BrocaBearCatalog.headerPose)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: mascotSize, height: mascotSize)
+                            .clipped()
+                            .offset(x: -mascotLeftOffset * 1.5)
+                            .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
+                            .accessibilityLabel("Broca the Bear")
+                    }
+                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
                 }
-                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
-                .padding(.bottom, 30)
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
             }
         }
-        .frame(height: 270)
+        .frame(height: 310)
         .frame(maxWidth: .infinity)
     }
 
@@ -237,8 +260,20 @@ struct HomeView: View {
         HStack(alignment: .top, spacing: 12) {
             parentLockCard
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .background {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                parentLockCardHeight = geometry.size.height
+                            }
+                            .onChange(of: geometry.size.height) { _, newHeight in
+                                parentLockCardHeight = newHeight
+                            }
+                    }
+                }
 
             parentModeToggleCard
+                .frame(width: 118, height: max(parentLockCardHeight, 1))
         }
     }
 
@@ -250,36 +285,20 @@ struct HomeView: View {
                 .foregroundStyle(ContinuumTheme.testMagenta)
 
             Text(
-                ParentModeStore.hasPINConfigured
+                hasParentPINConfigured
                     ? "A 4-digit PIN protects parent settings. Switch to child mode when your child is ready to practice."
                     : "Add a 4-digit PIN before switching to child mode."
             )
             .font(.system(size: 20, weight: .medium, design: .rounded))
-            .foregroundStyle(ContinuumTheme.subtitleGray)
+            .foregroundStyle(ContinuumTheme.pencilLead)
             .fixedSize(horizontal: false, vertical: true)
 
-            if ParentModeStore.hasPINConfigured {
-                Button("View PIN") {
-                    presentStoredPIN()
-                }
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(ContinuumTheme.testMagenta)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .fullRoundedHitTarget(cornerRadius: 14)
-                .buttonStyle(.plain)
+            if hasParentPINConfigured {
+                parentPINButton(title: "View PIN", action: presentStoredPIN)
             } else {
-                Button("Set PIN") {
+                parentPINButton(title: "Set PIN") {
                     showPINSetupSheet = true
                 }
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(ContinuumTheme.testMagenta)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .fullRoundedHitTarget(cornerRadius: 14)
-                .buttonStyle(.plain)
             }
 
             /*
@@ -304,15 +323,31 @@ struct HomeView: View {
                 isChildMode: parentMode.isChildMode,
                 onSelectParent: handleSelectParentMode,
                 onSelectChild: { parentMode.switchToChildMode() },
-                usesVerticalLayout: true
+                usesVerticalLayout: true,
+                fillsAvailableHeight: true
             )
         }
         .padding(.horizontal, 10)
-        .padding(.vertical, 16)
-        .frame(width: 118)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(parentSettingsCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(parentSettingsCardBorder)
+        .appTourHighlight(.homeChildModeToggle)
+    }
+
+    /// Builds a full-width parent PIN action button with a large tap target.
+    private func parentPINButton(title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(ContinuumTheme.testMagenta)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .fullRoundedHitTarget(cornerRadius: 14)
+        }
+        .buttonStyle(.plain)
     }
 
     private var parentSettingsCardBackground: some View {
@@ -328,14 +363,18 @@ struct HomeView: View {
             .stroke(ContinuumTheme.testMagenta.opacity(0.25), lineWidth: 2)
     }
 
-    /// Shows the saved parent PIN in a popup alert.
+    /// Shows the saved parent PIN in the themed in-app sheet.
     private func presentStoredPIN() {
-        if let pin = ParentModeStore.storedPIN() {
-            viewedPIN = pin
-            showViewPINAlert = true
+        if let pin = ParentModeStore.storedPIN(), !pin.isEmpty {
+            pinDisplayContent = ParentPINDisplayContent(
+                pinText: pin,
+                isUnavailableMessage: false
+            )
         } else {
-            viewedPIN = "PIN unavailable. Set a new PIN to store it on this device."
-            showViewPINAlert = true
+            pinDisplayContent = ParentPINDisplayContent(
+                pinText: "PIN unavailable. Set a new PIN to store it on this device.",
+                isUnavailableMessage: true
+            )
         }
     }
 

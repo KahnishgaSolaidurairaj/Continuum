@@ -11,6 +11,8 @@ enum BrocaBearCatalog {
     ]
 
     static let defaultPose = "BrocaBearWaving"
+    static let headerPose = "BrocaBear"
+    static let goalProgressPose = "BrocaBearThinking"
 
     /// Returns a random pose image name, optionally avoiding the current pose.
     /// - Parameter current: The pose currently on screen.

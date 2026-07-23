@@ -59,7 +59,7 @@ enum ContinuumTheme {
 }
 
 extension View {
-    /// Applies the darker purple capsule styling used for home practice buttons.
+    /// Applies the theme purple capsule styling used for home practice buttons.
     func homePracticeCapsuleStyle() -> some View {
         font(.system(size: 24, weight: .bold, design: .rounded))
             .foregroundStyle(.white)
@@ -68,13 +68,13 @@ extension View {
             .frame(maxWidth: .infinity, minHeight: 64)
             .background(
                 LinearGradient(
-                    colors: [ContinuumTheme.homePracticePurple, ContinuumTheme.homePracticePurpleDeep],
+                    colors: [ContinuumTheme.tabPurple, Color(red: 0.68, green: 0.52, blue: 0.92)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
             .clipShape(Capsule())
-            .shadow(color: ContinuumTheme.homePracticePurpleDeep.opacity(0.35), radius: 8, y: 4)
+            .shadow(color: ContinuumTheme.tabPurple.opacity(0.28), radius: 8, y: 4)
             .fullCapsuleHitTarget()
     }
 
