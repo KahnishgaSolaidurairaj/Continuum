@@ -4,6 +4,8 @@ import SwiftUI
 struct TryActivityView: View {
     let target: PracticeTarget
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @State private var playbackToken = 0
     @State private var playerReady = false
     @State private var segmentFinished = false
@@ -64,7 +66,7 @@ struct TryActivityView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 360)
+            .frame(minHeight: layout.scaled(360, phone: 240))
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         } else {
             missingClipCard
@@ -92,7 +94,7 @@ struct TryActivityView: View {
             playbackToken += 1
         } label: {
             Image(systemName: "play.circle.fill")
-                .font(.system(size: 96))
+                .font(.system(size: layout.scaled(96, phone: 64)))
                 .foregroundStyle(.white)
                 .shadow(color: ContinuumTheme.stormBlueDeep.opacity(0.45), radius: 8)
         }
@@ -103,7 +105,7 @@ struct TryActivityView: View {
     private var playbackErrorOverlay: some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 52))
+                .font(.system(size: layout.scaled(52, phone: 40)))
                 .foregroundStyle(ContinuumTheme.stormBlueDeep)
 
             Text("Couldn't play inside the app")
@@ -132,7 +134,7 @@ struct TryActivityView: View {
     private var missingClipCard: some View {
         VStack(spacing: 12) {
             Image(systemName: "play.rectangle")
-                .font(.system(size: 44))
+                .font(.system(size: layout.scaled(44, phone: 36)))
                 .foregroundStyle(ContinuumTheme.stormBlueDeep)
 
             Text("Video clip coming soon")

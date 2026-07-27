@@ -9,6 +9,8 @@ enum AppTab: Hashable {
 
 /// Root tab shell matching the wireframe home / practice / dashboard flow.
 struct MainTabView: View {
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @State private var selectedTab: AppTab = .home
     @State private var practiceRootID = UUID()
     @State private var shouldPulsePrioritySection = false
@@ -63,7 +65,7 @@ struct MainTabView: View {
                     onTabSelected: selectTab,
                     showsDashboardTab: !parentMode.isChildMode
                 )
-                    .padding(.horizontal, 28)
+                    .padding(.horizontal, layout.scaled(28, phone: 16))
                     .padding(.bottom, 10)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
@@ -166,11 +168,20 @@ struct ContinuumTabBar: View {
     let onTabSelected: (AppTab) -> Void
     var showsDashboardTab = true
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     /// Approximate layout height used to keep tab content from crowding the bar.
     static let layoutHeight: CGFloat = 76
+    static let phoneLayoutHeight: CGFloat = 68
 
     /// Space scroll content should leave above the floating tab bar.
     static let contentBottomPadding: CGFloat = layoutHeight + 18
+
+    /// Returns bottom padding for scroll content based on the active device layout.
+    static func contentBottomPadding(for layout: ContinuumDeviceLayout) -> CGFloat {
+        let height = layout.isPhone ? phoneLayoutHeight : layoutHeight
+        return height + (layout.isPhone ? 14 : 18)
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -195,8 +206,8 @@ struct ContinuumTabBar: View {
                 )
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 12)
+        .padding(.horizontal, layout.scaled(18, phone: 14))
+        .padding(.vertical, layout.scaled(12, phone: 10))
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(
@@ -224,11 +235,11 @@ struct ContinuumTabBar: View {
         return Button {
             onTabSelected(tab)
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: layout.scaled(6, phone: 4)) {
                 Image(systemName: isSelected ? selectedSystemImage : systemImage)
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(.system(size: layout.scaled(24, phone: 20), weight: .semibold))
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.system(size: layout.scaled(15, phone: 13), weight: .semibold, design: .rounded))
             }
             .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.62))
             .padding(.vertical, 6)

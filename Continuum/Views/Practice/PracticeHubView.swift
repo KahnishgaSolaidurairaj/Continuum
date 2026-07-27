@@ -87,7 +87,7 @@ struct PhonemeSelectionView: View {
     var appTourStepIndex: Int? = nil
     var isChildMode = false
 
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.continuumDeviceLayout) private var layout
 
     @State private var expandedSections: Set<String> = []
     @State private var prioritySoundIDs: [String] = PracticePriorityStore.prioritySoundIDs
@@ -100,7 +100,7 @@ struct PhonemeSelectionView: View {
     @State private var childMotivationMessage = BrocaMotivation.randomMessage()
 
     private var columnCount: Int {
-        horizontalSizeClass == .compact ? 2 : 4
+        layout.isPhone ? 2 : 4
     }
 
     private var priorityColumnCount: Int {
@@ -116,9 +116,10 @@ struct PhonemeSelectionView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
                     Text(isChildMode ? "Your focus sounds" : "Which sound?")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .font(layout.font(36, phoneSize: 28, weight: .bold))
                         .foregroundStyle(ContinuumTheme.pencilLead)
                         .frame(maxWidth: .infinity)
+                        .phoneAdaptiveTypography(lineLimit: 2)
 
                     prioritySoundsSection
                         .id(Self.prioritySectionScrollID)
@@ -133,9 +134,9 @@ struct PhonemeSelectionView: View {
                         collapsibleSoundSection(title: "Vowel Teams", sounds: PracticeSoundCatalog.vowelTeams)
                     }
                 }
-                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
-                .padding(.top, 20)
-                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
+                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
+                .padding(.top, layout.scaled(20, phone: 16))
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding(for: layout))
             }
             .scrollIndicators(.visible)
             .onAppear {
@@ -171,51 +172,24 @@ struct PhonemeSelectionView: View {
     /// Priority sounds pinned to the top for focused practice.
     private var prioritySoundsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 10) {
-                Label("Priority Sounds", systemImage: "folder.fill")
-                    .font(.system(size: isChildMode ? 32 : 26, weight: .bold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.tabPurple)
-
-                Spacer()
-
-                if !isChildMode {
-                    Button {
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
-                            isManagingPriority.toggle()
-                        }
-                    } label: {
-                        Text(isManagingPriority ? "Done" : "Manage")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 18)
-                            .padding(.vertical, 10)
-                            .background(ContinuumTheme.tabPurple)
-                            .clipShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
-                    .appTourHighlight(.practiceManageButton)
-
-                    if isManagingPriority {
-                        Button {
-                            showPriorityPicker = true
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 14, weight: .bold))
-                                Text("Add")
-                            }
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
+            Group {
+                if layout.isPhone && !isChildMode {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("Priority Sounds", systemImage: "folder.fill")
+                            .font(layout.font(isChildMode ? 32 : 26, phoneSize: isChildMode ? 26 : 22, weight: .bold))
                             .foregroundStyle(ContinuumTheme.tabPurple)
-                            .padding(.horizontal, 18)
-                            .padding(.vertical, 10)
-                            .background(Color.white.opacity(0.95))
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule()
-                                    .stroke(ContinuumTheme.tabPurple.opacity(0.35), lineWidth: 2)
-                            )
-                        }
-                        .buttonStyle(.plain)
+
+                        priorityManagementButtons
+                    }
+                } else {
+                    HStack(spacing: 10) {
+                        Label("Priority Sounds", systemImage: "folder.fill")
+                            .font(.system(size: isChildMode ? 32 : 26, weight: .bold, design: .rounded))
+                            .foregroundStyle(ContinuumTheme.tabPurple)
+
+                        Spacer()
+
+                        priorityManagementButtons
                     }
                 }
             }
@@ -281,7 +255,7 @@ struct PhonemeSelectionView: View {
                 )
             }
         }
-        .padding(isChildMode ? 24 : 18)
+        .padding(layout.scaled(isChildMode ? 24 : 18, phone: isChildMode ? 18 : 14))
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(
@@ -309,25 +283,91 @@ struct PhonemeSelectionView: View {
         .appTourHighlight(.practicePrioritySection)
     }
 
+    @ViewBuilder
+    private var priorityManagementButtons: some View {
+        if !isChildMode {
+            if layout.isPhone {
+                HStack(spacing: 10) {
+                    managePriorityButton
+                    if isManagingPriority {
+                        addPriorityButton
+                    }
+                }
+            } else {
+                Spacer()
+                managePriorityButton
+                if isManagingPriority {
+                    addPriorityButton
+                }
+            }
+        } else if !layout.isPhone {
+            Spacer()
+        }
+    }
+
+    private var managePriorityButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                isManagingPriority.toggle()
+            }
+        } label: {
+            Text(isManagingPriority ? "Done" : "Manage")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .padding(.horizontal, layout.scaled(18, phone: 14))
+                .padding(.vertical, layout.scaled(10, phone: 8))
+                .background(ContinuumTheme.tabPurple)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .appTourHighlight(.practiceManageButton)
+    }
+
+    private var addPriorityButton: some View {
+        Button {
+            showPriorityPicker = true
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "plus")
+                    .font(.system(size: 14, weight: .bold))
+                Text("Add")
+            }
+            .font(.system(size: 16, weight: .bold, design: .rounded))
+            .foregroundStyle(ContinuumTheme.tabPurple)
+            .padding(.horizontal, layout.scaled(18, phone: 14))
+            .padding(.vertical, layout.scaled(10, phone: 8))
+            .background(Color.white.opacity(0.95))
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(ContinuumTheme.tabPurple.opacity(0.35), lineWidth: 2)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
     /// Motivational Broca panel shown below priority sounds in child mode.
     private var childPracticeBrocaSection: some View {
         VStack(spacing: 18) {
             Image(childBrocaPoseName)
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: 280, maxHeight: 280)
+                .frame(
+                    maxWidth: layout.scaled(280, phone: 180),
+                    maxHeight: layout.scaled(280, phone: 180)
+                )
                 .shadow(color: .black.opacity(0.12), radius: 12, y: 6)
                 .accessibilityLabel("Broca the Bear")
 
             Text("“\(childMotivationMessage)”")
-                .font(.system(size: 26, weight: .semibold, design: .rounded))
+                .font(layout.font(26, phoneSize: 20, weight: .semibold))
                 .foregroundStyle(ContinuumTheme.pencilLead)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 8)
 
             Text("Tap a focus sound above to start practicing!")
-                .font(.system(size: 20, weight: .medium, design: .rounded))
+                .font(layout.font(20, phoneSize: 17, weight: .medium))
                 .foregroundStyle(ContinuumTheme.subtitleGray)
                 .multilineTextAlignment(.center)
         }
@@ -429,7 +469,7 @@ struct PhonemeSelectionView: View {
                         .foregroundStyle(ContinuumTheme.tabPurple)
 
                     Text(title)
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(layout.font(26, phoneSize: 22, weight: .bold))
                         .foregroundStyle(ContinuumTheme.tabPurple)
 
                     Text("\(sounds.count)")
@@ -519,12 +559,18 @@ private struct PracticeSoundTile: View {
     let onSelect: () -> Void
     let onRemove: () -> Void
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Button(action: onSelect) {
                 VStack(spacing: usesLargeStyle ? 14 : 10) {
                     Text(sound.displayName)
-                        .font(.system(size: usesLargeStyle ? 28 : 20, weight: .bold, design: .rounded))
+                        .font(.system(
+                            size: layout.scaled(usesLargeStyle ? 28 : 20, phone: usesLargeStyle ? 24 : 18),
+                            weight: .bold,
+                            design: .rounded
+                        ))
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
@@ -532,14 +578,21 @@ private struct PracticeSoundTile: View {
                     HighlightedWordText(
                         word: sound.level1Example.word,
                         highlights: sound.level1Example.highlights,
-                        font: .system(size: usesLargeStyle ? 30 : 22, weight: .semibold, design: .rounded),
+                        font: .system(
+                            size: layout.scaled(usesLargeStyle ? 30 : 22, phone: usesLargeStyle ? 24 : 18),
+                            weight: .semibold,
+                            design: .rounded
+                        ),
                         baseColor: ContinuumTheme.pencilLead,
                         highlightColor: ContinuumTheme.tabPurple
                     )
                 }
-                .padding(.horizontal, usesLargeStyle ? 16 : 10)
-                .padding(.vertical, usesLargeStyle ? 22 : 16)
-                .frame(maxWidth: .infinity, minHeight: usesLargeStyle ? 148 : 104)
+                .padding(.horizontal, layout.scaled(usesLargeStyle ? 16 : 10, phone: usesLargeStyle ? 12 : 8))
+                .padding(.vertical, layout.scaled(usesLargeStyle ? 22 : 16, phone: usesLargeStyle ? 18 : 12))
+                .frame(
+                    maxWidth: .infinity,
+                    minHeight: layout.scaled(usesLargeStyle ? 148 : 104, phone: usesLargeStyle ? 120 : 88)
+                )
                 .background(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .fill(.white)
@@ -705,34 +758,34 @@ struct ActivityCarouselView: View {
     let onBack: () -> Void
     var appTourStepIndex: Int? = nil
 
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.continuumDeviceLayout) private var layout
 
     private var usesColumnLayout: Bool {
-        horizontalSizeClass == .compact
+        layout.isPhone
     }
 
     private var activityCardsSpacing: CGFloat {
-        usesColumnLayout ? 24 : 16
+        layout.scaled(16, phone: 24)
     }
 
     private var pageHorizontalPadding: CGFloat {
-        ContinuumTheme.pageHorizontalPadding
+        ContinuumTheme.pageHorizontalPadding(for: layout)
     }
 
     private var activityIconContainerSize: CGFloat {
-        usesColumnLayout ? 92 : 72
+        layout.scaled(72, phone: 80)
     }
 
     private var activityIconSize: CGFloat {
-        usesColumnLayout ? 44 : 34
+        layout.scaled(34, phone: 38)
     }
 
     private var activityCardPadding: CGFloat {
-        usesColumnLayout ? 28 : 22
+        layout.scaled(22, phone: 18)
     }
 
     private var activityCardInnerSpacing: CGFloat {
-        usesColumnLayout ? 22 : 18
+        layout.scaled(18, phone: 16)
     }
 
     var body: some View {
@@ -768,7 +821,7 @@ struct ActivityCarouselView: View {
                 }
                 .padding(.horizontal, pageHorizontalPadding)
                 .padding(.top, usesColumnLayout ? 16 : 12)
-                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding(for: layout))
             }
             .onAppear {
                 scrollToActivitiesForTour(using: scrollProxy)
@@ -809,15 +862,16 @@ struct ActivityCarouselView: View {
             }
 
             Text("Practice \(target.displayLabel)")
-                .font(.system(size: usesColumnLayout ? 32 : 38, weight: .bold, design: .rounded))
+                .font(layout.font(usesColumnLayout ? 32 : 38, phoneSize: 26, weight: .bold))
                 .foregroundStyle(ContinuumTheme.pencilLead)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
+                .phoneAdaptiveTypography(lineLimit: 2)
 
             phonemePreviewCard
 
             Text("Choose an activity")
-                .font(.system(size: usesColumnLayout ? 26 : 30, weight: .bold, design: .rounded))
+                .font(layout.font(usesColumnLayout ? 26 : 30, phoneSize: 22, weight: .bold))
                 .foregroundStyle(ContinuumTheme.pencilLead)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
@@ -891,10 +945,10 @@ struct ActivityCarouselView: View {
     private var phonemePreviewCard: some View {
         Button(action: onBack) {
             Text(target.traceCharacter.uppercased())
-                .font(.system(size: usesColumnLayout ? 56 : 72, weight: .bold, design: .rounded))
+                .font(layout.font(usesColumnLayout ? 56 : 72, phoneSize: 48, weight: .bold))
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
-                .frame(height: usesColumnLayout ? 120 : 148)
+                .frame(height: layout.scaled(usesColumnLayout ? 120 : 148, phone: 96))
                 .background(
                     RoundedRectangle(cornerRadius: 28, style: .continuous)
                         .fill(.white)
@@ -967,6 +1021,7 @@ struct ActivityDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.continuumDeviceLayout) private var layout
     @Environment(TabBarVisibility.self) private var tabBarVisibility
 
     @State private var tracker = ActivitySessionTracker()
@@ -991,7 +1046,7 @@ struct ActivityDetailView: View {
                 Button("I'm Done") {
                     showMoodSheet = true
                 }
-                .font(ContinuumTheme.kidButtonFont)
+                .font(ContinuumTheme.kidButtonFont(for: layout))
                 .foregroundStyle(ContinuumTheme.tabPurple)
             }
         }

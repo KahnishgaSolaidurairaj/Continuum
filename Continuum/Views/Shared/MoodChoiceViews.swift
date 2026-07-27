@@ -25,6 +25,7 @@ struct MoodChoice: Identifiable {
 /// Sheet shown when a child finishes a practice activity.
 struct ActivityMoodSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.continuumDeviceLayout) private var layout
 
     let onComplete: (String?) -> Void
 
@@ -35,7 +36,7 @@ struct ActivityMoodSheet: View {
 
             VStack(spacing: 14) {
                 Text("How did you feel?")
-                    .font(ContinuumTheme.kidSectionHeaderFont)
+                    .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
                     .foregroundStyle(ContinuumTheme.tabPurple)
                     .frame(maxWidth: .infinity)
                     .padding(.top, 8)
@@ -56,9 +57,9 @@ struct ActivityMoodSheet: View {
                     dismiss()
                 } label: {
                     Text("Skip")
-                        .font(ContinuumTheme.kidButtonFont)
+                        .font(ContinuumTheme.kidButtonFont(for: layout))
                         .foregroundStyle(ContinuumTheme.stormBlue)
-                        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                        .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight(for: layout))
                         .background(.white.opacity(0.9))
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
@@ -75,10 +76,10 @@ struct ActivityMoodSheet: View {
     private func moodRow(label: String, emoji: String, isSelected: Bool) -> some View {
         HStack(spacing: 16) {
             Text(emoji)
-                .font(.system(size: 40))
+                .font(.system(size: layout.scaled(40, phone: 32)))
 
             Text(label)
-                .font(ContinuumTheme.kidBodyFont.weight(.semibold))
+                .font(ContinuumTheme.kidBodyFont(for: layout).weight(.semibold))
                 .foregroundStyle(.primary)
 
             Spacer()

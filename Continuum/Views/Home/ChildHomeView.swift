@@ -6,6 +6,8 @@ struct ChildHomeView: View {
     let onOpenPracticeWithPriorityFocus: () -> Void
     let onDone: () -> Void
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse)
     private var engagements: [ActivityEngagementRecord]
 
@@ -46,9 +48,18 @@ struct ChildHomeView: View {
     }
 
     private var primaryActionRow: some View {
-        HStack(spacing: 14) {
-            warmUpButton
-            practiceFocusButton
+        Group {
+            if layout.isPhone {
+                VStack(spacing: 14) {
+                    warmUpButton
+                    practiceFocusButton
+                }
+            } else {
+                HStack(spacing: 14) {
+                    warmUpButton
+                    practiceFocusButton
+                }
+            }
         }
     }
 
@@ -57,9 +68,9 @@ struct ChildHomeView: View {
             showWarmUpSheet = true
         } label: {
             Text("Warm up")
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .font(layout.font(24, phoneSize: 20, weight: .bold))
                 .foregroundStyle(ContinuumTheme.homeMintText)
-                .frame(maxWidth: .infinity, minHeight: 64)
+                .frame(maxWidth: .infinity, minHeight: layout.scaled(64, phone: 52))
                 .background(
                     LinearGradient(
                         colors: [Color(red: 0.78, green: 0.96, blue: 0.82), ContinuumTheme.homeMint],
@@ -83,40 +94,14 @@ struct ChildHomeView: View {
     }
 
     private var brocaGoalProgressRow: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Image(BrocaBearCatalog.goalProgressPose)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 80, height: 80)
-                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
-                .accessibilityLabel("Broca the Bear")
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Today's goal")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.pencilLead)
-
-                Text("\(todayPracticeMinutes) of \(dailyGoalMinutes) minutes")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.subtitleGray)
-
-                goalProgressBar
+        Group {
+            if layout.isPhone {
+                phoneGoalProgressRow
+            } else {
+                padGoalProgressRow
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Button(action: onDone) {
-                Text("Done")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(minWidth: 96, minHeight: 52)
-                    .background(ContinuumTheme.testMagenta, in: Capsule())
-            }
-            .buttonStyle(.plain)
-            .contentShape(Capsule())
-            .accessibilityLabel("Done practicing")
-            .accessibilityHint("Enter parent PIN to return to parent mode")
         }
-        .padding(18)
+        .padding(layout.scaled(18, phone: 14))
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -130,6 +115,72 @@ struct ChildHomeView: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(ContinuumTheme.testMagenta.opacity(0.25), lineWidth: 2)
         )
+    }
+
+    private var padGoalProgressRow: some View {
+        HStack(alignment: .center, spacing: 12) {
+            goalBrocaImage
+
+            VStack(alignment: .leading, spacing: 10) {
+                goalTextContent
+                goalProgressBar
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            doneButton
+        }
+    }
+
+    private var phoneGoalProgressRow: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 12) {
+                goalBrocaImage
+                goalTextContent
+            }
+
+            goalProgressBar
+
+            doneButton
+                .frame(maxWidth: .infinity)
+        }
+    }
+
+    private var goalBrocaImage: some View {
+        Image(BrocaBearCatalog.goalProgressPose)
+            .resizable()
+            .scaledToFit()
+            .frame(width: layout.scaled(80, phone: 64), height: layout.scaled(80, phone: 64))
+            .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+            .accessibilityLabel("Broca the Bear")
+    }
+
+    private var goalTextContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Today's goal")
+                .font(layout.font(22, phoneSize: 18, weight: .bold))
+                .foregroundStyle(ContinuumTheme.pencilLead)
+
+            Text("\(todayPracticeMinutes) of \(dailyGoalMinutes) minutes")
+                .font(layout.font(18, phoneSize: 15, weight: .semibold))
+                .foregroundStyle(ContinuumTheme.subtitleGray)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var doneButton: some View {
+        Button(action: onDone) {
+            Text("Done")
+                .font(layout.font(18, phoneSize: 16, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(minWidth: layout.isPhone ? nil : 96, minHeight: layout.scaled(52, phone: 48))
+                .frame(maxWidth: layout.isPhone ? .infinity : nil)
+                .padding(.horizontal, layout.isPhone ? 16 : 0)
+                .background(ContinuumTheme.testMagenta, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .contentShape(Capsule())
+        .accessibilityLabel("Done practicing")
+        .accessibilityHint("Enter parent PIN to return to parent mode")
     }
 
     /// Thick capsule progress bar for today's practice goal.

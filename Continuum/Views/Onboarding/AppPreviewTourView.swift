@@ -127,6 +127,8 @@ struct AppTourStep: Identifiable {
 
 /// First-launch overlay that walks through Continuum's main tabs and actions.
 struct AppPreviewTourView: View {
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @Binding var stepIndex: Int
     let highlightFrames: [AppTourAnchor: CGRect]
     let onSelectTab: (AppTab) -> Void
@@ -142,9 +144,10 @@ struct AppPreviewTourView: View {
     }
 
     private var tourCardBottomPadding: CGFloat {
-        currentStep.showsActivityPreview
-            ? ContinuumTabBar.layoutHeight + 96
-            : ContinuumTabBar.layoutHeight + 12
+        let tabHeight = layout.isPhone ? ContinuumTabBar.phoneLayoutHeight : ContinuumTabBar.layoutHeight
+        return currentStep.showsActivityPreview
+            ? tabHeight + (layout.isPhone ? 84 : 96)
+            : tabHeight + (layout.isPhone ? 8 : 12)
     }
 
     var body: some View {
@@ -173,18 +176,18 @@ struct AppPreviewTourView: View {
     private var tourCard: some View {
         VStack(spacing: 10) {
             Text(currentStep.title)
-                .font(ContinuumTheme.kidSubheadFont.weight(.bold))
+                .font(ContinuumTheme.kidSubheadFont(for: layout).weight(.bold))
                 .foregroundStyle(ContinuumTheme.testMagenta)
                 .multilineTextAlignment(.center)
 
             Text(currentStep.message)
-                .font(ContinuumTheme.kidCaptionFont)
+                .font(ContinuumTheme.kidCaptionFont(for: layout))
                 .foregroundStyle(ContinuumTheme.pencilLead)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(currentStep.actionHint)
-                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .font(layout.font(16, phoneSize: 14, weight: .medium))
                 .foregroundStyle(ContinuumTheme.subtitleGray)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -194,9 +197,9 @@ struct AppPreviewTourView: View {
 
             tourActionButtons
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .frame(maxWidth: 420)
+        .padding(.horizontal, layout.scaled(16, phone: 14))
+        .padding(.vertical, layout.scaled(14, phone: 12))
+        .frame(maxWidth: layout.isPhone ? .infinity : 420)
         .background(
             LinearGradient(
                 colors: [ContinuumTheme.homePink, ContinuumTheme.testPinkSoft],
@@ -227,8 +230,8 @@ struct AppPreviewTourView: View {
         HStack(spacing: 10) {
             Button(action: onSkip) {
                 Text("Skip")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .frame(maxWidth: .infinity, minHeight: 46)
+                    .font(layout.font(18, phoneSize: 16, weight: .bold))
+                    .frame(maxWidth: .infinity, minHeight: layout.scaled(46, phone: 42))
                     .foregroundStyle(ContinuumTheme.testMagenta)
                     .background(Color.white.opacity(0.92))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -243,8 +246,8 @@ struct AppPreviewTourView: View {
 
             Button(action: advanceStep) {
                 Text(isFinalStep ? (currentStep.id == 8 ? "Set PIN" : "Get Started") : "Next")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .frame(maxWidth: .infinity, minHeight: 46)
+                    .font(layout.font(18, phoneSize: 16, weight: .bold))
+                    .frame(maxWidth: .infinity, minHeight: layout.scaled(46, phone: 42))
                     .foregroundStyle(.white)
                     .background(ContinuumTheme.testMagenta)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))

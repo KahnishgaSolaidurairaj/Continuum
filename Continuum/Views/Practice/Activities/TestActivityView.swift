@@ -6,6 +6,7 @@ struct TestActivityView: View {
     let target: PracticeTarget
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.continuumDeviceLayout) private var layout
     @State private var viewModel = WordTestViewModel()
 
     private var testCardBorder: Color {
@@ -94,14 +95,14 @@ struct TestActivityView: View {
             HighlightedWordText(
                 word: viewModel.currentWord,
                 highlights: FlashWordBank.highlights(for: target, word: viewModel.currentWord),
-                font: .system(size: 44, weight: .bold, design: .rounded),
+                font: .system(size: layout.scaled(44, phone: 32), weight: .bold, design: .rounded),
                 baseColor: ContinuumTheme.pencilLead,
                 highlightColor: ContinuumTheme.testMagenta
             )
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
         }
-        .padding(PracticeActivityChrome.cardInnerPadding)
+        .padding(PracticeActivityChrome.cardInnerPadding(for: layout))
         .frame(maxWidth: .infinity)
         .practiceActivityCardStyle(borderColor: testCardBorder)
     }
@@ -112,7 +113,7 @@ struct TestActivityView: View {
             .foregroundStyle(ContinuumTheme.pencilLead)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
-            .padding(PracticeActivityChrome.cardInnerPadding)
+            .padding(PracticeActivityChrome.cardInnerPadding(for: layout))
             .practiceActivityCardStyle(borderColor: testCardBorder)
     }
 
@@ -131,7 +132,7 @@ struct TestActivityView: View {
                 .foregroundStyle(ContinuumTheme.subtitleGray)
                 .multilineTextAlignment(.center)
         }
-        .padding(PracticeActivityChrome.cardInnerPadding)
+        .padding(PracticeActivityChrome.cardInnerPadding(for: layout))
         .frame(maxWidth: .infinity)
         .practiceActivityCardStyle(borderColor: testCardBorder)
     }
@@ -157,7 +158,7 @@ struct TestActivityView: View {
             ProgressView(value: viewModel.recordingProgress)
                 .tint(ContinuumTheme.testMagenta)
         }
-        .padding(PracticeActivityChrome.cardInnerPadding)
+        .padding(PracticeActivityChrome.cardInnerPadding(for: layout))
         .frame(maxWidth: .infinity)
         .practiceActivityCardStyle(borderColor: testCardBorder)
     }
@@ -170,7 +171,7 @@ struct TestActivityView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Text("\(score.correctness)%")
-                .font(.system(size: 56, weight: .bold, design: .rounded))
+                .font(.system(size: layout.scaled(56, phone: 40), weight: .bold, design: .rounded))
                 .foregroundStyle(ContinuumTheme.pencilLead)
                 .frame(maxWidth: .infinity, alignment: .center)
 
@@ -179,7 +180,7 @@ struct TestActivityView: View {
                 .foregroundStyle(ContinuumTheme.subtitleGray)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(PracticeActivityChrome.cardInnerPadding)
+        .padding(PracticeActivityChrome.cardInnerPadding(for: layout))
         .frame(maxWidth: .infinity)
         .practiceActivityCardStyle(borderColor: testCardBorder)
     }

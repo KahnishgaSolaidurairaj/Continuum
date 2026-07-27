@@ -3,6 +3,8 @@ import SwiftData
 
 /// Parent/clinician dashboard with calendar heatmap and practice analytics.
 struct DashboardView: View {
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @Query(sort: \PracticeSessionRecord.timestamp, order: .reverse) private var sessions: [PracticeSessionRecord]
     @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse) private var engagements: [ActivityEngagementRecord]
 
@@ -39,11 +41,12 @@ struct DashboardView: View {
                     DashboardScrollOffsetReader()
 
                     Text("Progress Report")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .font(layout.font(40, phoneSize: 30, weight: .bold))
                         .foregroundStyle(ContinuumTheme.pencilLead)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 12)
                         .padding(.bottom, 4)
+                        .phoneAdaptiveTypography(lineLimit: 2)
 
                     ThisWeekSummaryCard(summary: weeklySummary)
 
@@ -55,9 +58,18 @@ struct DashboardView: View {
                         displayedMonth: $displayedMonth
                     )
 
-                    HStack(alignment: .top, spacing: 10) {
-                        ActivityTimeCard(engagements: engagements, date: selectedDate)
-                        TopPracticedSoundsCard(date: selectedDate, stats: topPracticedSounds)
+                    Group {
+                        if layout.isPhone {
+                            VStack(spacing: 10) {
+                                ActivityTimeCard(engagements: engagements, date: selectedDate)
+                                TopPracticedSoundsCard(date: selectedDate, stats: topPracticedSounds)
+                            }
+                        } else {
+                            HStack(alignment: .top, spacing: 10) {
+                                ActivityTimeCard(engagements: engagements, date: selectedDate)
+                                TopPracticedSoundsCard(date: selectedDate, stats: topPracticedSounds)
+                            }
+                        }
                     }
 
                     ActivityMoodCard(engagements: engagements, date: selectedDate)
@@ -74,9 +86,9 @@ struct DashboardView: View {
                         needs: strengthsAndNeeds.needs
                     )
                 }
-                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
+                .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
                 .padding(.vertical, 12)
-                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding(for: layout))
             }
             .coordinateSpace(name: "dashboardScroll")
             .onPreferenceChange(DashboardScrollOffsetKey.self) { scrollOffset = $0 }
@@ -90,6 +102,8 @@ struct ActivityTimeCard: View {
     let engagements: [ActivityEngagementRecord]
     let date: Date
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     private var durations: [PracticeActivity: TimeInterval] {
         ActivityEngagementAnalytics.durationsByActivity(on: date, records: engagements)
     }
@@ -99,7 +113,7 @@ struct ActivityTimeCard: View {
     }
 
     var body: some View {
-        DashboardCard(height: DashboardLayout.statPairHeight) {
+        DashboardCard(height: DashboardLayout.cardHeight(DashboardLayout.statPairHeight, layout: layout)) {
             VStack(alignment: .leading, spacing: 12) {
                 DashboardCardHeader(
                     title: "Time by game",
@@ -111,7 +125,7 @@ struct ActivityTimeCard: View {
                     VStack(alignment: .leading, spacing: DashboardLayout.miniBoxSpacing) {
                         if !hasActivity {
                             Text(emptyStateMessage)
-                                .font(DashboardTypography.body)
+                                .font(DashboardTypography.body(for: layout))
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, minHeight: 120, alignment: .center)
                         } else {
@@ -148,13 +162,15 @@ struct ActivityMoodCard: View {
     let engagements: [ActivityEngagementRecord]
     let date: Date
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     private var moodVisits: [ActivityEngagementRecord] {
         ActivityEngagementAnalytics.engagements(on: date, records: engagements)
             .filter { $0.mood != nil }
     }
 
     var body: some View {
-        DashboardCard(height: DashboardLayout.moodsHeight) {
+        DashboardCard(height: DashboardLayout.cardHeight(DashboardLayout.moodsHeight, layout: layout)) {
             VStack(alignment: .leading, spacing: 12) {
                 DashboardCardHeader(
                     title: "Moods",
@@ -164,9 +180,17 @@ struct ActivityMoodCard: View {
 
                 if moodVisits.isEmpty {
                     Text(emptyStateMessage)
-                        .font(ContinuumTheme.kidBodyFont)
+                        .font(ContinuumTheme.kidBodyFont(for: layout))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else if layout.isPhone {
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(PracticeActivity.allCases) { activity in
+                                phoneMoodSection(for: activity)
+                            }
+                        }
+                    }
                 } else {
                     moodColumnHeaders
 
@@ -186,6 +210,22 @@ struct ActivityMoodCard: View {
             }
             .frame(maxHeight: .infinity, alignment: .top)
         }
+    }
+
+    private func phoneMoodSection(for activity: PracticeActivity) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: activity.systemImage)
+                    .font(.system(size: DashboardTypography.rowIconSize(for: layout), weight: .semibold))
+                    .foregroundStyle(ContinuumTheme.tabPurple)
+                Text(activity.subtitle)
+                    .font(DashboardTypography.label(for: layout))
+                    .foregroundStyle(.black)
+            }
+
+            MoodActivityColumn(visits: moodVisits(for: activity))
+        }
+        .padding(.bottom, 4)
     }
 
     private var moodColumnHeaders: some View {
@@ -294,18 +334,20 @@ struct PracticeCalendarCard: View {
     @Binding var selectedDate: Date
     @Binding var displayedMonth: Date
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     private let calendar = Calendar.current
     private let weekdaySymbols = Calendar.current.shortWeekdaySymbols
 
     var body: some View {
-        DashboardCard(height: DashboardLayout.calendarHeight) {
+        DashboardCard(height: DashboardLayout.cardHeight(DashboardLayout.calendarHeight, layout: layout)) {
             VStack(alignment: .leading, spacing: 10) {
                 monthHeader
 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
                     ForEach(weekdaySymbols, id: \.self) { symbol in
                         Text(symbol)
-                            .font(DashboardTypography.cardSubtitle.weight(.semibold))
+                            .font(DashboardTypography.cardSubtitle(for: layout).weight(.semibold))
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
                     }
@@ -331,7 +373,7 @@ struct PracticeCalendarCard: View {
                     legendItem(color: ContinuumTheme.tabPurple, label: "Practiced")
                     legendItem(color: .gray.opacity(0.25), label: "No practice")
                 }
-                .font(DashboardTypography.cardSubtitle)
+                .font(DashboardTypography.cardSubtitle(for: layout))
                 .foregroundStyle(.secondary)
             }
             .frame(maxHeight: .infinity, alignment: .top)
@@ -353,7 +395,7 @@ struct PracticeCalendarCard: View {
                 shiftMonth(by: -1)
             } label: {
                 Image(systemName: "chevron.left.circle.fill")
-                    .font(.system(size: 28, weight: .semibold))
+                    .font(.system(size: layout.scaled(28, phone: 24), weight: .semibold))
                     .foregroundStyle(ContinuumTheme.tabPurple)
             }
             .buttonStyle(.plain)
@@ -362,8 +404,10 @@ struct PracticeCalendarCard: View {
             Spacer()
 
             Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .font(layout.font(24, phoneSize: 20, weight: .bold))
                 .foregroundStyle(.black)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
 
             Spacer()
 
@@ -371,7 +415,7 @@ struct PracticeCalendarCard: View {
                 shiftMonth(by: 1)
             } label: {
                 Image(systemName: "chevron.right.circle.fill")
-                    .font(.system(size: 28, weight: .semibold))
+                    .font(.system(size: layout.scaled(28, phone: 24), weight: .semibold))
                     .foregroundStyle(ContinuumTheme.tabPurple)
             }
             .buttonStyle(.plain)

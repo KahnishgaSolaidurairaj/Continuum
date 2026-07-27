@@ -4,6 +4,8 @@ import SwiftUI
 struct FlashActivityView: View {
     let target: PracticeTarget
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @State private var selectedLevel: FlashLevel = .sound
     @State private var wordIndex = 0
 
@@ -27,13 +29,13 @@ struct FlashActivityView: View {
             flashInstructions
 
             levelPicker
-                .padding(.horizontal, 28)
-                .padding(.vertical, 28)
+                .padding(.horizontal, layout.scaled(28, phone: 16))
+                .padding(.vertical, layout.scaled(28, phone: 18))
                 .practiceActivityCardStyle()
 
             flashcard
                 .frame(maxWidth: .infinity)
-                .frame(minHeight: 360)
+                .frame(minHeight: layout.scaled(360, phone: 260))
 
             if selectedLevel != .sound && levelWords.count > 1 {
                 PracticeSecondaryButton(title: "Next word", systemImage: "arrow.right.circle.fill") {
@@ -65,12 +67,12 @@ struct FlashActivityView: View {
     private var flashInstructions: some View {
         VStack(spacing: 8) {
             Text("Listen to the sound")
-                .font(ContinuumTheme.kidSectionHeaderFont)
+                .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
                 .foregroundStyle(ContinuumTheme.pencilLead)
                 .multilineTextAlignment(.center)
 
             Text("Practice \(target.displayLabel)")
-                .font(ContinuumTheme.kidBodyFont)
+                .font(ContinuumTheme.kidBodyFont(for: layout))
                 .foregroundStyle(ContinuumTheme.subtitleGray)
                 .multilineTextAlignment(.center)
         }
@@ -81,56 +83,70 @@ struct FlashActivityView: View {
     private var levelPicker: some View {
         VStack(spacing: 16) {
             Text("Level")
-                .font(ContinuumTheme.kidSectionHeaderFont)
+                .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
                 .foregroundStyle(ContinuumTheme.tabPurple)
 
-            HStack(spacing: 12) {
-                ForEach(FlashLevel.allCases) { level in
-                    Button {
-                        selectedLevel = level
-                    } label: {
-                        VStack(spacing: 6) {
-                            Text(level.label)
-                                .font(ContinuumTheme.kidButtonFont)
-                            Text(level.subtitle)
-                                .font(ContinuumTheme.kidCaptionFont)
-                                .multilineTextAlignment(.center)
-                        }
-                        .foregroundStyle(
-                            selectedLevel == level ? .white : ContinuumTheme.sandboxMint
-                        )
-                        .frame(maxWidth: .infinity, minHeight: 72)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(
-                                    selectedLevel == level
-                                        ? ContinuumTheme.tabPurple
-                                        : ContinuumTheme.sandboxMintSoft
-                                )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(
-                                    selectedLevel == level
-                                        ? ContinuumTheme.tabPurple
-                                        : ContinuumTheme.sandboxMint.opacity(0.45),
-                                    lineWidth: 1.5
-                                )
-                        )
+            Group {
+                if layout.isPhone {
+                    VStack(spacing: 10) {
+                        levelButtons
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("\(level.label), \(level.subtitle)")
-                    .accessibilityAddTraits(selectedLevel == level ? .isSelected : [])
+                } else {
+                    HStack(spacing: 12) {
+                        levelButtons
+                    }
                 }
             }
         }
     }
 
+    private var levelButtons: some View {
+        ForEach(FlashLevel.allCases) { level in
+            Button {
+                selectedLevel = level
+            } label: {
+                VStack(spacing: 6) {
+                    Text(level.label)
+                        .font(ContinuumTheme.kidButtonFont(for: layout))
+                    Text(level.subtitle)
+                        .font(ContinuumTheme.kidCaptionFont(for: layout))
+                        .multilineTextAlignment(.center)
+                }
+                .foregroundStyle(
+                    selectedLevel == level ? .white : ContinuumTheme.sandboxMint
+                )
+                .frame(maxWidth: .infinity, minHeight: layout.scaled(72, phone: 56))
+                .padding(.horizontal, 6)
+                .padding(.vertical, layout.scaled(10, phone: 8))
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(
+                            selectedLevel == level
+                                ? ContinuumTheme.tabPurple
+                                : ContinuumTheme.sandboxMintSoft
+                        )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(
+                            selectedLevel == level
+                                ? ContinuumTheme.tabPurple
+                                : ContinuumTheme.sandboxMint.opacity(0.45),
+                            lineWidth: 1.5
+                        )
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(level.label), \(level.subtitle)")
+            .accessibilityAddTraits(selectedLevel == level ? .isSelected : [])
+        }
+    }
+
     /// Large card showing the phoneme or word for the active level.
     private var flashcard: some View {
-        ZStack {
+        let cardHeight = layout.scaled(360, phone: 260)
+
+        return ZStack {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(Color.white.opacity(0.97))
 
@@ -143,7 +159,7 @@ struct FlashActivityView: View {
 
                 if selectedLevel == .sound {
                     Text(target.displayLabel)
-                        .font(.system(size: 96, weight: .bold, design: .rounded))
+                        .font(.system(size: layout.scaled(96, phone: 64), weight: .bold, design: .rounded))
                         .foregroundStyle(ContinuumTheme.tabPurple)
                         .minimumScaleFactor(0.5)
                         .lineLimit(2)
@@ -151,19 +167,19 @@ struct FlashActivityView: View {
                 } else if hasWordsForSelectedLevel {
                     highlightedWordView(
                         word: currentWord,
-                        font: .system(size: wordFontSize(for: currentWord, cardHeight: 360), weight: .bold, design: .rounded)
+                        font: .system(size: wordFontSize(for: currentWord, cardHeight: cardHeight), weight: .bold, design: .rounded)
                     )
                     .minimumScaleFactor(0.45)
                     .lineLimit(2)
                     .padding(.horizontal, 12)
                 } else {
                     Text("No words yet")
-                        .font(ContinuumTheme.kidSectionHeaderFont)
+                        .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
                         .foregroundStyle(ContinuumTheme.subtitleGray)
                 }
             }
-            .padding(.vertical, 32)
-            .padding(.horizontal, 24)
+            .padding(.vertical, layout.scaled(32, phone: 24))
+            .padding(.horizontal, layout.scaled(24, phone: 16))
         }
         .practiceActivityCardStyle()
     }
@@ -171,10 +187,10 @@ struct FlashActivityView: View {
     /// Shows which sound the child is practicing on word levels.
     private var practiceBadge: some View {
         Text("Practice: \(target.displayLabel)")
-            .font(.system(size: 28, weight: .bold, design: .rounded))
+            .font(layout.font(28, phoneSize: 22, weight: .bold))
             .foregroundStyle(ContinuumTheme.sandboxMint)
-            .padding(.horizontal, 28)
-            .padding(.vertical, 16)
+            .padding(.horizontal, layout.scaled(28, phone: 18))
+            .padding(.vertical, layout.scaled(16, phone: 12))
             .background(ContinuumTheme.sandboxMintSoft)
             .clipShape(Capsule())
             .overlay(

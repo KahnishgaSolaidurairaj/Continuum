@@ -361,6 +361,7 @@ struct ParentPINResetSheet: View {
 /// Full-screen prompt shown when leaving child mode and returning to the parent home.
 struct ParentPINUnlockSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.continuumDeviceLayout) private var layout
 
     let onUnlocked: () -> Void
 
@@ -395,7 +396,10 @@ struct ParentPINUnlockSheet: View {
                 Image(BrocaBearCatalog.defaultPose)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 160, height: 160)
+                    .frame(
+                        width: layout.scaled(160, phone: 120),
+                        height: layout.scaled(160, phone: 120)
+                    )
                     .shadow(color: .black.opacity(0.12), radius: 10, y: 5)
                     .accessibilityHidden(true)
 
@@ -405,7 +409,7 @@ struct ParentPINUnlockSheet: View {
                     subtitle: entrySubtitle,
                     errorMessage: errorMessage
                 )
-                .frame(maxWidth: 420)
+                .frame(maxWidth: layout.isPhone ? .infinity : 420)
 
                 /*
                 if !usesTemporaryPIN {
@@ -453,8 +457,8 @@ struct ParentPINUnlockSheet: View {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal, 28)
-            .padding(.vertical, 32)
+            .padding(.horizontal, layout.scaled(28, phone: 20))
+            .padding(.vertical, layout.scaled(32, phone: 24))
         }
         .onChange(of: pin) { _, newValue in
             guard newValue.count == 4 else { return }
@@ -543,6 +547,7 @@ struct ParentPINDisplayContent: Identifiable {
 /// Themed sheet that displays the saved parent PIN for reference.
 struct ParentPINDisplaySheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.continuumDeviceLayout) private var layout
 
     let pinText: String
     var isUnavailableMessage = false
@@ -553,7 +558,7 @@ struct ParentPINDisplaySheet: View {
 
             VStack(spacing: 24) {
                 Text("Your Parent PIN")
-                    .font(ContinuumTheme.kidSectionHeaderFont)
+                    .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
                     .foregroundStyle(ContinuumTheme.testMagenta)
                     .frame(maxWidth: .infinity)
 
@@ -565,7 +570,7 @@ struct ParentPINDisplaySheet: View {
                             .multilineTextAlignment(.center)
                     } else {
                         Text(pinText)
-                            .font(.system(size: 56, weight: .bold, design: .rounded))
+                            .font(.system(size: layout.scaled(56, phone: 44), weight: .bold, design: .rounded))
                             .foregroundStyle(ContinuumTheme.pencilLead)
                             .multilineTextAlignment(.center)
                             .tracking(6)
@@ -597,7 +602,7 @@ struct ParentPINDisplaySheet: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
         }
-        .presentationDetents([.height(380)])
+        .presentationDetents([.height(layout.scaled(380, phone: 320))])
         .presentationDragIndicator(.visible)
     }
 }

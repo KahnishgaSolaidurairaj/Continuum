@@ -7,6 +7,7 @@ struct HomeView: View {
     let onOpenPracticeWithPriorityFocus: () -> Void
 
     @Environment(ParentModeController.self) private var parentMode
+    @Environment(\.continuumDeviceLayout) private var layout
 
     @Query(sort: \ActivityEngagementRecord.endedAt, order: .reverse)
     private var engagements: [ActivityEngagementRecord]
@@ -39,10 +40,10 @@ struct HomeView: View {
                 VStack(spacing: 0) {
                     heroHeader
                     mainPanel
-                        .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
-                        .padding(.top, -22)
+                        .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
+                        .padding(.top, layout.isPhone ? -10 : -22)
                 }
-                .padding(.bottom, ContinuumTabBar.contentBottomPadding)
+                .padding(.bottom, ContinuumTabBar.contentBottomPadding(for: layout))
             }
         }
         .sheet(isPresented: $showGoalSheet) {
@@ -93,57 +94,102 @@ struct HomeView: View {
             HomeHillsBackground()
 
             GeometryReader { geometry in
-                let mascotSize = min(geometry.size.width * 0.57, 294)
+                let mascotSize = min(
+                    geometry.size.width * (layout.isPhone ? 0.30 : 0.57),
+                    layout.scaled(294, phone: 112)
+                )
                 let mascotLeftOffset = mascotSize * 0.12
-                let taglineLineHeight = UIFont.systemFont(ofSize: 26, weight: .medium).lineHeight
+                let taglineLineHeight = UIFont.systemFont(
+                    ofSize: layout.isPhone ? 20 : 26,
+                    weight: .medium
+                ).lineHeight
 
-                ZStack(alignment: .bottom) {
-                    HStack(alignment: .bottom, spacing: 6) {
-                        VStack(alignment: .leading, spacing: 12) {
+                if layout.isPhone {
+                    HStack(alignment: .top, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(parentMode.isChildMode ? "Let's practice!" : "Welcome to")
-                                .font(.system(size: 36, weight: .semibold, design: .rounded))
+                                .font(layout.font(36, phoneSize: 20, weight: .semibold))
                                 .foregroundStyle(ContinuumTheme.pencilLead)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.85)
 
                             Text("Continuum")
-                                .font(.system(size: 68, weight: .bold, design: .rounded))
+                                .font(layout.font(68, phoneSize: 32, weight: .bold))
                                 .foregroundStyle(ContinuumTheme.pencilLead)
                                 .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
-                                .minimumScaleFactor(0.8)
+                                .minimumScaleFactor(0.75)
                                 .lineLimit(1)
 
                             Text(parentMode.isChildMode ? "Your practice space" : "Continue therapy at home")
-                                .font(.system(size: 26, weight: .medium, design: .rounded))
+                                .font(layout.font(26, phoneSize: 15, weight: .medium))
                                 .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.85)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Color.clear
-                            .frame(width: mascotSize, height: mascotSize)
-                            .accessibilityHidden(true)
-                    }
-                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
-                    .padding(.bottom, 26)
-                    .offset(y: -taglineLineHeight)
-
-                    HStack {
-                        Spacer()
 
                         Image(BrocaBearCatalog.headerPose)
                             .resizable()
                             .scaledToFill()
                             .frame(width: mascotSize, height: mascotSize)
                             .clipped()
-                            .offset(x: -mascotLeftOffset * 1.5)
                             .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
                             .accessibilityLabel("Broca the Bear")
                     }
-                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding)
+                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
+                    .padding(.top, 2)
+                    .padding(.bottom, 28)
+                    .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                } else {
+                    ZStack(alignment: .bottom) {
+                        HStack(alignment: .bottom, spacing: 6) {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(parentMode.isChildMode ? "Let's practice!" : "Welcome to")
+                                    .font(.system(size: 36, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(ContinuumTheme.pencilLead)
+
+                                Text("Continuum")
+                                    .font(.system(size: 68, weight: .bold, design: .rounded))
+                                    .foregroundStyle(ContinuumTheme.pencilLead)
+                                    .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
+                                    .minimumScaleFactor(0.8)
+                                    .lineLimit(1)
+
+                                Text(parentMode.isChildMode ? "Your practice space" : "Continue therapy at home")
+                                    .font(.system(size: 26, weight: .medium, design: .rounded))
+                                    .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Color.clear
+                                .frame(width: mascotSize, height: mascotSize)
+                                .accessibilityHidden(true)
+                        }
+                        .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
+                        .padding(.bottom, 26)
+                        .offset(y: -taglineLineHeight)
+
+                        HStack {
+                            Spacer()
+
+                            Image(BrocaBearCatalog.headerPose)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: mascotSize, height: mascotSize)
+                                .clipped()
+                                .offset(x: -mascotLeftOffset * 1.5)
+                                .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
+                                .accessibilityLabel("Broca the Bear")
+                        }
+                        .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
+                    }
+                    .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
             }
         }
-        .frame(height: 310)
+        .frame(height: layout.scaled(310, phone: 196))
         .frame(maxWidth: .infinity)
     }
 
@@ -184,37 +230,53 @@ struct HomeView: View {
 
     /// Warm up and practice call-to-action buttons from the mockup.
     private var primaryActionRow: some View {
-        HStack(spacing: 14) {
-            Button {
-                showWarmUpSheet = true
-            } label: {
-                Text("Warm up")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(ContinuumTheme.homeMintText)
-                    .frame(maxWidth: .infinity, minHeight: 64)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(red: 0.78, green: 0.96, blue: 0.82), ContinuumTheme.homeMint],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .clipShape(Capsule())
-                    .shadow(color: ContinuumTheme.homeMintText.opacity(0.22), radius: 8, y: 4)
-                    .fullCapsuleHitTarget()
-                    .appTourHighlight(.homeWarmUp)
+        Group {
+            if layout.isPhone {
+                VStack(spacing: 14) {
+                    warmUpButton
+                    practiceSoundsButton
+                }
+            } else {
+                HStack(spacing: 14) {
+                    warmUpButton
+                    practiceSoundsButton
+                }
             }
-            .buttonStyle(.plain)
-
-            Button {
-                onOpenPracticeTab()
-            } label: {
-                Text("Practice Sounds")
-                    .homePracticeCapsuleStyle()
-                    .appTourHighlight(.homePracticeSounds)
-            }
-            .buttonStyle(.plain)
         }
+    }
+
+    private var warmUpButton: some View {
+        Button {
+            showWarmUpSheet = true
+        } label: {
+            Text("Warm up")
+                .font(layout.font(24, phoneSize: 20, weight: .bold))
+                .foregroundStyle(ContinuumTheme.homeMintText)
+                .frame(maxWidth: .infinity, minHeight: layout.scaled(64, phone: 52))
+                .background(
+                    LinearGradient(
+                        colors: [Color(red: 0.78, green: 0.96, blue: 0.82), ContinuumTheme.homeMint],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .clipShape(Capsule())
+                .shadow(color: ContinuumTheme.homeMintText.opacity(0.22), radius: 8, y: 4)
+                .fullCapsuleHitTarget()
+                .appTourHighlight(.homeWarmUp)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var practiceSoundsButton: some View {
+        Button {
+            onOpenPracticeTab()
+        } label: {
+            Text("Practice Sounds")
+                .homePracticeCapsuleStyle()
+                .appTourHighlight(.homePracticeSounds)
+        }
+        .buttonStyle(.plain)
     }
 
     /// 2x2 suggestions grid with quick actions.
@@ -222,7 +284,7 @@ struct HomeView: View {
         VStack(spacing: 12) {
             HStack {
                 Label("Suggestions", systemImage: "sparkles")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(layout.font(22, phoneSize: 18, weight: .bold))
                     .foregroundStyle(ContinuumTheme.pencilLead)
                 Spacer()
             }
@@ -257,23 +319,33 @@ struct HomeView: View {
 
     /// Parent-only controls for PIN setup beside the mode toggle card.
     private var parentPinSettingsSection: some View {
-        HStack(alignment: .top, spacing: 12) {
-            parentLockCard
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background {
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear {
-                                parentLockCardHeight = geometry.size.height
-                            }
-                            .onChange(of: geometry.size.height) { _, newHeight in
-                                parentLockCardHeight = newHeight
-                            }
-                    }
+        Group {
+            if layout.isPhone {
+                VStack(spacing: 12) {
+                    parentLockCard
+                    parentModeToggleCard
+                        .frame(maxWidth: .infinity)
                 }
+            } else {
+                HStack(alignment: .top, spacing: 12) {
+                    parentLockCard
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background {
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onAppear {
+                                        parentLockCardHeight = geometry.size.height
+                                    }
+                                    .onChange(of: geometry.size.height) { _, newHeight in
+                                        parentLockCardHeight = newHeight
+                                    }
+                            }
+                        }
 
-            parentModeToggleCard
-                .frame(width: 118, height: max(parentLockCardHeight, 1))
+                    parentModeToggleCard
+                        .frame(width: 118, height: max(parentLockCardHeight, 1))
+                }
+            }
         }
     }
 
@@ -281,7 +353,7 @@ struct HomeView: View {
     private var parentLockCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             Label("Parent Lock", systemImage: "lock.shield.fill")
-                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .font(layout.font(26, phoneSize: 22, weight: .bold))
                 .foregroundStyle(ContinuumTheme.testMagenta)
 
             Text(
@@ -289,7 +361,7 @@ struct HomeView: View {
                     ? "A 4-digit PIN protects parent settings. Switch to child mode when your child is ready to practice."
                     : "Add a 4-digit PIN before switching to child mode."
             )
-            .font(.system(size: 20, weight: .medium, design: .rounded))
+            .font(layout.font(20, phoneSize: 17, weight: .medium))
             .foregroundStyle(ContinuumTheme.pencilLead)
             .fixedSize(horizontal: false, vertical: true)
 
@@ -323,13 +395,13 @@ struct HomeView: View {
                 isChildMode: parentMode.isChildMode,
                 onSelectParent: handleSelectParentMode,
                 onSelectChild: { parentMode.switchToChildMode() },
-                usesVerticalLayout: true,
-                fillsAvailableHeight: true
+                usesVerticalLayout: !layout.isPhone,
+                fillsAvailableHeight: !layout.isPhone
             )
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, layout.scaled(10, phone: 12))
+        .padding(.vertical, layout.scaled(14, phone: 12))
+        .frame(maxWidth: .infinity, maxHeight: layout.isPhone ? nil : .infinity)
         .background(parentSettingsCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(parentSettingsCardBorder)

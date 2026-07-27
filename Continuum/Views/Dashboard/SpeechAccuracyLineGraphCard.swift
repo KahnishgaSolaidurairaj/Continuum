@@ -8,6 +8,8 @@ struct SpeechAccuracyLineGraphCard: View {
     @Binding var selectedGroup: SoundGroupFilter
     @Binding var selectedSoundID: String?
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @State private var selectedAttempt: Int?
 
     private var points: [AccuracyPoint] {
@@ -29,7 +31,7 @@ struct SpeechAccuracyLineGraphCard: View {
     }
 
     var body: some View {
-        DashboardCard(height: DashboardLayout.speechAccuracyHeight) {
+        DashboardCard(height: DashboardLayout.cardHeight(DashboardLayout.speechAccuracyHeight, layout: layout)) {
             VStack(alignment: .leading, spacing: 12) {
                 DashboardCardHeader(
                     title: "Speech accuracy",
@@ -153,28 +155,41 @@ struct SpeechAccuracyLineGraphCard: View {
     }
 
     private var filterPickers: some View {
-        HStack(spacing: 12) {
-            Picker("Group", selection: $selectedGroup) {
-                ForEach(SoundGroupFilter.allCases) { group in
-                    Text(group.label).tag(group)
+        Group {
+            if layout.isPhone {
+                VStack(alignment: .leading, spacing: 10) {
+                    filterPickerContent
+                }
+            } else {
+                HStack(spacing: 12) {
+                    filterPickerContent
+                }
+            }
+        }
+        .font(DashboardTypography.cardSubtitle(for: layout))
+    }
+
+    @ViewBuilder
+    private var filterPickerContent: some View {
+        Picker("Group", selection: $selectedGroup) {
+            ForEach(SoundGroupFilter.allCases) { group in
+                Text(group.label).tag(group)
+            }
+        }
+        .pickerStyle(.menu)
+        .onChange(of: selectedGroup) { _, _ in
+            selectedSoundID = nil
+        }
+
+        if selectedGroup != .all {
+            Picker("Sound", selection: soundSelectionBinding) {
+                Text("All").tag(Optional<String>.none)
+                ForEach(availableSounds) { sound in
+                    Text(sound.displayName).tag(Optional(sound.id))
                 }
             }
             .pickerStyle(.menu)
-            .onChange(of: selectedGroup) { _, _ in
-                selectedSoundID = nil
-            }
-
-            if selectedGroup != .all {
-                Picker("Sound", selection: soundSelectionBinding) {
-                    Text("All").tag(Optional<String>.none)
-                    ForEach(availableSounds) { sound in
-                        Text(sound.displayName).tag(Optional(sound.id))
-                    }
-                }
-                .pickerStyle(.menu)
-            }
         }
-        .font(DashboardTypography.cardSubtitle)
     }
 
     private var soundSelectionBinding: Binding<String?> {
