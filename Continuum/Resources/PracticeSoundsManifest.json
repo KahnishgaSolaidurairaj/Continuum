@@ -68,7 +68,7 @@
           "word": "Mat",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -77,7 +77,7 @@
           "word": "Rat",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -86,7 +86,7 @@
           "word": "Sat",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -95,7 +95,7 @@
           "word": "Map",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -104,7 +104,7 @@
           "word": "Cap",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -113,7 +113,7 @@
           "word": "Tap",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -122,7 +122,7 @@
           "word": "Jam",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -131,7 +131,7 @@
           "word": "Ram",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -140,7 +140,7 @@
           "word": "Van",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -149,7 +149,7 @@
           "word": "Can",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -160,16 +160,16 @@
           "word": "Cabbage",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
-            }
+            }, {"start": 4, "length": 1}
           ]
         },
         {
           "word": "Sandwich",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -178,7 +178,7 @@
           "word": "Saturday",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -187,7 +187,7 @@
           "word": "January",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -196,16 +196,16 @@
           "word": "Salad",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
           "word": "Cactus",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -214,16 +214,16 @@
           "word": "Galaxy",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
           "word": "Lantern",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -232,61 +232,16 @@
           "word": "Manager",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
           "word": "Pancake",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "After",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Cat",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Hat",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Pan",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bag",
-          "highlights": [
-            {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -451,9 +406,9 @@
           "word": "Elephant",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
-            }
+            }, { "start": 0, "length":1 }
           ]
         },
         {
@@ -462,7 +417,7 @@
             {
               "start": 1,
               "length": 1
-            }
+            }, { "start": 3, "length":1 }
           ]
         },
         {
@@ -471,7 +426,7 @@
             {
               "start": 1,
               "length": 1
-            }
+            }, { "start": 3, "length":1 }
           ]
         },
         {
@@ -487,7 +442,7 @@
           "word": "Together",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 1
             }
           ]
@@ -496,9 +451,9 @@
           "word": "Envelope",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 1
-            }
+            }, { "start": 3, "length":1 }
           ]
         },
         {
@@ -525,56 +480,11 @@
             {
               "start": 1,
               "length": 1
-            }
+            }, { "start": 3, "length":1 }
           ]
         },
         {
           "word": "Pepperoni",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Pen",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bed",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Red",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Ten",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Net",
           "highlights": [
             {
               "start": 1,
@@ -650,7 +560,7 @@
           "word": "Pin",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -659,7 +569,7 @@
           "word": "Win",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -668,7 +578,7 @@
           "word": "Fin",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -677,7 +587,7 @@
           "word": "Dip",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -686,7 +596,7 @@
           "word": "Tip",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -695,7 +605,7 @@
           "word": "Lip",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -704,7 +614,7 @@
           "word": "Kid",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -713,7 +623,7 @@
           "word": "Dig",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -722,7 +632,7 @@
           "word": "Milk",
           "highlights": [
             {
-              "start": 3,
+              "start": 1,
               "length": 1
             }
           ]
@@ -731,7 +641,7 @@
           "word": "Gift",
           "highlights": [
             {
-              "start": 3,
+              "start": 1,
               "length": 1
             }
           ]
@@ -742,7 +652,7 @@
           "word": "Instrument",
           "highlights": [
             {
-              "start": 3,
+              "start": 0,
               "length": 1
             }
           ]
@@ -751,16 +661,16 @@
           "word": "Invisible",
           "highlights": [
             {
-              "start": 3,
+              "start": 0,
               "length": 1
-            }
+            }, { "start": 3, "length":1 }, { "start": 5, "length":1 }
           ]
         },
         {
           "word": "Important",
           "highlights": [
             {
-              "start": 3,
+              "start": 0,
               "length": 1
             }
           ]
@@ -769,7 +679,7 @@
           "word": "Different",
           "highlights": [
             {
-              "start": 3,
+              "start": 1,
               "length": 1
             }
           ]
@@ -778,7 +688,7 @@
           "word": "Dinosaur",
           "highlights": [
             {
-              "start": 3,
+              "start": 1,
               "length": 1
             }
           ]
@@ -796,7 +706,7 @@
           "word": "Hospital",
           "highlights": [
             {
-              "start": 3,
+              "start": 4,
               "length": 1
             }
           ]
@@ -805,7 +715,7 @@
           "word": "Piglet",
           "highlights": [
             {
-              "start": 3,
+              "start": 1,
               "length": 1
             }
           ]
@@ -814,7 +724,7 @@
           "word": "Sister",
           "highlights": [
             {
-              "start": 3,
+              "start": 1,
               "length": 1
             }
           ]
@@ -823,52 +733,7 @@
           "word": "Kitchen",
           "highlights": [
             {
-              "start": 3,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Busy",
-          "highlights": [
-            {
-              "start": 3,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "English",
-          "highlights": [
-            {
-              "start": 3,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bit",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Sit",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Fish",
-          "highlights": [
-            {
-              "start": 3,
+              "start": 1,
               "length": 1
             }
           ]
@@ -892,15 +757,7 @@
         ]
       },
       "level2Words": [
-        {
-          "word": "Water",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
+        
         {
           "word": "Hot",
           "highlights": [
@@ -932,7 +789,7 @@
           "word": "Rock",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 1
             }
           ]
@@ -1033,16 +890,16 @@
           "word": "Chocolate",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
-            }
+            }, { "start": 4, "length":1 }
           ]
         },
         {
           "word": "Problem",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
             }
           ]
@@ -1062,14 +919,14 @@
             {
               "start": 1,
               "length": 1
-            }
+            }, { "start": 3, "length":1 }
           ]
         },
         {
           "word": "Dinosaur",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 1
             }
           ]
@@ -1078,9 +935,9 @@
           "word": "Octopus",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 1
-            }
+            }, { "start": 3, "length":1 }
           ]
         },
         {
@@ -1098,7 +955,7 @@
             {
               "start": 1,
               "length": 1
-            }
+            }, { "start": 4, "length":1 }
           ]
         },
         {
@@ -1107,56 +964,11 @@
             {
               "start": 1,
               "length": 1
-            }
+            }, { "start": 6, "length":1 }
           ]
         },
         {
           "word": "Dollar",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Water",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Hot",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Cot",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Pond",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Rock",
           "highlights": [
             {
               "start": 1,
@@ -1324,7 +1136,7 @@
           "word": "Wonderful",
           "highlights": [
             {
-              "start": 1,
+              "start": 7,
               "length": 1
             }
           ]
@@ -1333,7 +1145,7 @@
           "word": "Thunder",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
             }
           ]
@@ -1342,7 +1154,7 @@
           "word": "Underground",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 1
             }
           ]
@@ -1409,51 +1221,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Fun",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bug",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "But",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Cut",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Mud",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -1505,7 +1272,7 @@
           "word": "Play",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -1515,7 +1282,7 @@
           "highlights": [
             {
               "start": 1,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -1523,8 +1290,8 @@
           "word": "May",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1532,8 +1299,8 @@
           "word": "Way",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1542,7 +1309,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -1550,8 +1317,8 @@
           "word": "Pay",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1559,8 +1326,8 @@
           "word": "Ray",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1568,8 +1335,8 @@
           "word": "Hay",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1578,7 +1345,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -1587,7 +1354,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -1596,7 +1363,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -1605,7 +1372,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         }
@@ -1616,7 +1383,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -1624,8 +1391,8 @@
           "word": "Airplane",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 0,
+              "length": 2
             }
           ]
         },
@@ -1634,7 +1401,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -1642,8 +1409,8 @@
           "word": "Display",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 5,
+              "length": 2
             }
           ]
         },
@@ -1651,8 +1418,8 @@
           "word": "Explain",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 4,
+              "length": 2
             }
           ]
         },
@@ -1660,7 +1427,7 @@
           "word": "Parade",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 1
             }
           ]
@@ -1669,8 +1436,8 @@
           "word": "Sailboat",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1678,8 +1445,8 @@
           "word": "Daydream",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1687,8 +1454,8 @@
           "word": "Mayflower",
           "highlights": [
             {
-              "start": 2,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1697,48 +1464,12 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
         {
           "word": "Flavor",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Day",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Rain",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Play",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Say",
           "highlights": [
             {
               "start": 2,
@@ -1796,7 +1527,7 @@
           "word": "Tree",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -1814,7 +1545,7 @@
           "word": "We",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -1823,7 +1554,7 @@
           "word": "He",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -1832,7 +1563,7 @@
           "word": "She",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 1
             }
           ]
@@ -1841,8 +1572,8 @@
           "word": "Key",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1850,8 +1581,8 @@
           "word": "Tea",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1859,8 +1590,8 @@
           "word": "Pea",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1868,8 +1599,8 @@
           "word": "Sea",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -1877,8 +1608,8 @@
           "word": "Free",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         },
@@ -1886,8 +1617,8 @@
           "word": "Glee",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         },
@@ -1895,8 +1626,8 @@
           "word": "Knee",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         }
@@ -1906,8 +1637,8 @@
           "word": "Believe",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 3,
+              "length": 2
             }
           ]
         },
@@ -1915,8 +1646,8 @@
           "word": "Between",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 4,
+              "length": 2
             }
           ]
         },
@@ -1924,8 +1655,8 @@
           "word": "Seventeen",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 6,
+              "length": 2
             }
           ]
         },
@@ -1933,7 +1664,7 @@
           "word": "Magazine",
           "highlights": [
             {
-              "start": 0,
+              "start": 5,
               "length": 1
             }
           ]
@@ -1942,7 +1673,7 @@
           "word": "Machine",
           "highlights": [
             {
-              "start": 0,
+              "start": 6,
               "length": 1
             }
           ]
@@ -1951,7 +1682,7 @@
           "word": "Peanut",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -1960,80 +1691,8 @@
           "word": "Freedom",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Evening",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Receipt",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Repeat",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "See",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bee",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Tree",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Me",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "We",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         }
@@ -2050,7 +1709,7 @@
         "word": "Lie",
         "highlights": [
           {
-            "start": 0,
+            "start": 1,
             "length": 2
           }
         ]
@@ -2061,7 +1720,7 @@
           "highlights": [
             {
               "start": 1,
-              "length": 3
+              "length": 1
             }
           ]
         },
@@ -2079,7 +1738,7 @@
           "highlights": [
             {
               "start": 1,
-              "length": 2
+              "length": 1
             }
           ]
         },
@@ -2087,8 +1746,8 @@
           "word": "Fly",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 2,
+              "length": 1
             }
           ]
         },
@@ -2096,7 +1755,7 @@
           "word": "Pie",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -2114,8 +1773,8 @@
           "word": "Cry",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 2,
+              "length": 1
             }
           ]
         },
@@ -2123,8 +1782,8 @@
           "word": "Dry",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 2,
+              "length": 1
             }
           ]
         },
@@ -2132,8 +1791,8 @@
           "word": "Try",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 2,
+              "length": 1
             }
           ]
         },
@@ -2141,8 +1800,8 @@
           "word": "Sky",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 2,
+              "length": 1
             }
           ]
         },
@@ -2150,8 +1809,8 @@
           "word": "Why",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 2,
+              "length": 1
             }
           ]
         },
@@ -2186,8 +1845,8 @@
           "word": "Spy",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 2,
+              "length": 1
             }
           ]
         }
@@ -2197,8 +1856,8 @@
           "word": "Butterfly",
           "highlights": [
             {
-              "start": 1,
-              "length": 3
+              "start": 8,
+              "length": 1
             }
           ]
         },
@@ -2206,8 +1865,8 @@
           "word": "Multiply",
           "highlights": [
             {
-              "start": 1,
-              "length": 3
+              "start": 7,
+              "length": 1
             }
           ]
         },
@@ -2215,8 +1874,8 @@
           "word": "Identify",
           "highlights": [
             {
-              "start": 1,
-              "length": 3
+              "start": 7,
+              "length": 1
             }
           ]
         },
@@ -2225,8 +1884,8 @@
           "highlights": [
             {
               "start": 1,
-              "length": 3
-            }
+              "length": 1
+            }, {"start": 5, "length": 1}
           ]
         },
         {
@@ -2234,16 +1893,16 @@
           "highlights": [
             {
               "start": 1,
-              "length": 3
-            }
+              "length": 1
+            }, {"start": 4, "length": 1}
           ]
         },
         {
           "word": "Sunlight",
           "highlights": [
             {
-              "start": 1,
-              "length": 3
+              "start": 4,
+              "length": 1
             }
           ]
         },
@@ -2252,7 +1911,7 @@
           "highlights": [
             {
               "start": 1,
-              "length": 3
+              "length": 1
             }
           ]
         },
@@ -2260,8 +1919,8 @@
           "word": "Eyelash",
           "highlights": [
             {
-              "start": 1,
-              "length": 3
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -2270,7 +1929,7 @@
           "highlights": [
             {
               "start": 1,
-              "length": 3
+              "length": 1
             }
           ]
         },
@@ -2279,53 +1938,8 @@
           "highlights": [
             {
               "start": 1,
-              "length": 3
-            }
-          ]
-        },
-        {
-          "word": "Night",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 3
-            }
-          ]
-        },
-        {
-          "word": "Bite",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 3
-            }
-          ]
-        },
-        {
-          "word": "Time",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 3
-            }
-          ]
-        },
-        {
-          "word": "Fly",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Pie",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
+              "length": 1
+            }, {"start": 5, "length": 1}
           ]
         }
       ]
@@ -2396,7 +2010,7 @@
           "word": "Bo",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -2405,7 +2019,7 @@
           "word": "Low",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -2414,7 +2028,7 @@
           "word": "Show",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 1
             }
           ]
@@ -2423,7 +2037,7 @@
           "word": "Glow",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 1
             }
           ]
@@ -2432,7 +2046,7 @@
           "word": "Flow",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 1
             }
           ]
@@ -2441,7 +2055,7 @@
           "word": "Slow",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 1
             }
           ]
@@ -2450,7 +2064,7 @@
           "word": "Bow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -2459,7 +2073,7 @@
           "word": "Row",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -2468,7 +2082,7 @@
           "word": "Mow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -2477,7 +2091,7 @@
           "word": "Tow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -2488,7 +2102,7 @@
           "word": "Potato",
           "highlights": [
             {
-              "start": 0,
+              "start": 5,
               "length": 1
             }
           ]
@@ -2497,16 +2111,16 @@
           "word": "Tomato",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
-            }
+            }, {"start": 5, "length": 1}
           ]
         },
         {
           "word": "Telephone",
           "highlights": [
             {
-              "start": 0,
+              "start": 6,
               "length": 1
             }
           ]
@@ -2517,14 +2131,14 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 5, "length": 1}
           ]
         },
         {
           "word": "Explode",
           "highlights": [
             {
-              "start": 0,
+              "start": 4,
               "length": 1
             }
           ]
@@ -2533,16 +2147,16 @@
           "word": "Portfolio",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
-            }
+            }, {"start": 8, "length": 1}
           ]
         },
         {
           "word": "Motorcycle",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 1
             }
           ]
@@ -2551,7 +2165,7 @@
           "word": "Snowflake",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 1
             }
           ]
@@ -2562,59 +2176,14 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 5, "length": 1}
           ]
         },
         {
           "word": "Photograph",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Open",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Go",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "No",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "So",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Rose",
-          "highlights": [
-            {
-              "start": 0,
+              "start": 2,
               "length": 1
             }
           ]
@@ -2678,8 +2247,8 @@
           "word": "Due",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -2687,8 +2256,8 @@
           "word": "Cue",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -2696,8 +2265,8 @@
           "word": "Sue",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -2705,8 +2274,8 @@
           "word": "Mew",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -2714,8 +2283,8 @@
           "word": "Few",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -2723,8 +2292,8 @@
           "word": "New",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 1,
+              "length": 2
             }
           ]
         },
@@ -2732,8 +2301,8 @@
           "word": "Stew",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         },
@@ -2741,8 +2310,8 @@
           "word": "Blue",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         },
@@ -2750,8 +2319,8 @@
           "word": "Glue",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         },
@@ -2759,17 +2328,8 @@
           "word": "True",
           "highlights": [
             {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Rescue14",
-          "highlights": [
-            {
-              "start": 4,
-              "length": 1
+              "start": 2,
+              "length": 2
             }
           ]
         }
@@ -2779,7 +2339,7 @@
           "word": "University",
           "highlights": [
             {
-              "start": 4,
+              "start": 0,
               "length": 1
             }
           ]
@@ -2788,7 +2348,7 @@
           "word": "Uniform",
           "highlights": [
             {
-              "start": 4,
+              "start": 0,
               "length": 1
             }
           ]
@@ -2797,7 +2357,7 @@
           "word": "Universe",
           "highlights": [
             {
-              "start": 4,
+              "start": 0,
               "length": 1
             }
           ]
@@ -2806,7 +2366,7 @@
           "word": "Unicycle",
           "highlights": [
             {
-              "start": 4,
+              "start": 0,
               "length": 1
             }
           ]
@@ -2815,7 +2375,7 @@
           "word": "Unicorn",
           "highlights": [
             {
-              "start": 4,
+              "start": 0,
               "length": 1
             }
           ]
@@ -2833,7 +2393,7 @@
           "word": "Volume",
           "highlights": [
             {
-              "start": 4,
+              "start": 3,
               "length": 1
             }
           ]
@@ -2851,8 +2411,8 @@
           "word": "Continue",
           "highlights": [
             {
-              "start": 4,
-              "length": 1
+              "start": 6,
+              "length": 2
             }
           ]
         },
@@ -2860,52 +2420,7 @@
           "word": "Attitude",
           "highlights": [
             {
-              "start": 4,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Rescue",
-          "highlights": [
-            {
-              "start": 4,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Unit",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Music",
-          "highlights": [
-            {
-              "start": 4,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Human",
-          "highlights": [
-            {
-              "start": 4,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Due",
-          "highlights": [
-            {
-              "start": 0,
+              "start": 5,
               "length": 1
             }
           ]
@@ -2978,7 +2493,7 @@
           "word": "Cool",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -2987,7 +2502,7 @@
           "word": "Pool",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -2996,7 +2511,7 @@
           "word": "Tool",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3014,7 +2529,7 @@
           "word": "Fool",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3023,7 +2538,7 @@
           "word": "Wool",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3032,7 +2547,7 @@
           "word": "Doom",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3041,7 +2556,7 @@
           "word": "Boom",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3050,7 +2565,7 @@
           "word": "Zoom",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3070,7 +2585,7 @@
           "word": "Afternoon",
           "highlights": [
             {
-              "start": 2,
+              "start": 6,
               "length": 2
             }
           ]
@@ -3079,7 +2594,7 @@
           "word": "Balloon",
           "highlights": [
             {
-              "start": 2,
+              "start": 4,
               "length": 2
             }
           ]
@@ -3088,7 +2603,7 @@
           "word": "Bedroom",
           "highlights": [
             {
-              "start": 2,
+              "start": 4,
               "length": 2
             }
           ]
@@ -3097,7 +2612,7 @@
           "word": "Bathroom",
           "highlights": [
             {
-              "start": 2,
+              "start": 5,
               "length": 2
             }
           ]
@@ -3106,7 +2621,7 @@
           "word": "Classroom",
           "highlights": [
             {
-              "start": 2,
+              "start": 6,
               "length": 2
             }
           ]
@@ -3115,7 +2630,7 @@
           "word": "Moonlight",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3124,7 +2639,7 @@
           "word": "Noodle",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3142,7 +2657,7 @@
           "word": "Toothbrush",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -3151,52 +2666,7 @@
           "word": "Raccoon",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Blue",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Group",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Moon",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Food",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Room",
-          "highlights": [
-            {
-              "start": 2,
+              "start": 4,
               "length": 2
             }
           ]
@@ -3226,7 +2696,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 2, "length": 1}
           ]
         },
         {
@@ -3244,7 +2714,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 2, "length": 1}
           ]
         },
         {
@@ -3345,15 +2815,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Bob14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -3440,51 +2901,6 @@
         },
         {
           "word": "Backpack",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bob",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bus",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bed",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Bear",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Ball",
           "highlights": [
             {
               "start": 0,
@@ -3737,51 +3153,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Cat",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Kit",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Key",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Cup",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Come",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -3927,15 +3298,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Dog14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -3990,7 +3352,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
@@ -4028,51 +3390,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Dog",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Dig",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Dad",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Dot",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Mud",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -4097,7 +3414,7 @@
           "word": "Phone",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4142,8 +3459,8 @@
           "word": "Fat",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -4151,7 +3468,7 @@
           "word": "Fed",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4160,7 +3477,7 @@
           "word": "Fit",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4169,7 +3486,7 @@
           "word": "Fix",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4178,7 +3495,7 @@
           "word": "Fax",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4187,7 +3504,7 @@
           "word": "Fig",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4196,7 +3513,7 @@
           "word": "Fur",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4205,7 +3522,7 @@
           "word": "Fad",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4214,7 +3531,7 @@
           "word": "Fob",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4223,7 +3540,7 @@
           "word": "Fop",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4234,7 +3551,7 @@
           "word": "Fantastic",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4243,8 +3560,8 @@
           "word": "February",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -4252,8 +3569,8 @@
           "word": "Favorite",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -4261,7 +3578,7 @@
           "word": "Festival",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -4270,8 +3587,8 @@
           "word": "Furniture",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -4279,17 +3596,17 @@
           "word": "Firefighter",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
+              "start": 0,
+              "length": 1
+            }, {"start": 4, "length": 1}
           ]
         },
         {
           "word": "Football",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -4297,8 +3614,8 @@
           "word": "Forever",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -4306,8 +3623,8 @@
           "word": "Friendly",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         },
@@ -4315,53 +3632,8 @@
           "word": "Fountain",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Phone",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Often",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Fun",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Fog",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Fin",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
+              "start": 0,
+              "length": 1
             }
           ]
         }
@@ -4509,15 +3781,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Go14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -4527,7 +3790,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 2, "length": 1}
           ]
         },
         {
@@ -4545,7 +3808,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
@@ -4604,51 +3867,6 @@
         },
         {
           "word": "Gymnastics",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Go",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Gap",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Gum",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Guest",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Egg",
           "highlights": [
             {
               "start": 0,
@@ -4716,7 +3934,7 @@
           "highlights": [
             {
               "start": 0,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -4901,51 +4119,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Hop",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Hot",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Home",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Happy",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Who",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -4979,7 +4152,7 @@
           "word": "Edge",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -5195,42 +4368,6 @@
         },
         {
           "word": "Giraffe",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Edge",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Jump",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Jet",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Gem",
           "highlights": [
             {
               "start": 0,
@@ -5483,51 +4620,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Lip",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Lap",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Log",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Lake",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Love",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -5561,7 +4653,7 @@
           "word": "Ham",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
             }
           ]
@@ -5570,7 +4662,7 @@
           "word": "Gum",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
             }
           ]
@@ -5588,7 +4680,7 @@
           "word": "Sam",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
             }
           ]
@@ -5673,15 +4765,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Mom14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -5691,7 +4774,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 2, "length": 2}
           ]
         },
         {
@@ -5774,51 +4857,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Mom",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Ham",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Gum",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Some",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Sam",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -5852,8 +4890,8 @@
           "word": "Know",
           "highlights": [
             {
-              "start": 1,
-              "length": 1
+              "start": 0,
+              "length": 2
             }
           ]
         },
@@ -5964,15 +5002,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Nose14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -6059,51 +5088,6 @@
         },
         {
           "word": "Northeast",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Nose",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Know",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Nap",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Net",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Nut",
           "highlights": [
             {
               "start": 0,
@@ -6356,51 +5340,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Pop",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Pup",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Pan",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Please",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Flip",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -6461,7 +5400,7 @@
           "word": "Car",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 1
             }
           ]
@@ -6573,7 +5512,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 6, "length": 1}
           ]
         },
         {
@@ -6591,7 +5530,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 7, "length": 1}
           ]
         },
         {
@@ -6600,7 +5539,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 6, "length": 1}
           ]
         },
         {
@@ -6609,7 +5548,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 7, "length": 1}
           ]
         },
         {
@@ -6645,52 +5584,7 @@
             {
               "start": 0,
               "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Red",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Rip",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Rain",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Ring",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Car",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
+            }, {"start": 5, "length": 1}, {"start": 12, "length": 1}
           ]
         }
       ]
@@ -6837,15 +5731,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Circle14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -6855,7 +5740,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 6, "length": 1}
           ]
         },
         {
@@ -6882,7 +5767,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
@@ -6900,7 +5785,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 5, "length": 1}
           ]
         },
         {
@@ -6932,51 +5817,6 @@
         },
         {
           "word": "Suitcase",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Circle",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Pace",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Course",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Sit",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Soap",
           "highlights": [
             {
               "start": 0,
@@ -7129,15 +5969,6 @@
             }
           ]
         },
-        {
-          "word": "Tap14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        }
       ],
       "level3Words": [
         {
@@ -7173,7 +6004,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 8, "length": 1}
           ]
         },
         {
@@ -7182,7 +6013,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 4, "length": 1}
           ]
         },
         {
@@ -7191,7 +6022,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
@@ -7223,51 +6054,6 @@
         },
         {
           "word": "Tropical",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Tap",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Ten",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Toy",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Tip",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Net",
           "highlights": [
             {
               "start": 0,
@@ -7383,51 +6169,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Van10",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Vet11",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Vine12",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Of13",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Love14",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -7520,51 +6261,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Van",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Vet",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Vine",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Of",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Love",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -7626,7 +6322,7 @@
           "highlights": [
             {
               "start": 0,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -7686,33 +6382,6 @@
         },
         {
           "word": "Won",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Wet12",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Win13",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Web14",
           "highlights": [
             {
               "start": 0,
@@ -7811,51 +6480,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Wet",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Win",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Web",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Quick",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Why",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -7891,7 +6515,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 2, "length": 1}
           ]
         },
         {
@@ -7992,24 +6616,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Yes13",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Yay14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -8102,51 +6708,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Yes",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Yay",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Yak",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Yell",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Yard",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -8199,7 +6760,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -8208,7 +6769,7 @@
           "highlights": [
             {
               "start": 2,
-              "length": 1
+              "length": 2
             }
           ]
         },
@@ -8265,42 +6826,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Zoo11",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Zone12",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "His13",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Buzz14",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 1
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -8319,7 +6844,7 @@
             {
               "start": 0,
               "length": 1
-            }
+            }, {"start": 3, "length": 1}
           ]
         },
         {
@@ -8393,51 +6918,6 @@
               "length": 1
             }
           ]
-        },
-        {
-          "word": "Zoo",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Zone",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "His",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Buzz",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
-        },
-        {
-          "word": "Fizz",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 1
-            }
-          ]
         }
       ]
     },
@@ -8498,7 +6978,7 @@
           "word": "Lunch",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -8568,24 +7048,6 @@
         },
         {
           "word": "Chef",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Chin13",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Chip14",
           "highlights": [
             {
               "start": 0,
@@ -8684,51 +7146,6 @@
               "length": 2
             }
           ]
-        },
-        {
-          "word": "Chin",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Chip",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Chat",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Chop",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Lunch",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
         }
       ]
     },
@@ -8789,7 +7206,7 @@
           "word": "Wish",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 2
             }
           ]
@@ -8859,24 +7276,6 @@
         },
         {
           "word": "Shad",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Shop13",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Shoe14",
           "highlights": [
             {
               "start": 0,
@@ -8975,51 +7374,6 @@
               "length": 2
             }
           ]
-        },
-        {
-          "word": "Shop",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Shoe",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Fish",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Shape",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Wish",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
         }
       ]
     },
@@ -9044,7 +7398,7 @@
           "word": "Math",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -9053,7 +7407,7 @@
           "word": "Path",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -9062,7 +7416,7 @@
           "word": "Bath",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -9080,7 +7434,7 @@
           "word": "Tooth",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 2
             }
           ]
@@ -9089,7 +7443,7 @@
           "word": "Thaw",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9098,7 +7452,7 @@
           "word": "Thud",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9107,70 +7461,7 @@
           "word": "Thug",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Math8",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Path9",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Bath10",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Thick11",
-          "highlights": [
-            {
               "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Tooth12",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Math13",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Path14",
-          "highlights": [
-            {
-              "start": 1,
               "length": 2
             }
           ]
@@ -9181,7 +7472,7 @@
           "word": "Thankful",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9190,7 +7481,7 @@
           "word": "Thinker",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9199,7 +7490,7 @@
           "word": "Thirteen",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9208,7 +7499,7 @@
           "word": "Thousand",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9217,7 +7508,7 @@
           "word": "Thunder",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9226,7 +7517,7 @@
           "word": "Thermometer",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9235,7 +7526,7 @@
           "word": "Thorough",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9244,7 +7535,7 @@
           "word": "Thoughtful",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9253,7 +7544,7 @@
           "word": "Thumbnail",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9262,52 +7553,7 @@
           "word": "Thumbtack",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Math",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Path",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Bath",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Thick",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Tooth",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -9393,78 +7639,6 @@
               "length": 2
             }
           ]
-        },
-        {
-          "word": "That7",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "These8",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Those9",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Them10",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Then11",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "That12",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "These13",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Those14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -9472,7 +7646,7 @@
           "word": "Feather",
           "highlights": [
             {
-              "start": 0,
+              "start": 3,
               "length": 2
             }
           ]
@@ -9481,7 +7655,7 @@
           "word": "Father",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 2
             }
           ]
@@ -9490,7 +7664,7 @@
           "word": "Gather",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 2
             }
           ]
@@ -9499,7 +7673,7 @@
           "word": "Rather",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 2
             }
           ]
@@ -9508,7 +7682,7 @@
           "word": "Leather",
           "highlights": [
             {
-              "start": 0,
+              "start": 3,
               "length": 2
             }
           ]
@@ -9517,7 +7691,7 @@
           "word": "Weather",
           "highlights": [
             {
-              "start": 0,
+              "start": 3,
               "length": 2
             }
           ]
@@ -9526,7 +7700,7 @@
           "word": "Whether",
           "highlights": [
             {
-              "start": 0,
+              "start": 3,
               "length": 2
             }
           ]
@@ -9535,7 +7709,7 @@
           "word": "Smoothie",
           "highlights": [
             {
-              "start": 0,
+              "start": 4,
               "length": 2
             }
           ]
@@ -9544,7 +7718,7 @@
           "word": "Breathe",
           "highlights": [
             {
-              "start": 0,
+              "start": 4,
               "length": 2
             }
           ]
@@ -9553,52 +7727,7 @@
           "word": "Clothing",
           "highlights": [
             {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "That",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "These",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Those",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Them",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Then",
-          "highlights": [
-            {
-              "start": 0,
+              "start": 3,
               "length": 2
             }
           ]
@@ -9675,87 +7804,6 @@
               "length": 2
             }
           ]
-        },
-        {
-          "word": "When6",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "White7",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Whale8",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "What9",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Whiz10",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "When11",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "White12",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Whale13",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "What14",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -9806,87 +7854,6 @@
         },
         {
           "word": "Whichever",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "When",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "White",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Whale",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "What",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Whiz",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Whom",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "When6",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "White7",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Whale8",
           "highlights": [
             {
               "start": 0,
@@ -10038,15 +8005,6 @@
               "length": 2
             }
           ]
-        },
-        {
-          "word": "Ring14",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -10054,7 +8012,7 @@
           "word": "Running",
           "highlights": [
             {
-              "start": 2,
+              "start": 5,
               "length": 2
             }
           ]
@@ -10063,16 +8021,16 @@
           "word": "Swinging",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
-            }
+            }, {"start": 6, "length": 2}
           ]
         },
         {
           "word": "Painting",
           "highlights": [
             {
-              "start": 2,
+              "start": 6,
               "length": 2
             }
           ]
@@ -10081,7 +8039,7 @@
           "word": "Evening",
           "highlights": [
             {
-              "start": 2,
+              "start": 5,
               "length": 2
             }
           ]
@@ -10090,7 +8048,7 @@
           "word": "Building",
           "highlights": [
             {
-              "start": 2,
+              "start": 6,
               "length": 2
             }
           ]
@@ -10099,7 +8057,7 @@
           "word": "Learning",
           "highlights": [
             {
-              "start": 2,
+              "start": 6,
               "length": 2
             }
           ]
@@ -10108,7 +8066,7 @@
           "word": "Sleeping",
           "highlights": [
             {
-              "start": 2,
+              "start": 6,
               "length": 2
             }
           ]
@@ -10117,7 +8075,7 @@
           "word": "Reading",
           "highlights": [
             {
-              "start": 2,
+              "start": 5,
               "length": 2
             }
           ]
@@ -10128,59 +8086,14 @@
             {
               "start": 2,
               "length": 2
-            }
+            }, {"start": 5, "length": 2}
           ]
         },
         {
           "word": "Drawing",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Ring",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Long",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Bang",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "King",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Bring",
-          "highlights": [
-            {
-              "start": 2,
+              "start": 5,
               "length": 2
             }
           ]
@@ -10244,7 +8157,7 @@
           "word": "Think",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10345,7 +8258,7 @@
           "word": "Drinking",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10354,16 +8267,7 @@
           "word": "Thinking",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Skating",
-          "highlights": [
-            {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10381,7 +8285,7 @@
           "word": "Thanking",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10390,7 +8294,7 @@
           "word": "Blinking",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10399,7 +8303,7 @@
           "word": "Clinking",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10408,7 +8312,7 @@
           "word": "Shrinking",
           "highlights": [
             {
-              "start": 2,
+              "start": 4,
               "length": 2
             }
           ]
@@ -10417,7 +8321,7 @@
           "word": "Spanking",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10426,52 +8330,7 @@
           "word": "Stinking",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Pink",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Bank",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Blink",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Crank",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Think",
-          "highlights": [
-            {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10508,7 +8367,7 @@
           "word": "Measure",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10535,7 +8394,7 @@
           "word": "Azure",
           "highlights": [
             {
-              "start": 2,
+              "start": 1,
               "length": 2
             }
           ]
@@ -10544,7 +8403,7 @@
           "word": "Leisure",
           "highlights": [
             {
-              "start": 2,
+              "start": 3,
               "length": 2
             }
           ]
@@ -10553,8 +8412,8 @@
           "word": "Seizure",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 3,
+              "length": 1
             }
           ]
         },
@@ -10562,8 +8421,8 @@
           "word": "Closure",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 3,
+              "length": 1
             }
           ]
         },
@@ -10571,8 +8430,8 @@
           "word": "Treasure",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 4,
+              "length": 1
             }
           ]
         },
@@ -10580,8 +8439,8 @@
           "word": "Division",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 4,
+              "length": 1
             }
           ]
         },
@@ -10589,44 +8448,8 @@
           "word": "Occasion",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Beige11",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Measure12",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Vision13",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Pleasure14",
-          "highlights": [
-            {
               "start": 4,
-              "length": 2
+              "length": 1
             }
           ]
         }
@@ -10636,7 +8459,7 @@
           "word": "Television",
           "highlights": [
             {
-              "start": 2,
+              "start": 6,
               "length": 2
             }
           ]
@@ -10645,7 +8468,7 @@
           "word": "Revision",
           "highlights": [
             {
-              "start": 2,
+              "start": 4,
               "length": 2
             }
           ]
@@ -10654,8 +8477,8 @@
           "word": "Provision",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 5,
+              "length": 1
             }
           ]
         },
@@ -10663,8 +8486,8 @@
           "word": "Explosion",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 5,
+              "length": 1
             }
           ]
         },
@@ -10672,8 +8495,8 @@
           "word": "Collision",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 5,
+              "length": 1
             }
           ]
         },
@@ -10681,8 +8504,8 @@
           "word": "Decision",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
+              "start": 4,
+              "length": 1
             }
           ]
         },
@@ -10690,80 +8513,8 @@
           "word": "Precision",
           "highlights": [
             {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Beige",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Measure",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Vision",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Pleasure",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Azure",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Leisure",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Seizure",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Closure",
-          "highlights": [
-            {
-              "start": 2,
-              "length": 2
+              "start": 5,
+              "length": 1
             }
           ]
         }
@@ -10902,24 +8653,6 @@
               "length": 2
             }
           ]
-        },
-        {
-          "word": "Turn13",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Her14",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -10936,7 +8669,7 @@
           "word": "Thursday",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -10954,7 +8687,7 @@
           "word": "Concern",
           "highlights": [
             {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -10963,7 +8696,7 @@
           "word": "Dessert",
           "highlights": [
             {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -10972,7 +8705,7 @@
           "word": "Hamburger",
           "highlights": [
             {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -11006,51 +8739,6 @@
         },
         {
           "word": "Nursery",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Turn",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Her",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Fur",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Burn",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Hurt",
           "highlights": [
             {
               "start": 1,
@@ -11099,7 +8787,7 @@
           "word": "Star",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -11126,7 +8814,7 @@
           "word": "Art",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11135,7 +8823,7 @@
           "word": "Arm",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11144,7 +8832,7 @@
           "word": "Arc",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11153,7 +8841,7 @@
           "word": "Ark",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11162,7 +8850,7 @@
           "word": "Arg",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11171,7 +8859,7 @@
           "word": "Arp",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11180,7 +8868,7 @@
           "word": "Arf",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11189,7 +8877,7 @@
           "word": "Arb",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11198,7 +8886,7 @@
           "word": "Ard",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11207,7 +8895,7 @@
           "word": "Arl",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11218,7 +8906,7 @@
           "word": "Artist",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11227,7 +8915,7 @@
           "word": "Argument",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11236,7 +8924,7 @@
           "word": "Arctic",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11245,7 +8933,7 @@
           "word": "Armchair",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11254,7 +8942,7 @@
           "word": "Armadillo",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -11299,52 +8987,7 @@
           "word": "Sparkle",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Dark",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Car",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Star",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Far",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Jar",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -11509,7 +9152,7 @@
           "word": "Important",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 2
             }
           ]
@@ -11518,7 +9161,7 @@
           "word": "Explorer",
           "highlights": [
             {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -11527,7 +9170,7 @@
           "word": "Recorder",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 2
             }
           ]
@@ -11536,7 +9179,7 @@
           "word": "Decorator",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 2
             }
           ]
@@ -11545,7 +9188,7 @@
           "word": "Storybook",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -11554,7 +9197,7 @@
           "word": "Popcorn",
           "highlights": [
             {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -11563,7 +9206,7 @@
           "word": "Airport",
           "highlights": [
             {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -11572,7 +9215,7 @@
           "word": "Outdoor",
           "highlights": [
             {
-              "start": 1,
+              "start": 5,
               "length": 2
             }
           ]
@@ -11581,7 +9224,7 @@
           "word": "Indoor",
           "highlights": [
             {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -11590,52 +9233,7 @@
           "word": "Uniform",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Pork",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Corn",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "For",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Born",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Horn",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -11744,7 +9342,7 @@
           "word": "Spoil",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -11753,7 +9351,7 @@
           "word": "Broil",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -11800,7 +9398,7 @@
           "word": "Appointment",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 2
             }
           ]
@@ -11809,16 +9407,7 @@
           "word": "Enjoyment",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Explosion",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 3,
               "length": 2
             }
           ]
@@ -11872,7 +9461,7 @@
           "word": "Avoiding",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -11881,52 +9470,7 @@
           "word": "Employer",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Toy",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Joy",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Coin",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Join",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Soil",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 4,
               "length": 2
             }
           ]
@@ -11963,7 +9507,7 @@
           "word": "Cow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -11972,7 +9516,7 @@
           "word": "Now",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -11981,7 +9525,7 @@
           "word": "How",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -11999,7 +9543,7 @@
           "word": "Bow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12008,7 +9552,7 @@
           "word": "Pow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12017,7 +9561,7 @@
           "word": "Vow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12026,7 +9570,7 @@
           "word": "Wow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12035,7 +9579,7 @@
           "word": "Mow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12044,7 +9588,7 @@
           "word": "Row",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12053,7 +9597,7 @@
           "word": "Low",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12062,7 +9606,7 @@
           "word": "Sow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12071,7 +9615,7 @@
           "word": "Tow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12080,7 +9624,7 @@
           "word": "Dow",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12091,7 +9635,7 @@
           "word": "Flowerpot",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12100,7 +9644,7 @@
           "word": "Powder",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12109,7 +9653,7 @@
           "word": "Powerful",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12118,7 +9662,7 @@
           "word": "Downstairs",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
             }
           ]
@@ -12127,7 +9671,7 @@
           "word": "Uptown",
           "highlights": [
             {
-              "start": 0,
+              "start": 3,
               "length": 2
             }
           ]
@@ -12136,16 +9680,16 @@
           "word": "Downtown",
           "highlights": [
             {
-              "start": 0,
+              "start": 1,
               "length": 2
-            }
+            }, {"start": 5, "length": 2}
           ]
         },
         {
           "word": "Rainbow",
           "highlights": [
             {
-              "start": 0,
+              "start": 5,
               "length": 2
             }
           ]
@@ -12154,7 +9698,7 @@
           "word": "Snowplow",
           "highlights": [
             {
-              "start": 0,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12163,7 +9707,7 @@
           "word": "Eyebrow",
           "highlights": [
             {
-              "start": 0,
+              "start": 5,
               "length": 2
             }
           ]
@@ -12172,52 +9716,7 @@
           "word": "Handout",
           "highlights": [
             {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Ouch",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Cow",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Now",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "How",
-          "highlights": [
-            {
-              "start": 0,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Town",
-          "highlights": [
-            {
-              "start": 0,
+              "start": 4,
               "length": 2
             }
           ]
@@ -12246,7 +9745,7 @@
           "highlights": [
             {
               "start": 1,
-              "length": 2
+              "length": 1
             }
           ]
         },
@@ -12308,7 +9807,7 @@
           "word": "Shook",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12326,7 +9825,7 @@
           "word": "Brook",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12335,7 +9834,7 @@
           "word": "Crook",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12366,15 +9865,6 @@
               "length": 2
             }
           ]
-        },
-        {
-          "word": "Pull14",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
         }
       ],
       "level3Words": [
@@ -12384,14 +9874,14 @@
             {
               "start": 1,
               "length": 2
-            }
+            }, {"start": 5, "length": 2}
           ]
         },
         {
           "word": "Notebook",
           "highlights": [
             {
-              "start": 1,
+              "start": 5,
               "length": 2
             }
           ]
@@ -12409,7 +9899,7 @@
           "word": "Brooklyn",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12419,7 +9909,7 @@
           "highlights": [
             {
               "start": 1,
-              "length": 2
+              "length": 1
             }
           ]
         },
@@ -12454,7 +9944,7 @@
           "word": "Childhood",
           "highlights": [
             {
-              "start": 1,
+              "start": 6,
               "length": 2
             }
           ]
@@ -12463,52 +9953,7 @@
           "word": "Neighborhood",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Pull",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Book",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Look",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Good",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Foot",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 9,
               "length": 2
             }
           ]
@@ -12635,7 +10080,7 @@
           "word": "Spawn",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12644,7 +10089,7 @@
           "word": "Thaw",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12653,16 +10098,7 @@
           "word": "Claw",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Haul14",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12673,7 +10109,7 @@
           "word": "Awesome",
           "highlights": [
             {
-              "start": 1,
+              "start": 0,
               "length": 2
             }
           ]
@@ -12682,7 +10118,7 @@
           "word": "Drawing",
           "highlights": [
             {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
@@ -12691,7 +10127,7 @@
           "word": "Strawberry",
           "highlights": [
             {
-              "start": 1,
+              "start": 3,
               "length": 2
             }
           ]
@@ -12754,52 +10190,7 @@
           "word": "Clawfoot",
           "highlights": [
             {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Haul",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Saw",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Paw",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Raw",
-          "highlights": [
-            {
-              "start": 1,
-              "length": 2
-            }
-          ]
-        },
-        {
-          "word": "Law",
-          "highlights": [
-            {
-              "start": 1,
+              "start": 2,
               "length": 2
             }
           ]
