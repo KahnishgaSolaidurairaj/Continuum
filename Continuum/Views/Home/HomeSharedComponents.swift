@@ -146,9 +146,8 @@ struct HomeStreakRow: View {
                 streakTextBlock(titleSize: 24, subtitleSize: 17)
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                dayIndicators(circleSize: 30, spacing: 10)
-            }
+            dayIndicators(circleSize: 30, spacing: 10)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
     }
 
@@ -237,17 +236,28 @@ struct HomeSuggestionCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(accentColor.opacity(0.22))
-                        .frame(
-                            width: layout.scaled(54, phone: 44),
-                            height: layout.scaled(54, phone: 44)
-                        )
-                    Image(systemName: icon)
-                        .font(.system(size: layout.scaled(24, phone: 20), weight: .bold))
-                        .foregroundStyle(accentColor)
+                if !layout.isPhone {
+                    ZStack {
+                        Circle()
+                            .fill(accentColor.opacity(0.22))
+                            .frame(
+                                width: layout.scaled(54, phone: 44),
+                                height: layout.scaled(54, phone: 44)
+                            )
+                        Image(systemName: icon)
+                            .font(.system(size: layout.scaled(24, phone: 20), weight: .bold))
+                            .foregroundStyle(accentColor)
+                    }
                 }
+                // Phone: practice and target icons hidden
+                // ZStack {
+                //     Circle()
+                //         .fill(accentColor.opacity(0.22))
+                //         .frame(width: layout.scaled(54, phone: 44), height: layout.scaled(54, phone: 44))
+                //     Image(systemName: icon)
+                //         .font(.system(size: layout.scaled(24, phone: 20), weight: .bold))
+                //         .foregroundStyle(accentColor)
+                // }
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text(title)

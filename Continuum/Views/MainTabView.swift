@@ -58,16 +58,10 @@ struct MainTabView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            if !tabBarVisibility.isHidden {
-                ContinuumTabBar(
-                    selectedTab: $selectedTab,
-                    onTabSelected: selectTab,
-                    showsDashboardTab: !parentMode.isChildMode
-                )
-                    .padding(.horizontal, layout.scaled(28, phone: 16))
-                    .padding(.bottom, 10)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if !tabBarVisibility.isHidden {
+                    tabBarChrome
+                }
             }
 
             if showAppTour, !tabBarVisibility.isHidden {
@@ -160,6 +154,22 @@ struct MainTabView: View {
             showPostTourPINSetup = true
         }
     }
+
+    /// Bottom tab bar inset anchored to the screen bottom on iPhone.
+    private var tabBarChrome: some View {
+        VStack(spacing: 0) {
+            ContinuumTabBar(
+                selectedTab: $selectedTab,
+                onTabSelected: selectTab,
+                showsDashboardTab: !parentMode.isChildMode
+            )
+            .padding(.horizontal, layout.scaled(28, phone: 16))
+            .padding(.top, layout.isPhone ? 8 : 10)
+            .padding(.bottom, layout.isPhone ? 2 : 10)
+        }
+        .frame(maxWidth: .infinity)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
 }
 
 /// Floating bottom navigation bar from the updated Continuum mockup.
@@ -179,8 +189,10 @@ struct ContinuumTabBar: View {
 
     /// Returns bottom padding for scroll content based on the active device layout.
     static func contentBottomPadding(for layout: ContinuumDeviceLayout) -> CGFloat {
-        let height = layout.isPhone ? phoneLayoutHeight : layoutHeight
-        return height + (layout.isPhone ? 14 : 18)
+        if layout.isPhone {
+            return 8
+        }
+        return layoutHeight + 18
     }
 
     var body: some View {

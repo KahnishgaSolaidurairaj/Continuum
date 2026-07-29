@@ -41,7 +41,7 @@ struct HomeView: View {
                     heroHeader
                     mainPanel
                         .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
-                        .padding(.top, layout.isPhone ? -10 : -22)
+                        .padding(.top, layout.isPhone ? -36 : -22)
                 }
                 .padding(.bottom, ContinuumTabBar.contentBottomPadding(for: layout))
             }
@@ -95,8 +95,8 @@ struct HomeView: View {
 
             GeometryReader { geometry in
                 let mascotSize = min(
-                    geometry.size.width * (layout.isPhone ? 0.30 : 0.57),
-                    layout.scaled(294, phone: 112)
+                    geometry.size.width * (layout.isPhone ? 0.34 : 0.57),
+                    layout.scaled(294, phone: 126)
                 )
                 let mascotLeftOffset = mascotSize * 0.12
                 let taglineLineHeight = UIFont.systemFont(
@@ -105,41 +105,45 @@ struct HomeView: View {
                 ).lineHeight
 
                 if layout.isPhone {
-                    HStack(alignment: .top, spacing: 6) {
+                    ZStack(alignment: .topLeading) {
+                        HStack {
+                            Spacer(minLength: 0)
+
+                            Image(BrocaBearCatalog.headerPose)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: mascotSize, height: mascotSize)
+                                .clipped()
+                                .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
+                                .accessibilityLabel("Broca the Bear")
+                        }
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text(parentMode.isChildMode ? "Let's practice!" : "Welcome to")
-                                .font(layout.font(36, phoneSize: 20, weight: .semibold))
+                                .font(layout.font(36, phoneSize: 24, weight: .semibold))
                                 .foregroundStyle(ContinuumTheme.pencilLead)
                                 .lineLimit(2)
                                 .minimumScaleFactor(0.85)
 
                             Text("Continuum")
-                                .font(layout.font(68, phoneSize: 32, weight: .bold))
+                                .font(layout.font(68, phoneSize: 38, weight: .bold))
                                 .foregroundStyle(ContinuumTheme.pencilLead)
                                 .shadow(color: .white.opacity(0.9), radius: 0, x: 1, y: 1)
                                 .minimumScaleFactor(0.75)
                                 .lineLimit(1)
 
                             Text(parentMode.isChildMode ? "Your practice space" : "Continue therapy at home")
-                                .font(layout.font(26, phoneSize: 15, weight: .medium))
+                                .font(layout.font(26, phoneSize: 18, weight: .medium))
                                 .foregroundStyle(ContinuumTheme.pencilLead.opacity(0.82))
                                 .lineLimit(2)
                                 .minimumScaleFactor(0.85)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Image(BrocaBearCatalog.headerPose)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: mascotSize, height: mascotSize)
-                            .clipped()
-                            .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
-                            .accessibilityLabel("Broca the Bear")
+                        .padding(.leading, ContinuumTheme.pageHorizontalPadding(for: layout))
+                        .padding(.trailing, mascotSize * 0.42)
                     }
-                    .padding(.horizontal, ContinuumTheme.pageHorizontalPadding(for: layout))
                     .padding(.top, 2)
-                    .padding(.bottom, 28)
+                    .padding(.bottom, 8)
                     .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 } else {
                     ZStack(alignment: .bottom) {
@@ -189,7 +193,7 @@ struct HomeView: View {
                 }
             }
         }
-        .frame(height: layout.scaled(310, phone: 196))
+        .frame(height: layout.scaled(310, phone: 172))
         .frame(maxWidth: .infinity)
     }
 

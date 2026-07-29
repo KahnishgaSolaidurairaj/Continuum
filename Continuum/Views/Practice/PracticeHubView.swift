@@ -173,24 +173,14 @@ struct PhonemeSelectionView: View {
     private var prioritySoundsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             Group {
-                if layout.isPhone && !isChildMode {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Label("Priority Sounds", systemImage: "folder.fill")
-                            .font(layout.font(isChildMode ? 32 : 26, phoneSize: isChildMode ? 26 : 22, weight: .bold))
-                            .foregroundStyle(ContinuumTheme.tabPurple)
+                HStack(spacing: 10) {
+                    Label("Priority Sounds", systemImage: "folder.fill")
+                        .font(layout.font(isChildMode ? 32 : 26, phoneSize: isChildMode ? 26 : 22, weight: .bold))
+                        .foregroundStyle(ContinuumTheme.tabPurple)
 
-                        priorityManagementButtons
-                    }
-                } else {
-                    HStack(spacing: 10) {
-                        Label("Priority Sounds", systemImage: "folder.fill")
-                            .font(.system(size: isChildMode ? 32 : 26, weight: .bold, design: .rounded))
-                            .foregroundStyle(ContinuumTheme.tabPurple)
+                    Spacer(minLength: 0)
 
-                        Spacer()
-
-                        priorityManagementButtons
-                    }
+                    priorityManagementButtons
                 }
             }
 
@@ -286,22 +276,12 @@ struct PhonemeSelectionView: View {
     @ViewBuilder
     private var priorityManagementButtons: some View {
         if !isChildMode {
-            if layout.isPhone {
-                HStack(spacing: 10) {
-                    managePriorityButton
-                    if isManagingPriority {
-                        addPriorityButton
-                    }
-                }
-            } else {
-                Spacer()
+            HStack(spacing: 10) {
                 managePriorityButton
                 if isManagingPriority {
                     addPriorityButton
                 }
             }
-        } else if !layout.isPhone {
-            Spacer()
         }
     }
 
@@ -327,14 +307,21 @@ struct PhonemeSelectionView: View {
         Button {
             showPriorityPicker = true
         } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "plus")
-                    .font(.system(size: 14, weight: .bold))
-                Text("Add")
+            Group {
+                if layout.isPhone {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .bold))
+                } else {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 14, weight: .bold))
+                        Text("Add")
+                    }
+                }
             }
             .font(.system(size: 16, weight: .bold, design: .rounded))
             .foregroundStyle(ContinuumTheme.tabPurple)
-            .padding(.horizontal, layout.scaled(18, phone: 14))
+            .padding(.horizontal, layout.scaled(18, phone: 12))
             .padding(.vertical, layout.scaled(10, phone: 8))
             .background(Color.white.opacity(0.95))
             .clipShape(Capsule())
@@ -344,6 +331,7 @@ struct PhonemeSelectionView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Add")
     }
 
     /// Motivational Broca panel shown below priority sounds in child mode.
