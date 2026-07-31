@@ -1,6 +1,15 @@
 # Continuum
 
-Continuum is a SwiftUI iPad/iPhone app for practicing English pronunciation at home. It is built for kids learning speech sounds, with a parent-facing progress view and Broca the Bear as a friendly guide.
+Meet Continuum! A gamified speech practice app designed to guide kids on English phonemes to stay engaged with speech therapy at home, while also enabling anxious parents to monitor progress without having to be beside them. Continuum is a SwiftUI iPad/iPhone app for practicing English pronunciation at home. It is built for kids learning speech sounds, with a parent-facing progress view and Broca the Bear as a friendly guide.
+
+Since we've started, we've launched Continuum on the App Store, taken part in Apple/Everyone Can Code's IOS App Startup Accelerator, and pitched our app to school and apple industry professionals! Our next step is pilots at real clinics and schools. If you're interested, reach out!
+
+App Store Link! https://apps.apple.com/us/app/continuum-speech-therapy/id6791718345
+Website for our App! https://continuum-website-ecc.vercel.app/
+
+AI was used for frontend fixups and design.
+
+Developed by Arjun Prabhakaran, Kahnishga Solaidurairaj, and Nyleah Jones 
 
 ## What it does
 
