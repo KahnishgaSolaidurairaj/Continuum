@@ -4,7 +4,7 @@ Meet Continuum! A gamified speech practice app designed to guide kids on English
 
 Since we've started, we've launched Continuum on the App Store, taken part in Apple/Everyone Can Code's IOS App Startup Accelerator, and pitched our app to school and apple industry professionals! Our next step is pilots at real clinics and schools. If you're interested, reach out!
 
-App Store Link! https://apps.apple.com/us/app/continuum-speech-therapy/id6791718345
+App Store Link! https://apps.apple.com/us/app/continuum-speech-therapy/id6791718345  
 Website for our App! https://continuum-website-ecc.vercel.app/
 
 AI was used for frontend fixups and design.
