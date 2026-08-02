@@ -56,16 +56,58 @@ enum ContinuumTheme {
     static let kidButtonFont: Font = .system(size: 22, weight: .bold, design: .rounded)
     static let kidCaptionFont: Font = .system(size: 18, weight: .medium, design: .rounded)
     static let kidMinTapHeight: CGFloat = 56
+
+    /// Returns page horizontal padding for the active device layout.
+    static func pageHorizontalPadding(for layout: ContinuumDeviceLayout) -> CGFloat {
+        layout.scaled(pageHorizontalPadding, phone: 16)
+    }
+
+    /// Returns the kid navigation title font for the active device layout.
+    static func kidNavigationTitleFont(for layout: ContinuumDeviceLayout) -> Font {
+        layout.font(34, phoneSize: 28, weight: .bold)
+    }
+
+    /// Returns the kid section header font for the active device layout.
+    static func kidSectionHeaderFont(for layout: ContinuumDeviceLayout) -> Font {
+        layout.font(30, phoneSize: 24, weight: .bold)
+    }
+
+    /// Returns the kid body font for the active device layout.
+    static func kidBodyFont(for layout: ContinuumDeviceLayout) -> Font {
+        layout.font(22, phoneSize: 18, weight: .medium)
+    }
+
+    /// Returns the kid subhead font for the active device layout.
+    static func kidSubheadFont(for layout: ContinuumDeviceLayout) -> Font {
+        layout.font(20, phoneSize: 17, weight: .semibold)
+    }
+
+    /// Returns the kid button font for the active device layout.
+    static func kidButtonFont(for layout: ContinuumDeviceLayout) -> Font {
+        layout.font(22, phoneSize: 18, weight: .bold)
+    }
+
+    /// Returns the kid caption font for the active device layout.
+    static func kidCaptionFont(for layout: ContinuumDeviceLayout) -> Font {
+        layout.font(18, phoneSize: 15, weight: .medium)
+    }
+
+    /// Returns the minimum tap height for the active device layout.
+    static func kidMinTapHeight(for layout: ContinuumDeviceLayout) -> CGFloat {
+        layout.scaled(kidMinTapHeight, phone: 48)
+    }
 }
 
-extension View {
-    /// Applies the theme purple capsule styling used for home practice buttons.
-    func homePracticeCapsuleStyle() -> some View {
-        font(.system(size: 24, weight: .bold, design: .rounded))
+private struct HomePracticeCapsuleStyleModifier: ViewModifier {
+    @Environment(\.continuumDeviceLayout) private var layout
+
+    func body(content: Content) -> some View {
+        content
+            .font(layout.font(24, phoneSize: 20, weight: .bold))
             .foregroundStyle(.white)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-            .frame(maxWidth: .infinity, minHeight: 64)
+            .frame(maxWidth: .infinity, minHeight: layout.scaled(64, phone: 52))
             .background(
                 LinearGradient(
                     colors: [ContinuumTheme.tabPurple, Color(red: 0.68, green: 0.52, blue: 0.92)],
@@ -77,40 +119,35 @@ extension View {
             .shadow(color: ContinuumTheme.tabPurple.opacity(0.28), radius: 8, y: 4)
             .fullCapsuleHitTarget()
     }
+}
 
-    /// Applies a large, centered navigation title that is easy for kids to read.
-    func kidFriendlyNavigationTitle(_ title: String) -> some View {
-        navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(title)
-                        .font(ContinuumTheme.kidNavigationTitleFont)
-                }
-            }
-    }
+private struct KidPrimaryButtonStyleModifier: ViewModifier {
+    @Environment(\.continuumDeviceLayout) private var layout
+    let background: Color
+    let foreground: Color
 
-    /// Applies kid-friendly primary button styling with a large tap target.
-    func kidPrimaryButtonStyle(
-        background: Color = ContinuumTheme.tabPurple,
-        foreground: Color = .white
-    ) -> some View {
-        font(ContinuumTheme.kidButtonFont)
+    func body(content: Content) -> some View {
+        content
+            .font(ContinuumTheme.kidButtonFont(for: layout))
             .foregroundStyle(foreground)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
-            .frame(minHeight: ContinuumTheme.kidMinTapHeight)
+            .padding(.horizontal, layout.scaled(24, phone: 18))
+            .padding(.vertical, layout.scaled(16, phone: 12))
+            .frame(minHeight: ContinuumTheme.kidMinTapHeight(for: layout))
             .background(background)
             .clipShape(RoundedRectangle(cornerRadius: 16))
     }
+}
 
-    /// Applies kid-friendly secondary button styling with a large tap target.
-    func kidSecondaryButtonStyle() -> some View {
-        font(ContinuumTheme.kidButtonFont)
+private struct KidSecondaryButtonStyleModifier: ViewModifier {
+    @Environment(\.continuumDeviceLayout) private var layout
+
+    func body(content: Content) -> some View {
+        content
+            .font(ContinuumTheme.kidButtonFont(for: layout))
             .foregroundStyle(ContinuumTheme.tabPurple)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
-            .frame(minHeight: ContinuumTheme.kidMinTapHeight)
+            .padding(.horizontal, layout.scaled(24, phone: 18))
+            .padding(.vertical, layout.scaled(16, phone: 12))
+            .frame(minHeight: ContinuumTheme.kidMinTapHeight(for: layout))
             .background(.white.opacity(0.95))
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(
@@ -118,18 +155,52 @@ extension View {
                     .stroke(ContinuumTheme.cardBorder.opacity(0.25), lineWidth: 2)
             )
     }
+}
+
+private struct ContinuumSheetInsetModifier: ViewModifier {
+    @Environment(\.continuumDeviceLayout) private var layout
+
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, layout.scaled(28, phone: 16))
+            .padding(.vertical, layout.scaled(28, phone: 16))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay {
+                RoundedRectangle(cornerRadius: layout.scaled(36, phone: 28))
+                    .strokeBorder(ContinuumTheme.tabPurple.opacity(0.5), lineWidth: 5)
+            }
+            .padding(.horizontal, layout.scaled(20, phone: 12))
+            .padding(.vertical, layout.scaled(20, phone: 12))
+    }
+}
+
+extension View {
+    /// Applies the theme purple capsule styling used for home practice buttons.
+    func homePracticeCapsuleStyle() -> some View {
+        modifier(HomePracticeCapsuleStyleModifier())
+    }
+
+    /// Applies a large, centered navigation title that is easy for kids to read.
+    func kidFriendlyNavigationTitle(_ title: String) -> some View {
+        modifier(KidFriendlyNavigationTitleModifier(title: title))
+    }
+
+    /// Applies kid-friendly primary button styling with a large tap target.
+    func kidPrimaryButtonStyle(
+        background: Color = ContinuumTheme.tabPurple,
+        foreground: Color = .white
+    ) -> some View {
+        modifier(KidPrimaryButtonStyleModifier(background: background, foreground: foreground))
+    }
+
+    /// Applies kid-friendly secondary button styling with a large tap target.
+    func kidSecondaryButtonStyle() -> some View {
+        modifier(KidSecondaryButtonStyleModifier())
+    }
 
     /// Applies warm-up-style outer inset and purple border for full-screen kid sheets.
     func continuumSheetInset() -> some View {
-        padding(.horizontal, 28)
-            .padding(.vertical, 28)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay {
-                RoundedRectangle(cornerRadius: 36)
-                    .strokeBorder(ContinuumTheme.tabPurple.opacity(0.5), lineWidth: 5)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 20)
+        modifier(ContinuumSheetInsetModifier())
     }
 
     /// Applies styling for selectable list rows in sheets.
@@ -155,5 +226,22 @@ extension View {
     /// Ensures taps register across an entire rounded-rectangle button label.
     func fullRoundedHitTarget(cornerRadius: CGFloat) -> some View {
         contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+}
+
+private struct KidFriendlyNavigationTitleModifier: ViewModifier {
+    @Environment(\.continuumDeviceLayout) private var layout
+    let title: String
+
+    func body(content: Content) -> some View {
+        content
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(title)
+                        .font(ContinuumTheme.kidNavigationTitleFont(for: layout))
+                }
+            }
     }
 }

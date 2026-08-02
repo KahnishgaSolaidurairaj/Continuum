@@ -5,12 +5,14 @@ struct TopPracticedSoundsCard: View {
     let date: Date
     let stats: [PracticedSoundStat]
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     private var maxCount: Int {
         max(stats.map(\.visitCount).max() ?? 1, 1)
     }
 
     var body: some View {
-        DashboardCard(height: DashboardLayout.statPairHeight) {
+        DashboardCard(height: DashboardLayout.cardHeight(DashboardLayout.statPairHeight, layout: layout)) {
             VStack(alignment: .leading, spacing: 12) {
                 DashboardCardHeader(
                     title: "Sounds practiced",
@@ -22,7 +24,7 @@ struct TopPracticedSoundsCard: View {
                     VStack(alignment: .leading, spacing: 10) {
                         if stats.isEmpty {
                             Text("No practice sounds recorded for this day.")
-                                .font(DashboardTypography.body)
+                                .font(DashboardTypography.body(for: layout))
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, minHeight: 120, alignment: .center)
                         } else {
@@ -30,12 +32,12 @@ struct TopPracticedSoundsCard: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
                                         Text(stat.displayName)
-                                            .font(DashboardTypography.body)
+                                            .font(DashboardTypography.body(for: layout))
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.85)
                                         Spacer(minLength: 4)
                                         Text("\(stat.visitCount)")
-                                            .font(DashboardTypography.bodyEmphasis)
+                                            .font(DashboardTypography.bodyEmphasis(for: layout))
                                             .foregroundStyle(ContinuumTheme.tabPurple)
                                     }
 

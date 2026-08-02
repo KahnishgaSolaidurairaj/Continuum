@@ -17,6 +17,11 @@ enum DashboardLayout {
     static var miniBoxStackHeight: CGFloat {
         miniBoxRowHeight * 3 + miniBoxSpacing * 2
     }
+
+    /// Returns a fixed card height on iPad and intrinsic height on iPhone.
+    static func cardHeight(_ padHeight: CGFloat, layout: ContinuumDeviceLayout) -> CGFloat? {
+        layout.isPhone ? nil : padHeight
+    }
 }
 
 /// Shared typography sized for kid- and parent-readable dashboard content.
@@ -29,6 +34,46 @@ enum DashboardTypography {
     static let caption: Font = ContinuumTheme.kidCaptionFont
     static let headerIconSize: CGFloat = 24
     static let rowIconSize: CGFloat = 22
+
+    /// Returns the dashboard card title font for the active device layout.
+    static func cardTitle(for layout: ContinuumDeviceLayout) -> Font {
+        layout.font(26, phoneSize: 22, weight: .bold)
+    }
+
+    /// Returns the dashboard card subtitle font for the active device layout.
+    static func cardSubtitle(for layout: ContinuumDeviceLayout) -> Font {
+        ContinuumTheme.kidSubheadFont(for: layout)
+    }
+
+    /// Returns the dashboard body font for the active device layout.
+    static func body(for layout: ContinuumDeviceLayout) -> Font {
+        ContinuumTheme.kidBodyFont(for: layout)
+    }
+
+    /// Returns the dashboard body emphasis font for the active device layout.
+    static func bodyEmphasis(for layout: ContinuumDeviceLayout) -> Font {
+        ContinuumTheme.kidBodyFont(for: layout).weight(.semibold)
+    }
+
+    /// Returns the dashboard label font for the active device layout.
+    static func label(for layout: ContinuumDeviceLayout) -> Font {
+        ContinuumTheme.kidSubheadFont(for: layout).weight(.bold)
+    }
+
+    /// Returns the dashboard caption font for the active device layout.
+    static func caption(for layout: ContinuumDeviceLayout) -> Font {
+        ContinuumTheme.kidCaptionFont(for: layout)
+    }
+
+    /// Returns the dashboard header icon size for the active device layout.
+    static func headerIconSize(for layout: ContinuumDeviceLayout) -> CGFloat {
+        layout.scaled(headerIconSize, phone: 20)
+    }
+
+    /// Returns the dashboard row icon size for the active device layout.
+    static func rowIconSize(for layout: ContinuumDeviceLayout) -> CGFloat {
+        layout.scaled(rowIconSize, phone: 18)
+    }
 }
 
 /// Reports measured dashboard text height for adaptive padding.
@@ -79,6 +124,8 @@ struct DashboardCardHeader: View {
     let systemImage: String
     let subtitle: String?
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     init(title: String, systemImage: String, subtitle: String? = nil) {
         self.title = title
         self.systemImage = systemImage
@@ -89,19 +136,21 @@ struct DashboardCardHeader: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 10) {
                 Image(systemName: systemImage)
-                    .font(.system(size: DashboardTypography.headerIconSize, weight: .semibold))
+                    .font(.system(size: DashboardTypography.headerIconSize(for: layout), weight: .semibold))
                     .foregroundStyle(ContinuumTheme.tabPurple)
 
                 Text(title)
-                    .font(DashboardTypography.cardTitle)
+                    .font(DashboardTypography.cardTitle(for: layout))
                     .foregroundStyle(.black)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
             }
 
             if let subtitle {
                 Text(subtitle)
-                    .font(DashboardTypography.cardSubtitle)
+                    .font(DashboardTypography.cardSubtitle(for: layout))
                     .foregroundStyle(.secondary)
-                    .padding(.leading, DashboardTypography.headerIconSize + 10)
+                    .padding(.leading, DashboardTypography.headerIconSize(for: layout) + 10)
             }
         }
     }

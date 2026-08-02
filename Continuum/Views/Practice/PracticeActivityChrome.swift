@@ -7,6 +7,21 @@ enum PracticeActivityChrome {
     static let contentSpacing: CGFloat = 24
     static let cardInnerPadding: CGFloat = 24
 
+    /// Returns horizontal padding for the active device layout.
+    static func contentHorizontalPadding(for layout: ContinuumDeviceLayout) -> CGFloat {
+        layout.scaled(contentHorizontalPadding, phone: 18)
+    }
+
+    /// Returns vertical padding for the active device layout.
+    static func contentVerticalPadding(for layout: ContinuumDeviceLayout) -> CGFloat {
+        layout.scaled(contentVerticalPadding, phone: 24)
+    }
+
+    /// Returns card inner padding for the active device layout.
+    static func cardInnerPadding(for layout: ContinuumDeviceLayout) -> CGFloat {
+        layout.scaled(cardInnerPadding, phone: 18)
+    }
+
     /// Background gradient for a practice activity screen.
     static func background(for activity: PracticeActivity) -> LinearGradient {
         switch activity {
@@ -55,27 +70,29 @@ struct PracticeActivityHeader: View {
     var title: String? = nil
     let subtitle: String
     let detail: String
-    var subtitleFont: Font = ContinuumTheme.kidSubheadFont
+    var subtitleFont: Font? = nil
     var borderColor: Color = ContinuumTheme.tabPurple.opacity(0.2)
+
+    @Environment(\.continuumDeviceLayout) private var layout
 
     var body: some View {
         VStack(spacing: 8) {
             if let title {
                 Text(title)
-                    .font(ContinuumTheme.kidSectionHeaderFont)
+                    .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
                     .foregroundStyle(ContinuumTheme.tabPurple)
             }
 
             Text(subtitle)
-                .font(subtitleFont)
+                .font(subtitleFont ?? ContinuumTheme.kidSubheadFont(for: layout))
                 .foregroundStyle(ContinuumTheme.pencilLead)
 
             Text(detail)
-                .font(ContinuumTheme.kidBodyFont)
+                .font(ContinuumTheme.kidBodyFont(for: layout))
                 .foregroundStyle(ContinuumTheme.subtitleGray)
                 .multilineTextAlignment(.center)
         }
-        .padding(PracticeActivityChrome.cardInnerPadding)
+        .padding(PracticeActivityChrome.cardInnerPadding(for: layout))
         .frame(maxWidth: .infinity)
         .practiceActivityCardStyle(borderColor: borderColor)
     }
@@ -86,19 +103,21 @@ struct PracticeActivityScrollLayout<Content: View>: View {
     var spacing: CGFloat = PracticeActivityChrome.contentSpacing
     @ViewBuilder var content: () -> Content
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
                 VStack(spacing: 0) {
-                    Spacer(minLength: PracticeActivityChrome.contentVerticalPadding)
+                    Spacer(minLength: PracticeActivityChrome.contentVerticalPadding(for: layout))
 
                     VStack(spacing: spacing) {
                         content()
                     }
-                    .padding(.horizontal, PracticeActivityChrome.contentHorizontalPadding)
+                    .padding(.horizontal, PracticeActivityChrome.contentHorizontalPadding(for: layout))
                     .frame(maxWidth: .infinity)
 
-                    Spacer(minLength: PracticeActivityChrome.contentVerticalPadding)
+                    Spacer(minLength: PracticeActivityChrome.contentVerticalPadding(for: layout))
                 }
                 .frame(minHeight: geometry.size.height)
             }
@@ -113,11 +132,13 @@ struct PracticePrimaryButton: View {
     var accent: Color = ContinuumTheme.tabPurple
     let action: () -> Void
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     var body: some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
-                .font(ContinuumTheme.kidButtonFont)
-                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                .font(ContinuumTheme.kidButtonFont(for: layout))
+                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight(for: layout))
                 .foregroundStyle(.white)
                 .background(accent)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -134,11 +155,13 @@ struct PracticeSecondaryButton: View {
     var accent: Color = ContinuumTheme.tabPurple
     let action: () -> Void
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     var body: some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
-                .font(ContinuumTheme.kidButtonFont)
-                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight)
+                .font(ContinuumTheme.kidButtonFont(for: layout))
+                .frame(maxWidth: .infinity, minHeight: ContinuumTheme.kidMinTapHeight(for: layout))
                 .foregroundStyle(accent)
                 .background(Color.white.opacity(0.97))
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))

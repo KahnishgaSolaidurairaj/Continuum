@@ -4,20 +4,22 @@ import SwiftUI
 struct ThisWeekSummaryCard: View {
     let summary: WeeklyDashboardSummary
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     var body: some View {
         DashboardCard {
             VStack(alignment: .leading, spacing: DashboardLayout.miniBoxSpacing) {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Image(systemName: "calendar")
-                        .font(.system(size: DashboardTypography.headerIconSize, weight: .semibold))
+                        .font(.system(size: DashboardTypography.headerIconSize(for: layout), weight: .semibold))
                         .foregroundStyle(ContinuumTheme.tabPurple)
 
                     Text("This week")
-                        .font(DashboardTypography.cardTitle)
+                        .font(DashboardTypography.cardTitle(for: layout))
                         .foregroundStyle(.black)
 
                     Text(summary.weekDateRangeLabel)
-                        .font(DashboardTypography.cardSubtitle)
+                        .font(DashboardTypography.cardSubtitle(for: layout))
                         .foregroundStyle(ContinuumTheme.tabPurple.opacity(0.85))
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
@@ -30,22 +32,16 @@ struct ThisWeekSummaryCard: View {
                     text: "\(summary.streakDays) day streak"
                 )
 
-                HStack(spacing: 10) {
-                    DashboardCompactStatBox(
-                        systemImage: PracticeActivity.sandbox.systemImage,
-                        title: "Sandbox",
-                        valueLine: "\(summary.sandboxVisits) visits"
-                    )
-                    DashboardCompactStatBox(
-                        systemImage: PracticeActivity.flash.systemImage,
-                        title: "Flash",
-                        valueLine: "\(summary.flashVisits) visits"
-                    )
-                    DashboardCompactStatBox(
-                        systemImage: PracticeActivity.test.systemImage,
-                        title: "Test",
-                        valueLine: "\(summary.testAttempts) attempts"
-                    )
+                Group {
+                    if layout.isPhone {
+                        VStack(spacing: 10) {
+                            statBoxes
+                        }
+                    } else {
+                        HStack(spacing: 10) {
+                            statBoxes
+                        }
+                    }
                 }
 
                 DashboardMiniBox(
@@ -54,6 +50,26 @@ struct ThisWeekSummaryCard: View {
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+    }
+
+    private var statBoxes: some View {
+        Group {
+            DashboardCompactStatBox(
+                systemImage: PracticeActivity.sandbox.systemImage,
+                title: "Sandbox",
+                valueLine: "\(summary.sandboxVisits) visits"
+            )
+            DashboardCompactStatBox(
+                systemImage: PracticeActivity.flash.systemImage,
+                title: "Flash",
+                valueLine: "\(summary.flashVisits) visits"
+            )
+            DashboardCompactStatBox(
+                systemImage: PracticeActivity.test.systemImage,
+                title: "Test",
+                valueLine: "\(summary.testAttempts) attempts"
+            )
         }
     }
 }

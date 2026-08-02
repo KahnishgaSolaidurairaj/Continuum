@@ -4,32 +4,19 @@ import SwiftUI
 struct SandboxActivityView: View {
     let target: PracticeTarget
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     @State private var tracedStrokes: [[CGPoint]] = []
     @State private var isDrawingStroke = false
     @State private var selectedPenThickness: PenThickness = .medium
 
     var body: some View {
         GeometryReader { geometry in
-            VStack(spacing: 20) {
-                Text("Trace with your finger")
-                    .font(ContinuumTheme.kidSectionHeaderFont)
-                    .foregroundStyle(ContinuumTheme.tabPurple)
-                    .multilineTextAlignment(.center)
-
-                tracingBox(availableHeight: geometry.size.height * 0.68)
-
-                penThicknessPicker
+            if layout.isPhone {
+                phoneLayout(in: geometry)
+            } else {
+                padLayout(in: geometry)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                LinearGradient(
-                    colors: [ContinuumTheme.homePink, ContinuumTheme.homeLavender],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -38,7 +25,7 @@ struct SandboxActivityView: View {
                     isDrawingStroke = false
                 } label: {
                     Text("Clear")
-                        .font(ContinuumTheme.kidButtonFont)
+                        .font(ContinuumTheme.kidButtonFont(for: layout))
                         .foregroundStyle(ContinuumTheme.tabPurple)
                         .padding(.horizontal, 22)
                         .padding(.vertical, 10)
@@ -50,10 +37,72 @@ struct SandboxActivityView: View {
         }
     }
 
+    /// iPhone layout reserves space so the pen picker always fits on screen.
+    private func phoneLayout(in geometry: GeometryProxy) -> some View {
+        let verticalPadding = layout.scaled(12, phone: 8)
+        let penPickerHeight: CGFloat = 188
+        let titleHeight: CGFloat = 34
+        let tracingHeight = max(
+            geometry.size.height - penPickerHeight - titleHeight - (verticalPadding * 2) - 16,
+            140
+        )
+
+        return VStack(spacing: 8) {
+            Text("Trace with your finger")
+                .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
+                .foregroundStyle(ContinuumTheme.tabPurple)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+
+            tracingBox(availableHeight: tracingHeight, borderPadding: 28)
+                .frame(maxHeight: tracingHeight)
+
+            Spacer(minLength: 0)
+
+            penThicknessPicker
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, layout.scaled(20, phone: 16))
+        .padding(.vertical, verticalPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(
+            LinearGradient(
+                colors: [ContinuumTheme.homePink, ContinuumTheme.homeLavender],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+    }
+
+    /// iPad layout keeps the original spacious tracing canvas.
+    private func padLayout(in geometry: GeometryProxy) -> some View {
+        VStack(spacing: 20) {
+            Text("Trace with your finger")
+                .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
+                .foregroundStyle(ContinuumTheme.tabPurple)
+                .multilineTextAlignment(.center)
+
+            tracingBox(availableHeight: geometry.size.height * 0.68, borderPadding: 46)
+                .frame(maxHeight: .infinity)
+
+            penThicknessPicker
+        }
+        .padding(.horizontal, layout.scaled(20, phone: 16))
+        .padding(.vertical, layout.scaled(12, phone: 10))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            LinearGradient(
+                colors: [ContinuumTheme.homePink, ContinuumTheme.homeLavender],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+    }
+
     /// Builds the main sand tracing canvas sized to fill most of the screen.
-    private func tracingBox(availableHeight: CGFloat) -> some View {
+    private func tracingBox(availableHeight: CGFloat, borderPadding: CGFloat) -> some View {
         GeometryReader { boxGeometry in
-            let borderPadding: CGFloat = 46
             let sandSize = CGSize(
                 width: boxGeometry.size.width - (borderPadding * 2),
                 height: boxGeometry.size.height - (borderPadding * 2)
@@ -67,7 +116,7 @@ struct SandboxActivityView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: max(availableHeight, 380))
+        .frame(height: layout.isPhone ? availableHeight : max(availableHeight, 380))
     }
 
     /// Sand canvas where touch coordinates match drawn stroke coordinates.
@@ -112,45 +161,62 @@ struct SandboxActivityView: View {
 
     /// Kid-friendly pen thickness selector with large tap targets.
     private var penThicknessPicker: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: layout.isPhone ? 8 : 10) {
             Text("Pen size")
-                .font(ContinuumTheme.kidSectionHeaderFont)
+                .font(ContinuumTheme.kidSectionHeaderFont(for: layout))
                 .foregroundStyle(ContinuumTheme.tabPurple)
 
-            HStack(spacing: 16) {
-                ForEach(PenThickness.allCases) { thickness in
-                    Button {
-                        selectedPenThickness = thickness
-                    } label: {
-                        VStack(spacing: 8) {
-                            Circle()
-                                .fill(ContinuumTheme.tabPurple)
-                                .frame(width: thickness.displaySize, height: thickness.displaySize)
-
-                            Text(thickness.label)
-                                .font(ContinuumTheme.kidCaptionFont.weight(.semibold))
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 96)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(selectedPenThickness == thickness ? .white : .white.opacity(0.55))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(
-                                    selectedPenThickness == thickness
-                                        ? ContinuumTheme.tabPurple
-                                        : ContinuumTheme.cardBorder.opacity(0.2),
-                                    lineWidth: selectedPenThickness == thickness ? 3 : 1.5
-                                )
-                        )
+            Group {
+                if layout.isPhone {
+                    LazyVGrid(
+                        columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
+                        spacing: 10
+                    ) {
+                        penThicknessButtons
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("\(thickness.label) pen")
-                    .accessibilityAddTraits(selectedPenThickness == thickness ? .isSelected : [])
+                } else {
+                    HStack(spacing: 16) {
+                        penThicknessButtons
+                    }
                 }
             }
+        }
+    }
+
+    private var penThicknessButtons: some View {
+        ForEach(PenThickness.allCases) { thickness in
+            Button {
+                selectedPenThickness = thickness
+            } label: {
+                VStack(spacing: layout.isPhone ? 4 : 8) {
+                    Circle()
+                        .fill(ContinuumTheme.tabPurple)
+                        .frame(width: thickness.displaySize, height: thickness.displaySize)
+
+                    Text(thickness.label)
+                        .font(ContinuumTheme.kidCaptionFont(for: layout).weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+                .frame(maxWidth: .infinity, minHeight: layout.scaled(96, phone: 52))
+                .padding(.vertical, layout.scaled(10, phone: 4))
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(selectedPenThickness == thickness ? .white : .white.opacity(0.55))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            selectedPenThickness == thickness
+                                ? ContinuumTheme.tabPurple
+                                : ContinuumTheme.cardBorder.opacity(0.2),
+                            lineWidth: selectedPenThickness == thickness ? 3 : 1.5
+                        )
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(thickness.label) pen")
+            .accessibilityAddTraits(selectedPenThickness == thickness ? .isSelected : [])
         }
     }
 }

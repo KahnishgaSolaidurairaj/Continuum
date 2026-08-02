@@ -5,8 +5,10 @@ struct StrengthsNeedsCard: View {
     let strengths: [PhonemePerformanceStat]
     let needs: [PhonemePerformanceStat]
 
+    @Environment(\.continuumDeviceLayout) private var layout
+
     var body: some View {
-        DashboardCard(height: DashboardLayout.analysisHeight) {
+        DashboardCard(height: DashboardLayout.cardHeight(DashboardLayout.analysisHeight, layout: layout)) {
             VStack(alignment: .leading, spacing: 12) {
                 DashboardCardHeader(
                     title: "Analysis",
@@ -16,9 +18,29 @@ struct StrengthsNeedsCard: View {
 
                 if strengths.isEmpty && needs.isEmpty {
                     Text("Complete more Test activities this week.")
-                        .font(DashboardTypography.body)
+                        .font(DashboardTypography.body(for: layout))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else if layout.isPhone {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            badgeColumn(
+                                title: "Strengths",
+                                stats: strengths,
+                                background: Color.green.opacity(0.15),
+                                foreground: Color.green.opacity(0.9)
+                            )
+
+                            Divider()
+
+                            badgeColumn(
+                                title: "Needs practice",
+                                stats: needs,
+                                background: Color.pink.opacity(0.15),
+                                foreground: Color.pink.opacity(0.95)
+                            )
+                        }
+                    }
                 } else {
                     ScrollView {
                         HStack(alignment: .top, spacing: 16) {
@@ -54,20 +76,20 @@ struct StrengthsNeedsCard: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(DashboardTypography.bodyEmphasis)
+                .font(DashboardTypography.bodyEmphasis(for: layout))
                 .foregroundStyle(.black)
 
             if stats.isEmpty {
                 Text("Not enough data yet.")
-                    .font(DashboardTypography.cardSubtitle)
+                    .font(DashboardTypography.cardSubtitle(for: layout))
                     .foregroundStyle(.secondary)
             } else {
                 FlowLayout(spacing: 10) {
                     ForEach(stats) { stat in
                         Text("/\(stat.phonemeLabel)/")
-                            .font(DashboardTypography.cardSubtitle.weight(.semibold))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 10)
+                            .font(DashboardTypography.cardSubtitle(for: layout).weight(.semibold))
+                            .padding(.horizontal, layout.scaled(14, phone: 12))
+                            .padding(.vertical, layout.scaled(10, phone: 8))
                             .background(background)
                             .foregroundStyle(foreground)
                             .clipShape(Capsule())
